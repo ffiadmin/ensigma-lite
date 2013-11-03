@@ -31,7 +31,7 @@
 		if ($sideBarCheck = mysql_fetch_array($sideBarGrabber)) {
 			$item = $sideBarCheck;
 			
-			if (privileges("publishSideBar") != "true" && $sideBarCheck['published'] == "0") {
+			if (privileges("publishSideBar") != "true" && $sideBarCheck['published'] == "0" && $sideBarCheck['message'] != "1") {
 				header ("Location: sidebar.php");
 				exit;
 			}
@@ -79,7 +79,7 @@
 	}
 	
 //Process the form
-	if (isset($_POST['submit']) && !empty ($_POST['title'])) {	
+	if (isset($_POST['submit']) && !empty($_POST['title'])) {
 		if (!isset ($sideBar)) {
 			$title = mysql_real_escape_string($_POST['title']);
 			$content = mysql_real_escape_string($_POST['content']);
@@ -118,29 +118,29 @@
 				$contentEditor = "content2";
 			}
 			
-			if ($sideBarData['title'] === $_POST['title'] && $sideBarData[$contentEditor] === $_POST['content'] && $sideBarData['type'] === $_POST['type']) {
+			if (stripslashes($sideBarData['title']) === $_POST['title'] && stripslashes($sideBarData[$contentEditor]) === $_POST['content']) {
 			//Redirect back to the main page, no changes were made
 				header("Location: sidebar.php");
 				exit;
-			} elseif (($sideBarData['title'] !== $_POST['title'] || $sideBarData['type'] !== $_POST['type']) || ($sideBarData['title'] !== $_POST['title'] && $sideBarData['type'] !== $_POST['type']) && $sideBarData[$contentEditor] === $_POST['content']) {
+			} elseif (stripslashes($sideBarData['title']) !== $_POST['title'] && stripslashes($sideBarData[$contentEditor]) === $_POST['content']) {
 				$editSideBarQuery = "UPDATE sidebar SET title = '{$title}' WHERE `id` = '{$sideBar}'";
 				
 				mysql_query($editSideBarQuery, $connDBA);
 				header ("Location: sidebar.php");
 				exit;
 			} else {
-				if (isset($_GET['content'])) {	
+				if (isset($_GET['content'])) {
 					if ($sideBarData['published'] != "0") {
 						if ($sideBarData['display'] == "1") {			
-							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
+							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
 						} else {
-							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
+							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
 						}
 					} else {
-						$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '0', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
+						$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
 					}
 				} else {
-					if ($sideBarData['published'] = "2") {
+					if ($sideBarData['published'] == "2") {
 						if ($sideBarData['display'] == "1") {
 							if (privileges("publishSideBar") == "true") {
 								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
@@ -154,19 +154,25 @@
 								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1',  message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
 						}
-					} else {
+					} elseif ($sideBarData['published'] == "1") {
 						if ($sideBarData['display'] == "1") {
 							if (privileges("publishSideBar") == "true") {
 								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							} else {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
 						} else {
 							if (privileges("publishSideBar") == "true") {
 								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
 							} else {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
+						}
+					} else {
+						if (privileges("publishSideBar") == "true") {
+							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
+						} else {
+							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '0', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 						}
 					}
 				}
@@ -196,6 +202,7 @@
 <script src="../../javascripts/common/popupConfirm.js" type="text/javascript"></script>
 <script src="../../javascripts/common/goToURL.js" type="text/javascript"></script>
 <script src="../../javascripts/common/showHide.js" type="text/javascript"></script>
+<script src="../../javascripts/common/openWindow.js" type="text/javascript"></script>
 </head>
 <body<?php bodyClass(); ?>>
 <?php toolTip(); ?>
@@ -205,12 +212,21 @@
       <?php if (isset ($item)) {echo "Edit the \"" . $item['title'] . "\" Box";} else {echo "Create New Box";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($item)) {echo "edit the content of the \"<strong>" . stripslashes(htmlentities($item['title'])) . "</strong>\" box";} else {echo "create a new box";} ?>.</p>
-    <p>&nbsp;</p>
-    <form action="manage_sidebar.php<?php 
-		if (isset ($item)) {
-			echo "?id=" . $item['id'];
+<?php
+//Let users know an update is pending if one is pending
+	if (isset ($item) && !isset($_GET['content'])) {
+		if ($item['published'] == "1" && privileges("publishPage") != "true") {
+			alert("An more recent version of this sidebar is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version.");
+		} elseif ($item['published'] == "1" && privileges("publishPage") == "true") {
+			alert("An more recent version of this sidebar is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version. Please <a href=\"sidebar.php\" onclick=\"MM_openBrWindow('approve_sidebar.php?id=" . $item['id'] . "','','status=yes,scrollbars=yes,resizable=yes,width=640,height=480')\">approve the newer version</a> if you wish to see the results.");
+		} else {
+			echo "<p>&nbsp;</p>";
 		}
-	?>" method="post" name="manageItem" id="validate" onsubmit="return errorsOnSubmit(this);">
+	} else {
+		echo "<p>&nbsp;</p>";
+	}
+?>
+    <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" name="manageItem" id="validate" onsubmit="return errorsOnSubmit(this);">
       <div class="catDivider one">Settings</div>
       <div class="stepContent">
       <blockquote>

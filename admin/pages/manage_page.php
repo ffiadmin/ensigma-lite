@@ -31,7 +31,7 @@
 		if ($pageCheck = mysql_fetch_array($pageGrabber)) {
 			$page = $pageCheck;
 			
-			if (privileges("publishStaffPage") != "true" && $pageCheck['published'] == "0") {
+			if (privileges("publishStaffPage") != "true" && $pageCheck['published'] == "0" && $pageCheck['message'] != "1") {
 				header ("Location: index.php");
 				exit;
 			}
@@ -125,25 +125,25 @@
 				$commentsEditor = "comments2";
 			}
 			
-			if ($pageData['title'] === $title && $pageData[$contentEditor] === $content && $pageData[$commentsEditor] === $comments) {
+			if (stripslashes($pageData['title']) === $_POST['title'] && stripslashes($pageData[$contentEditor]) === $_POST['content'] && stripslashes($pageData[$commentsEditor]) === stripslashes($comments)) {
 			//Redirect back to the main page, no changes were made
 				header("Location: index.php");
 				exit;
-			} elseif ($pageData['title'] !== $title && $pageData[$contentEditor] === $content && $pageData[$commentsEditor] === $comments) {
+			} elseif (stripslashes($pageData['title']) !== $_POST['title'] && stripslashes($pageData[$contentEditor]) === $_POST['content'] && stripslashes($pageData[$commentsEditor]) === stripslashes($comments)) {
 				$editPageQuery = "UPDATE staffpages SET title = '{$title}' WHERE `id` = '{$page}'";
 			} else {
 				if (isset($_GET['content'])) {	
 					if ($pageData['published'] != "0") {
 						if ($pageData['display'] == "1") {			
-							$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
+							$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
 						} else {
-							$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
+							$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
 						}
 					} else {
-						$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '0', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
+						$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
 					}
 				} else {
-					if ($pageData['published'] = "2") {
+					if ($pageData['published'] == "2") {
 						if ($pageData['display'] == "1") {
 							if (privileges("publishStaffPage") == "true") {
 								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
@@ -157,19 +157,25 @@
 								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1',  message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
 							}
 						}
-					} else {
+					} elseif ($pageData['published'] == "1") {
 						if ($pageData['display'] == "1") {
 							if (privileges("publishStaffPage") == "true") {
 								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
 							} else {
-								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
+								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
 							}
 						} else {
 							if (privileges("publishStaffPage") == "true") {
 								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
 							} else {
-								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
+								$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
 							}
+						}
+					} else {
+						if (privileges("publishStaffPage") == "true") {
+							$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
+						} else {
+							$editPageQuery = "UPDATE staffpages SET title = '{$title}', published = '0', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
 						}
 					}
 				}
@@ -208,29 +214,21 @@
       <?php if (isset ($page)) {echo "Edit the \"" . $page['title'] . "\" Staff Page";} else {echo "Create New Staff Page";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($page)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($page['title'])) . "</strong>\"";} else {echo "create a new staff page";} ?>.</p>
-	<?php
-	//Let users know an update is pending if one is pending
-		if (isset ($page) && !isset($_GET['content'])) {
-			if ($page['published'] == "1" && privileges("publishStaffPage") != "true") {
-				alert("An more recent version of this page is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version.");
-			} elseif ($page['published'] == "1" && privileges("publishStaffPage") == "true") {
-				alert("An more recent version of this page is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version. Please <a href=\"index.php\" onclick=\"MM_openBrWindow('approve.php?id=" . $page['id'] . "','','status=yes,scrollbars=yes,resizable=yes,width=640,height=480')\">approve the newer version</a> if you wish to see the results.");
-			} else {
-				echo "<p>&nbsp;</p>";
-			}
+<?php
+//Let users know an update is pending if one is pending
+	if (isset ($page) && !isset($_GET['content'])) {
+		if ($page['published'] == "1" && privileges("publishStaffPage") != "true") {
+			alert("An more recent version of this page is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version.");
+		} elseif ($page['published'] == "1" && privileges("publishStaffPage") == "true") {
+			alert("An more recent version of this page is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version. Please <a href=\"index.php\" onclick=\"MM_openBrWindow('approve.php?id=" . $page['id'] . "','','status=yes,scrollbars=yes,resizable=yes,width=640,height=480')\">approve the newer version</a> if you wish to see the results.");
 		} else {
 			echo "<p>&nbsp;</p>";
 		}
-	?>
-    <form action="manage_page.php<?php 
-		if (isset ($page)) {
-			echo "?id=" . $page['id'];
-		}
-		
-		if (isset($_GET['content'])) {
-			echo "&content=" . $_GET['content'];
-		}
-	?>" method="post" name="managePage" id="validate" onsubmit="return errorsOnSubmit(this);">
+	} else {
+		echo "<p>&nbsp;</p>";
+	}
+?>
+    <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" name="managePage" id="validate" onsubmit="return errorsOnSubmit(this);">
       <div class="catDivider one">Content</div>
       <div class="stepContent">
       <blockquote>

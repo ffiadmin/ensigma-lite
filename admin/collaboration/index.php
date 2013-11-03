@@ -253,7 +253,7 @@
 		
 		echo "</tr></tbody></table>";
 	 } else {
-		echo "<div class=\"noResults\">This site has no items</div>";
+		echo "<div class=\"noResults\">This site has no items. New items can be created by selecting an item from the tool bar above.</div>";
 	 } 
 ?>
 <?php footer(); ?>

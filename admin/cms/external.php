@@ -291,16 +291,16 @@
 				
 				if (privileges("autoPublishExternal", "true") != "true") {
 					if ($tabData['published'] == "0") {
-						echo "<td width=\"200\">" .  commentTrim(30, $tabData['title']) . "</td>";
+						echo "<td width=\"200\">" .  commentTrim(25, $tabData['title']) . "</td>";
 					} else {
 						$tab = $tabData['position'] - 1;
 						
-						echo "<td width=\"200\"><a href=\"javascript:void\" onclick=\"MM_openBrWindow('../../external.php?tab=" . $tab . "','','status=yes,scrollbars=yes,resizable=yes,width=320,height=240')\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($tabData['title']) . "</strong> tab')\" onmouseout=\"UnTip()\">" . commentTrim(30, $tabData['title']) . "</a></td>";
+						echo "<td width=\"200\"><a href=\"javascript:void\" onclick=\"MM_openBrWindow('../../external.php?tab=" . $tab . "','','status=yes,scrollbars=yes,resizable=yes,width=320,height=240')\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($tabData['title']) . "</strong> tab')\" onmouseout=\"UnTip()\">" . commentTrim(25, $tabData['title']) . "</a></td>";
 					}
 				} else {
 					$tab = $tabData['position'] - 1;
 					
-					echo "<td width=\"200\"><a href=\"javascript:void\" onclick=\"MM_openBrWindow('../../external.php?tab=" . $tab . "','','status=yes,scrollbars=yes,resizable=yes,width=320,height=240')\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($tabData['title']) . "</strong> tab')\" onmouseout=\"UnTip()\">" . commentTrim(30, $tabData['title']) . "</a></td>";
+					echo "<td width=\"200\"><a href=\"javascript:void\" onclick=\"MM_openBrWindow('../../external.php?tab=" . $tab . "','','status=yes,scrollbars=yes,resizable=yes,width=320,height=240')\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($tabData['title']) . "</strong> tab')\" onmouseout=\"UnTip()\">" . commentTrim(25, $tabData['title']) . "</a></td>";
 				}
 				
 				echo "<td>";
@@ -311,9 +311,9 @@
 							echo "<span class=\"notAssigned\">Waiting for approval</span>";
 						} else {
 							if ($tabData['display'] == "1") {
-								echo commentTrim(100, $tabData['content1']);
+								echo commentTrim(75, $tabData['content1']);
 							} else {
-								echo commentTrim(100, $tabData['content2']);
+								echo commentTrim(75, $tabData['content2']);
 							}
 						}
 					} else {
@@ -321,9 +321,9 @@
 					}
 				} else {
 					if ($tabData['display'] == "1") {
-						echo commentTrim(100, $tabData['content1']);
+						echo commentTrim(75, $tabData['content1']);
 					} else {
-						echo commentTrim(100, $tabData['content2']);
+						echo commentTrim(75, $tabData['content2']);
 					}
 				}
 				
@@ -333,7 +333,7 @@
 					if (privileges("publishExternal") == "true") {
 						echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_external.php?id=" . $tabData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($tabData['title']) . "</strong> tab')\" onmouseout=\"UnTip()\"></a></td>";
 					} else {
-						if ($tabData['published'] != "0") {
+						if ($tabData['published'] != "0" || $tabData['message'] == "1") {
 							echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_external.php?id=" . $tabData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($tabData['title']) . "</strong> tab')\" onmouseout=\"UnTip()\"></a></td>";
 						} else {
 							echo "<td width=\"50\"><span class=\"action noEdit\" onmouseover=\"Tip('This tab must be approved first')\" onmouseout=\"UnTip()\"></span></td>";

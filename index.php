@@ -224,7 +224,7 @@
 		}
 	}
 	
-	title($title); 
+	title(stripslashes(htmlentities($title))); 
 ?>
 <?php headers(); ?>
 <?php tinyMCESimple(); ?>
@@ -286,7 +286,7 @@
 	}
 	
 //Display the page content	
-	echo "<h2>" . $title . "</h2>" . $content;
+	echo "<h2>" . stripslashes($title) . "</h2>" . stripslashes($content);
 	
 //Display the comments
 	if (isset($commentsDisplay) && $commentsDisplay == "1") {
@@ -408,27 +408,27 @@
 		
 		while ($sideBar = mysql_fetch_array($sideBarCheck)) {
 			if ($sideBar['display'] == "1") {
-				$content = $sideBar['content1'];
+				$content = stripslashes($sideBar['content1']);
 			} else {
-				$content = $sideBar['content2'];
+				$content = stripslashes($sideBar['content2']);
 			}
 			
 			switch ($sideBar['type']) {
 			//If this is a custom content box
 				case "Custom Content" : 				
 					if (!isset($_SESSION['MM_Username'])) {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . $sideBar['title'] . "</h2></div></div><div class=\"content\">" . $content . "</div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . $content . "</div></div>";
 					} elseif (isset($_SESSION['MM_Username']) && privileges("editSideBar") != "true") {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . $sideBar['title'] . "</h2></div></div><div class=\"content\">" . $content . "</div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . $content . "</div></div>";
 					} elseif (isset($_SESSION['MM_Username']) && privileges("editSideBar") == "true") {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . $sideBar['title'] . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/manage_sidebar.php?id=" . $sideBar['id'] . "\"></a></h2></div></div><div class=\"content\">" . $content . "</div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/manage_sidebar.php?id=" . $sideBar['id'] . "\"></a></h2></div></div><div class=\"content\">" . stripslashes($content) . "</div></div>";
 					} break;
 			//If this is a login box	
 				case "Login" : 
 					if (!isset($_SESSION['MM_Username'])) {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . $sideBar['title'] . "</h2></div></div><div class=\"content\"><form id=\"login\" name=\"login\" method=\"post\" action=\"index.php\"><div align=\"center\"><div style=\"width:75%;\"><p>User name: <input type=\"text\" name=\"username\" id=\"username\" autocomplete=\"off\" /><br />Password: <input type=\"password\" name=\"password\" id=\"password\" autocomplete=\"off\" /></p><p><input type=\"submit\" name=\"submit\" id=\"submit\" value=\"Login\" /></p></div></div></form></div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\"><form id=\"login\" name=\"login\" method=\"post\" action=\"index.php\"><div align=\"center\"><div style=\"width:75%;\"><p>User name: <input type=\"text\" name=\"username\" id=\"username\" autocomplete=\"off\" /><br />Password: <input type=\"password\" name=\"password\" id=\"password\" autocomplete=\"off\" /></p><p><input type=\"submit\" name=\"submit\" id=\"submit\" value=\"Login\" /></p></div></div></form></div></div>";
 					} elseif (isset($_SESSION['MM_Username']) && privileges("editSideBar") == "true") {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . $sideBar['title'] . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/manage_sidebar.php?id=" . $sideBar['id'] . "\"></a></h2></div></div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/manage_sidebar.php?id=" . $sideBar['id'] . "\"></a></h2></div></div></div>";
 					} break;
 			  }
 		}

@@ -26,12 +26,12 @@
 			$checkPassWord = mysql_fetch_array($checkPassWordGrabber);
 			$passWord = $checkPassWord['passWord'];
 		} elseif (isset ($_POST['id']) && $_POST['passWord'] !== "") {
-			$passWord = $_POST['passWord'];	
+			$passWord = encrypt($_POST['passWord']);	
 		} elseif (!isset ($_POST['id']) && $_POST['passWord'] == "") {
 			header ("Location: manage_user.php");
 			exit;
 		} elseif (!isset ($_POST['id']) && $_POST['passWord'] !== "") {
-			$passWord = $_POST['passWord'];
+			$passWord = encrypt($_POST['passWord']);
 		}
 		
 		$userNameCheckGrabber = mysql_query("SELECT * FROM `users` WHERE `userName` = '{$userName}'", $connDBA);
@@ -59,7 +59,10 @@
 		
 		if (isset ($id)) {
 			$adminCheck = mysql_query("SELECT * FROM `users` WHERE `role` = 'Administrator'", $connDBA);
-			if (mysql_num_rows($adminCheck) == "1" && $role != "Administrator") {
+			$idCheckGrabber = mysql_query("SELECT * FROM `users` WHERE `userName` = '{$_SESSION['MM_Username']}'", $connDBA);
+			$idCheck = mysql_fetch_array($idCheckGrabber);
+			
+			if (mysql_num_rows($adminCheck) == "1" && $role != "Administrator" && $idCheck['id'] == $id) {
 				header("Location: index.php?message=noAdmin");
 				exit;
 			}
@@ -196,6 +199,7 @@
       <input name="userName" type="text" id="userName" size="50" autocomplete="off" class="validate[required,length[6,30],custom[noSpecialCharactersSpaces]]<?php if (isset($user)) {if ($user['userName'] == $_SESSION['MM_Username']) {echo " disabled";}} ?>" onblur="checkName(this.name, 'manage_user'<?php if (isset ($user)) {echo ", 'id=" . $user['id'] . "'";}?>)"<?php if (isset($user)) {if ($user['userName'] == $_SESSION['MM_Username']) {echo " readonly=\"readonly\"";}} if (isset($id)) {echo " value=\"" . $user['userName'] . "\"";} ?> />
     </p>
   </blockquote>
+  <a name="password"></a>
   <p>Password<?php if (!isset($id)) {echo "<span class=\"require\">*</span>";} ?>:</p>
   <blockquote>
     <p>

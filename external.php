@@ -6,12 +6,12 @@
 	
 //Select the tabs
 	if ($settings['autoPublishExternal'] == "1") {
-		$contentCheck = mysql_query("SELECT * FROM external WHERE `visible` = 'on' ORDER BY `position` ASC", $connDBA);
+		$contentCheck = mysql_query("SELECT * FROM external WHERE `visible` = 'on'", $connDBA);
 		$content = mysql_fetch_array($contentCheck);
 		$tabGrabber = mysql_query("SELECT * FROM external WHERE `visible` = 'on' ORDER BY `position` ASC", $connDBA);
 		$contentGrabber = mysql_query("SELECT * FROM external WHERE `visible` = 'on' ORDER BY `position` ASC", $connDBA);
 	} else {
-		$contentCheck = mysql_query("SELECT * FROM external WHERE `visible` = 'on' AND `published` != '0' ORDER BY `position` ASC", $connDBA);
+		$contentCheck = mysql_query("SELECT * FROM external WHERE `visible` = 'on' AND `published` != '0'", $connDBA);
 		$content = mysql_fetch_array($contentCheck);
 		$tabGrabber = mysql_query("SELECT * FROM external WHERE `visible` = 'on' AND `published` != '0' ORDER BY `position` ASC", $connDBA);
 		$contentGrabber = mysql_query("SELECT * FROM external WHERE `visible` = 'on' AND `published` != '0' ORDER BY `position` ASC", $connDBA);

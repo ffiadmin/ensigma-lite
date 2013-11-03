@@ -679,7 +679,7 @@ a.skip:focus, a.skip:active {
 	}
 	
 	div.toolBarAlert {
-		background:url(../../../Biomed-ed/images/alert.png) #EEEEEE no-repeat left;
+		background:url(../../images/admin_icons/alert.png) #EEEEEE no-repeat left;
 		padding-left:45px;
 		min-height:35px;
 		vertical-align:middle;

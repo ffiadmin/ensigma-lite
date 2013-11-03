@@ -332,9 +332,9 @@
 					echo "<td width=\"200\">";
 					
 					if ($pageData['position'] == "1") {
-						echo "<span class=\"homePage\">" . commentTrim(30, $pageData['title']) . "</span>";
+						echo "<span class=\"homePage\">" . commentTrim(25, $pageData['title']) . "</span>";
 					} else {
-						echo commentTrim(30, $pageData['title']);
+						echo commentTrim(25, $pageData['title']);
 					}
 					
 					echo "</td>";
@@ -342,9 +342,9 @@
 					echo "<td width=\"200\">";
 					
 					if ($pageData['position'] == "1") {
-						echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a></span>";
+						echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a></span>";
 					} else {
-						echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a>";
+						echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a>";
 					}
 					
 					echo "</td>";
@@ -353,9 +353,9 @@
 				echo "<td width=\"200\">";
 				
 				if ($pageData['position'] == "1") {
-					echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a></span>";
+					echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a></span>";
 				} else {
-					echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a>";
+					echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a>";
 				}
 				
 				echo "</td>";
@@ -369,9 +369,9 @@
 						echo "<span class=\"notAssigned\">Waiting for approval</span>";
 					} else {
 						if ($pageData['display'] == "1") {
-							echo commentTrim(100, $pageData['content1']);
+							echo commentTrim(75, $pageData['content1']);
 						} else {
-							echo commentTrim(100, $pageData['content2']);
+							echo commentTrim(75, $pageData['content2']);
 						}
 					}
 				} else {
@@ -391,7 +391,7 @@
 				if (privileges("publishPage") == "true") {
 					echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_page.php?id=" . $pageData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 				} else {
-					if ($pageData['published'] != "0") {
+					if ($pageData['published'] != "0" || $pageData['message'] == "1") {
 						echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_page.php?id=" . $pageData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 					} else {
 						echo "<td width=\"50\"><span class=\"action noEdit\" onmouseover=\"Tip('This page must be approved first')\" onmouseout=\"UnTip()\"></span></td>";

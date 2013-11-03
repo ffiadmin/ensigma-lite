@@ -283,7 +283,7 @@
 				echo "</select></form></td>";
 			}
 			
-			echo "<td width=\"200\">" . commentTrim(30, $itemData['title']) . "</td>";
+			echo "<td width=\"200\">" . commentTrim(25, $itemData['title']) . "</td>";
 			echo "<td width=\"150\">" . $itemData['type'] . "</td>";
 			echo "<td>";
 			
@@ -296,13 +296,13 @@
 							if ($itemData['type'] == "Login") {
 								echo "<span class=\"notAssigned\">None</span>";
 							} else {
-								echo commentTrim(100, $itemData['content1']);
+								echo commentTrim(50, $itemData['content1']);
 							}
 						} else {
 							if ($itemData['type'] == "Login") {
 								echo "<span class=\"notAssigned\">None</span>";
 							} else {
-								echo commentTrim(100, $itemData['content2']);
+								echo commentTrim(50, $itemData['content2']);
 							}
 						}
 					}
@@ -314,13 +314,13 @@
 					if ($itemData['type'] == "Login") {
 						echo "<span class=\"notAssigned\">None</span>";
 					} else {
-						echo commentTrim(100, $itemData['content1']);
+						echo commentTrim(50, $itemData['content1']);
 					}
 				} else {
 					if ($itemData['type'] == "Login") {
 						echo "<span class=\"notAssigned\">None</span>";
 					} else {
-						echo commentTrim(100, $itemData['content2']);
+						echo commentTrim(50, $itemData['content2']);
 					}
 				}
 			}
@@ -331,7 +331,7 @@
 				if (privileges("publishSideBar") == "true") {
 					echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_sidebar.php?id=" . $itemData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($itemData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 				} else {
-					if ($itemData['published'] != "0") {
+					if ($itemData['published'] != "0" || $itemData['message'] == "1") {
 						echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_sidebar.php?id=" . $itemData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($itemData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 					} else {
 						echo "<td width=\"50\"><span class=\"action noEdit\" onmouseover=\"Tip('This box must be approved first')\" onmouseout=\"UnTip()\"></span></td>";

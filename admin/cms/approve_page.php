@@ -16,13 +16,13 @@
 			$pageData = mysql_fetch_array($pageDataGrabber);
 			
 			if ($pageData['published'] == "2") {
-				die(successMessage("This page is already published"));
+				die(successMessage("This page is already published."));
 			}
 		} else {
-			die(errorMessage("This page does not exist"));
+			die(errorMessage("This page does not exist."));
 		}
 	} else {
-		die(errorMessage("The page ID was not provided"));
+		die(errorMessage("The page ID was not provided."));
 	}
 ?>
 <?php
@@ -121,9 +121,9 @@
   <div>
   <?php
       if ($pageData['display'] == "1") {
-          echo $pageData['content2'];
+          echo stripslashes($pageData['content2']);
       } else {
-          echo $pageData['content1'];
+          echo stripslashes($pageData['content1']);
       }
   ?>
   </div>
@@ -162,9 +162,9 @@
   <div>
   <?php
       if ($pageData['display'] == "1") {
-          echo $pageData['content1'];
+          echo stripslashes($pageData['content1']);
       } else {
-          echo $pageData['content2'];
+          echo stripslashes($pageData['content2']);
       }
   ?>
   </div>
@@ -186,7 +186,7 @@
 		  echo "Comments: <strong>Off</strong>";
 	  }
 		
-	  echo $pageData['content1'];
+	  echo stripslashes($pageData['content1']);
   ?>
 </div>
 <?php
