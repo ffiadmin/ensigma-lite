@@ -23,7 +23,7 @@
 				errorMessage("You have excedded the maxmium number of failed logins allowed for a 24 hour period. Please wait 24 hours before trying again.");
 			}
 			
-			if (isset($_GET['accesscheck'])) {
+			if (isset($_GET['accesscheck']) && !isset($_GET['expired']) && !isset($_GET['alert']) && !isset($_GET['remaining'])) {
 				errorMessage("Either you are not logged in, or do not have the appropriate privileges to perform this action.");
 			}
 		?>

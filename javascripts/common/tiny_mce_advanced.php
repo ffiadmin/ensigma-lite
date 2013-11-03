@@ -12,7 +12,7 @@ tinyMCE.init({
 		theme : "advanced",
 		skin : "o2k7",
 		skin_variant : "silver",
-		plugins : " safari,pagebreak,style,layer,table,save,advhr,advimage,autosave,advlink,emotions,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,tabfocus,AtD",
+		plugins : " safari,pagebreak,style,layer,table,save,advhr,advimage,autosave,advlink,emotions,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,tabfocus,AtD,autolink",
         
         atd_button_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/atdbuttontr.gif",
         atd_rpc_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/server/proxy.php?url=",
@@ -50,7 +50,7 @@ tinyMCE.init({
 		media_external_list_url : "lists/media_list.js",
 		autosave_ask_before_unload : true,
         editor_deselector : "noEditorAdvanced",
-        gecko_spellcheck : false,
+        gecko_spellcheck : false
 });
 
 function filebrowser(field_name, url, type, win) {

@@ -13,7 +13,7 @@ tinyMCE.init({
 		theme : "advanced",
 		skin : "o2k7",
 		skin_variant : "silver",
-		plugins : "inlinepopups,spellchecker,tabfocus,AtD,autosave",
+		plugins : "inlinepopups,spellchecker,tabfocus,AtD,autosave,autolink",
         
         atd_button_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/atdbuttontr.gif",
         atd_rpc_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/server/proxy.php?url=",
@@ -32,7 +32,7 @@ tinyMCE.init({
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
 		theme_advanced_resizing : true,
-        autosave_ask_before_unload : false,
+        autosave_ask_before_unload : true,
 		editor_deselector : "noEditorSimple",
-        gecko_spellcheck : false,
+        gecko_spellcheck : false
 	});

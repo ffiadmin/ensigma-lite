@@ -1,4 +1,4 @@
-function addAgenda(tableID, cellOneStart, cellOneEnd, cellTwoStart, cellTwoEnd, cellThreeStart, cellThreeEnd, cellFourStart, cellFourEnd) {
+function addAgenda(tableID, cellOneStart, cellOneEnd, cellTwoStart, cellTwoEnd, cellThreeStart, cellThreeEnd, cellFourStart, cellFourEnd, cellFiveStart, cellFiveEnd) {
 	var oRows = document.getElementById(tableID).getElementsByTagName('tr');
 	var tbl = document.getElementById(tableID);
 	var newRow = tbl.insertRow(tbl.rows.length);
@@ -20,7 +20,12 @@ function addAgenda(tableID, cellOneStart, cellOneEnd, cellTwoStart, cellTwoEnd, 
 	newCell4.innerHTML = cellFourStart + currentID + cellFourEnd;
 	
 	var newCell5 = newRow.insertCell(4);
-	newCell5.innerHTML = "<span class=\"action smallDelete\" onclick=\"deleteObject('agenda', '" + currentID + "')\">";
+	newCell5.innerHTML = cellFiveStart + currentID + cellFiveEnd;
+	
+	var newCell6 = newRow.insertCell(5);
+	newCell6.innerHTML = "<span class=\"action smallDelete\" onclick=\"deleteObject('agenda', '" + currentID + "')\">";
+	
+	$('#description' + currentID).parent().children('a').attr('onmouseover', "Tip('Add description')");
 }
 
 function addCategory(tableID, startHTML, middle1HTML, middle2HTML, endHTML, type) {

@@ -2,7 +2,7 @@
 <?php
 	if (privileges("sendEmail") == "true") {
 		if ($_SESSION['MM_UserGroup'] == "User") {
-			header("Location: send_email.php");
+			header("Location: email/index.php");
 			exit;
 		}
 		
@@ -150,7 +150,7 @@
 <h2>Collaboration</h2>
 <p>Communication can be established to registered users via announcements and mass emails.</p>
 <p>&nbsp;</p>
-<div class="toolBar"><a class="toolBarItem announcementLink" href="manage_announcement.php">Create Announcement</a><a class="toolBarItem agenda" href="manage_agenda.php">Create Agenda</a><a class="toolBarItem fileShare" href="manage_files.php">Create File Share</a><a class="toolBarItem statistics" href="manage_poll.php">Create a Poll</a><a class="toolBarItem feedback" href="manage_forum.php">Create a Forum</a><a class="toolBarItem email" href="send_email.php">Send Mass Email</a></div>
+<div class="toolBar"><a class="toolBarItem announcementLink" href="manage_announcement.php">Create Announcement</a><a class="toolBarItem agenda" href="manage_agenda.php">Create Agenda</a><a class="toolBarItem fileShare" href="manage_files.php">Create File Share</a><a class="toolBarItem statistics" href="manage_poll.php">Create a Poll</a><a class="toolBarItem feedback" href="manage_forum.php">Create a Forum</a><a class="toolBarItem email" href="email/index.php">Send Mass Email</a></div>
 <?php 
 	if (isset ($_GET['added']) && $_GET['added'] == "announcement") {successMessage("The announcement was successfully added");}
     if (isset ($_GET['updated']) && $_GET['updated'] == "announcement") {successMessage("The announcement was successfully updated");}

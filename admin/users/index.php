@@ -43,7 +43,7 @@
 <h2>Users</h2>
 <p>Below is a list of all users registered within this system. Users may be sorted according to a certain criteria by clicking on the text in the header row of the desired column.</p>
 <p>&nbsp;</p>
-<div class="toolBar"><a class="toolBarItem new" href="manage_user.php">Add New User</a><a class="toolBarItem user" href="privileges.php">Assign User Privileges</a><a class="toolBarItem alert" href="failed.php">Failed Logins</a><a class="toolBarItem search" href="search.php">Search for Users</a></div>
+<div class="toolBar"><a class="toolBarItem new" href="manage_user.php">Add New User</a><a class="toolBarItem user" href="privileges.php">Assign User Privileges</a><a class="toolBarItem alert" href="failed.php">Failed Logins</a><a class="toolBarItem email" href="welcome.php">Welcome Message</a><a class="toolBarItem search" href="search.php">Search for Users</a></div>
 <?php
 //A user was created
 	if (isset($_GET['message']) && $_GET['message'] == "userCreated") {
@@ -57,6 +57,9 @@
 //If the privileges are updated
 	} elseif (isset($_GET['updated']) && $_GET['updated'] == "privileges") {
 		successMessage("The privileges were modified");
+//If the welcome message was updated
+	} elseif (isset($_GET['updated']) && $_GET['updated'] == "welcome") {
+		successMessage("The welcome message was modified");
 	} else {
 		echo "<br />";
 	}

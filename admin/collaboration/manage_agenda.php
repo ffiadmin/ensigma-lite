@@ -24,14 +24,26 @@
 //Process the form
 	if (isset($_POST['submit']) && !empty ($_POST['title']) && !empty($_POST['assignee']) && !empty($_POST['task']) && !empty($_POST['dueDate']) && !empty($_POST['priority'])) {	
 		if (!isset ($agenda)) {
+		//Reorder and cleanup the assignee list
+			$assigneePrep = array();
+			
+			foreach($_POST['assignee'] as $array) {
+				$array = rtrim($array, ", ");
+				$array = explode(", ", $array);
+				sort($array);
+				array_push($assigneePrep, implode(", ", $array));
+			}
+			
+			$assignee = mysql_real_escape_string(serialize($assigneePrep));
+			
 			$title = mysql_real_escape_string($_POST['title']);
 			$fromDate = $_POST['from'];
 			$fromTime = $_POST['fromTime'];
 			$toDate = $_POST['to'];
 			$toTime = $_POST['toTime'];
 			$content = mysql_real_escape_string($_POST['content']);
-			$assignee = mysql_real_escape_string(serialize($_POST['assignee']));
 			$task = mysql_real_escape_string(serialize($_POST['task']));
+			$description = mysql_real_escape_string(serialize($_POST['description']));
 			$dueDate = mysql_real_escape_string(serialize($_POST['dueDate']));
 			$priority = mysql_real_escape_string(serialize($_POST['priority']));
 		
@@ -81,9 +93,9 @@
 			$position = $positionArray{'position'}+1;
 				
 			$newAgendaQuery = "INSERT INTO collaboration (
-								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`, `name`, `date`, `comment`
+								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `description`, `dueDate`, `priority`, `completed`, `directories`, `name`, `date`, `comment`
 							) VALUES (
-								NULL, '{$position}', 'on', 'Agenda', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '{$assignee}', '{$task}', '{$dueDate}', '{$priority}', '', '', '', '', ''
+								NULL, '{$position}', 'on', 'Agenda', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '{$assignee}', '{$task}', '{$description}', '{$dueDate}', '{$priority}', '', '', '', '', ''
 							)";
 							
 			mysql_query($newAgendaQuery, $connDBA);
@@ -97,6 +109,18 @@
 			header ($redirect);
 			exit;
 		} else {
+		//Reorder and cleanup the assignee list
+			$assigneePrep = array();
+			
+			foreach($_POST['assignee'] as $array) {
+				$array = rtrim($array, ", ");
+				$array = explode(", ", $array);
+				sort($array);
+				array_push($assigneePrep, implode(", ", $array));
+			}
+			
+			$assignee = mysql_real_escape_string(serialize($assigneePrep));
+			
 			$agenda = $_GET['id'];
 			$title = mysql_real_escape_string($_POST['title']);
 			$fromDate = $_POST['from'];
@@ -104,8 +128,8 @@
 			$toDate = $_POST['to'];
 			$toTime = $_POST['toTime'];
 			$content = mysql_real_escape_string($_POST['content']);
-			$assignee = mysql_real_escape_string(serialize($_POST['assignee']));
 			$task = mysql_real_escape_string(serialize($_POST['task']));
+			$description = mysql_real_escape_string(serialize($_POST['description']));
 			$dueDate = mysql_real_escape_string(serialize($_POST['dueDate']));
 			$priority = mysql_real_escape_string(serialize($_POST['priority']));
 			
@@ -164,9 +188,9 @@
 				}
 				
 				$completed = mysql_real_escape_string(serialize(array_merge($completed)));
-				$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `dueDate` = '{$dueDate}', `priority` = '{$priority}', `completed` = '{$completed}' WHERE `id` = '{$agenda}'";
+				$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `description` = '{$description}', `dueDate` = '{$dueDate}', `priority` = '{$priority}', `completed` = '{$completed}' WHERE `id` = '{$agenda}'";
 			} else {
-				$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `dueDate` = '{$dueDate}', `priority` = '{$priority}' WHERE `id` = '{$agenda}'";
+				$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}',  `description` = '{$description}', `dueDate` = '{$dueDate}', `priority` = '{$priority}' WHERE `id` = '{$agenda}'";
 			}
 			
 			mysql_query($editAgendaQuery, $connDBA);
@@ -190,12 +214,9 @@
 <?php headers(); ?>
 <?php tinyMCESimple(); ?>
 <?php validate(); ?>
-<script src="../../javascripts/common/datePicker.js" type="text/javascript"></script>
-<script src="../../javascripts/common/popupConfirm.js" type="text/javascript"></script>
-<script src="../../javascripts/common/goToURL.js" type="text/javascript"></script>
+<script src="../../javascripts/jQuery/agendaAssist.jquery.php" type="text/javascript"></script>
 <script src="../../javascripts/common/enableDisable.js" type="text/javascript"></script>
 <script src="../../javascripts/common/newObject.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="../../styles/common/datePicker.css" />
 </head>
 <body<?php bodyClass(); ?>>
 <?php toolTip(); ?>
@@ -378,26 +399,20 @@
         <blockquote>
         <table class="dataTable" id="agenda">
           <tr>
+          		<th class="tableHeader" width="20"></th>
             	<th class="tableHeader">Task</th>
-            	<th class="tableHeader" width="200">Assignee</th>
+            	<th class="tableHeader" width="200">Assignees</th>
                 <th class="tableHeader" width="200">Due Date</th>
             	<th class="tableHeader" width="100">Priority</th>
                 <th class="tableHeader" width="50"></th>
           </tr>
             <?php
 			//Display table rows according to what is going on			
-				if (!isset ($agenda)) {
-					$usersGrabber = mysql_query("SELECT * FROM `users` ORDER BY `firstName` ASC", $connDBA);
-					
+				if (!isset ($agenda)) {				
 					echo "<tr id=\"1\" align=\"center\">";
+						echo "<td width=\"20\"><input type=\"hidden\" name=\"description[]\" id=\"description1\" /><a href=\"javascript:;\" class=\"action noDescription loadDescription\" onmouseover=\"Tip('Add description');\" onmouseout=\"UnTip();\"></a></td>";
 						echo "<td><input type=\"text\" name=\"task[]\" id=\"task1\" class=\"validate[required]\" autocomplete=\"off\" size=\"40\"></td>";
-						echo "<td width=\"200\"><select name=\"assignee[]\" id=\"assignee1\" class=\"validate[required]\"><option value=\"\" selected=\"selected\">- Select -</option><option value=\"anyone\">Anyone</option>";
-						
-						while ($users = mysql_fetch_array($usersGrabber)) {
-							echo "<option value=\"" . $users['id'] . "\">" . $users['firstName'] . " " . $users['lastName'] . "</option>";
-						}
-							
-						echo "</select></td>";
+						echo "<td width=\"200\"><input type=\"text\" name=\"assignee[]\" id=\"assignee1\" autocomplete=\"off\" size=\"40\" class=\"assignee validate[required]\"></td>";
 						echo "<td width=\"200\"><input type=\"text\" name=\"dueDate[]\" id=\"dueDate1\" class=\"dueDate\" readonly=\"readonly\" /></td>";
 						echo "<td width=\"100\"><select name=\"priority[]\" id=\"priority1\"><option value=\"1\">Low</option><option value=\"2\" selected=\"selected\">Normal</option><option value=\"3\">High</option></select></td>";
 						echo "<td width=\"50\"><span class=\"action smallDelete\" onclick=\"deleteObject('agenda', '1')\"></span>";
@@ -405,57 +420,39 @@
 				} else {
 					$values = sizeof(unserialize($agenda['priority']));
 					$tasks = unserialize($agenda['task']);
+					$description = unserialize($agenda['description']);
 					$assignees = unserialize($agenda['assignee']);
 					$dueDates = unserialize($agenda['dueDate']);
 					$priorities = unserialize($agenda['priority']);
 					
-					for ($count = 0; $count <= $values - 1; $count++) {
-						$usersGrabber = mysql_query("SELECT * FROM `users` ORDER BY `firstName` ASC", $connDBA);
-						
+					for ($count = 0; $count <= $values - 1; $count++) {						
 						$rowID = $count + 1;
 						
+						if (empty($description[$count])) {
+							$class = "noDescription";
+							$value = "";
+							$tip = "Add description";
+						} else {
+							$class = "description";
+							$value = htmlentities(stripslashes($description[$count]));
+							$tip = "Edit description";
+						}
+						
 						echo "<tr id=\"" . $rowID . "\" align=\"center\">";
+							echo "<td width=\"20\"><input type=\"hidden\" name=\"description[]\" id=\"description1\" value=\"" . $value . "\" /><a href=\"javascript:;\" class=\"action " . $class . " loadDescription\" onmouseover=\"Tip('" . $tip . "');\" onmouseout=\"UnTip();\"></a></td>";
 							echo "<td><input type=\"text\" name=\"task[]\" id=\"task" . $rowID . "\" class=\"validate[required]\" autocomplete=\"off\" size=\"40\" value=\"" . htmlentities(stripslashes($tasks[$count])) . "\"></td>";
-							echo "<td width=\"200\"><select name=\"assignee[]\" id=\"assignee" . $rowID . "\" class=\"validate[required]\"><option value=\"\">- Select -</option><option value=\"anyone\"";
-							
-							if ($assignees[$count] == "anyone") {
-								echo " selected=\"selected\"";
-							}
-							
-							echo ">Anyone</option>";
-							
-							while ($users = mysql_fetch_array($usersGrabber)) {
-								echo "<option value=\"" . $users['id'] . "\"";
-								
-								if ($assignees[$count] == $users['id']) {
-									echo " selected=\"selected\"";
-								}
-								
-								echo ">" . $users['firstName'] . " " . $users['lastName'] . "</option>";
-							}
-								
-							echo "</select></td>";
+							echo "<td width=\"200\"><input type=\"text\" name=\"assignee[]\" id=\"assignee1\" class=\"assignee validate[required]\" autocomplete=\"off\" size=\"40\" value=\"" . htmlentities(stripslashes($assignees[$count])) . ", \"></td>";
 							echo "<td width=\"200\"><input type=\"text\" name=\"dueDate[]\" id=\"dueDate" . $rowID . "\" class=\"dueDate\" value=\"" . htmlentities(stripslashes($dueDates[$count])) . "\" readonly=\"readonly\" /></td>";
 							echo "<td width=\"100\"><select name=\"priority[]\" id=\"priority" . $rowID . "\"><option value=\"1\""; if ($priorities[$count] == "1") {echo " selected=\"selected\"";} echo ">Low</option><option value=\"2\""; if ($priorities[$count] == "2") {echo " selected=\"selected\"";} echo ">Normal</option><option value=\"3\""; if ($priorities[$count] == "3") {echo " selected=\"selected\"";} echo ">High</option></select></td>";
 							echo "<td width=\"50\"><span class=\"action smallDelete\" onclick=\"deleteObject('agenda', '" . $rowID . "', '" . $count . "');\"></span>";
 						echo "</tr>";
-													
-						unset($usersGrabber);
-						unset($users);
 					}
 					
 					echo "<input type=\"hidden\" name=\"removeData\" id=\"removeData\"  value=\"\" />";
 				}
 			?>
         </table>
-        <p><span class="smallAdd" onclick="addAgenda('agenda', '<input type=\'text\' name=\'task[]\' id=\'task', '\' class=\'validate[required]\' autocomplete=\'off\' size=\'40\'>', '<select name=\'assignee[]\' id=\'assignee', '\' class=\'validate[required]\'><option value=\'\' selected=\'selected\'>- Select -</option><option value=\'anyone\'>Anyone</option><?php
-		//Grab all users
-			$usersGrabber = mysql_query("SELECT * FROM `users` ORDER BY `firstName` ASC", $connDBA);
-			
-			while ($users = mysql_fetch_array($usersGrabber)) {
-				echo "<option value=\'" . $users['id'] . "\'>" . $users['firstName'] . " " . $users['lastName'] . "</option>";
-			}
-		?></select>', '<input type=\'text\' name=\'dueDate[]\' id=\'dueDate', '\' class=\'dueDate\' readonly=\'readonly\' />', '<select name=\'priority[]\' id=\'priority', '\'><option value=\'1\'>Low</option><option value=\'2\' selected=\'selected\'>Normal</option><option value=\'3\'>High</option></select>'); checkFields();">Add Another Task</span></p>
+        <p><span class="smallAdd" onclick="addAgenda('agenda', '<input type=\'hidden\' name=\'description[]\' id=\'description', '\' /><a href=\'javascript:;\' class=\'action noDescription loadDescription\' onmouseout=\'UnTip();\'></a>', '<input type=\'text\' name=\'task[]\' id=\'task', '\' class=\'validate[required]\' autocomplete=\'off\' size=\'40\'>', '<input type=\'text\' name=\'assignee[]\' id=\'assignee', '\' class=\'assignee validate[required]\' autocomplete=\'off\' size=\'40\'>', '<input type=\'text\' name=\'dueDate[]\' id=\'dueDate', '\' class=\'dueDate\' readonly=\'readonly\' />', '<select name=\'priority[]\' id=\'priority', '\'><option value=\'1\'>Low</option><option value=\'2\' selected=\'selected\'>Normal</option><option value=\'3\'>High</option></select>'); checkAuto(); checkCalendar();">Add Another Task</span></p>
         </blockquote>
       </div>
       <div class="catDivider three">Finish</div>

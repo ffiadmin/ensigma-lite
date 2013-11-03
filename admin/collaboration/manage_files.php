@@ -29,6 +29,8 @@
 			$fromTime = $_POST['fromTime'];
 			$toDate = $_POST['to'];
 			$toTime = $_POST['toTime'];
+			$canAdd = $_POST['canAdd'];
+			$canDelete = $_POST['canDelete'];
 			$content = mysql_real_escape_string($_POST['content']);
 			$category = mysql_real_escape_string(serialize($_POST['category']));
 		
@@ -90,9 +92,9 @@
 			$position = $positionArray{'position'}+1;
 				
 			$newFilesQuery = "INSERT INTO collaboration (
-								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`, `name`, `date`, `comment`
+								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`, `canAdd`, `canDelete`, `name`, `date`, `comment`
 							) VALUES (
-								NULL, '{$position}', 'on', 'File Share', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '', '', '', '', '', '{$category}', '', '', ''
+								NULL, '{$position}', 'on', 'File Share', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '', '', '', '', '', '{$category}', '{$canAdd}', '{$canDelete}', '', '', ''
 							)";
 			
 			mysql_query($newFilesQuery, $connDBA);
@@ -112,6 +114,8 @@
 			$fromTime = $_POST['fromTime'];
 			$toDate = $_POST['to'];
 			$toTime = $_POST['toTime'];
+			$canAdd = $_POST['canAdd'];
+			$canDelete = $_POST['canDelete'];
 			$content = mysql_real_escape_string($_POST['content']);
 			
 		//Ensure times are not inferior, the dates are the same, and all dates are set
@@ -186,7 +190,7 @@
 			
 			$category = serialize($newDirectories);
 				
-			$editFilesQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `directories` = '{$category}' WHERE `id` = '{$files}'";
+			$editFilesQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `directories` = '{$category}', `canAdd` = '{$canAdd}', `canDelete` = '{$canDelete}' WHERE `id` = '{$files}'";
 			
 			mysql_query($editFilesQuery, $connDBA);
 			header ($redirect);
@@ -389,6 +393,20 @@
 				}
 			?> />Enable</label>
           </p>
+        </blockquote>
+        <p>Users can upload files:</p>
+        <blockquote>
+        	<p>
+            <label><input type="radio" name="canAdd" value="1" id="canAdd_0"<?php if (isset($files)) { if ($files['canAdd'] == "1") {echo " checked=\"checked\"";}} else {echo " checked=\"checked\"";} ?> />Yes</label>
+            <label><input type="radio" name="canAdd" value="0" id="canAdd_1"<?php if (isset($files) && $files['canAdd'] == "0") {echo " checked=\"checked\"";} ?> />No</label>
+            </p>
+        </blockquote>
+        <p>Users can delete files:</p>
+        <blockquote>
+        	<p>
+            <label><input type="radio" name="canDelete" value="1" id="canDelete_0"<?php if (isset($files)) { if ($files['canDelete'] == "1") {echo " checked=\"checked\"";}} else {echo " checked=\"checked\"";} ?> />Yes</label>
+            <label><input type="radio" name="canDelete" value="0" id="canDelete_1"<?php if (isset($files) && $files['canDelete'] == "0") {echo " checked=\"checked\"";} ?> />No</label>
+            </p>
         </blockquote>
       </blockquote>
       </div>

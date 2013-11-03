@@ -16,21 +16,22 @@
 	}
 ?>
 <h2>Credits</h2>
-<p>Apex Development thanks all of the third party sources and developers which made this project possible.
+<p>ForwardFour thanks all of the third party sources and developers which made this project possible.
 <p>&nbsp;</p>
 <p>System core:</p>
 <blockquote>
-  <p><img src="images/common/logo.png" width="270" height="80" alt="Apex Development Logo" /></p>
+  <p><a href="http://www.forwardfour.com" target="_blank"><img src="images/common/logo.png" alt="ForwardFour" /></a></p>
   <p>&nbsp;</p>
 </blockquote>
 <p>Third-party modules:</p>
 <blockquote>
   <p><a href="http://tinymce.moxiecode.com/" target="_blank">TinyMCE</a></p>
-  <p><a href="http://www.lunarvis.com/products/tinymcefilebrowserwithupload.php" target="_blank">TinyBrowser</a></p>
+  <p><a href="http://neele.name/filebrowser/" target="_blank">PDW File Browser</a></p>
   <p><a href="http://www.afterthedeadline.com/" target="_blank">After the Deadline</a></p>
   <p><a href="http://www.themza.com/moodle/" target="_blank">ThemZa</a></p>
   <p><a href="http://www.fusioncharts.com/free/" target="_blank">FusionCharts</a></p>
-  <p><a href="http://jqueryui.com/demos/datepicker/" target="_blank">jQuery DatePicker</a></p>
+  <p><a href="http://jquery.com/" target="_blank">jQuery</a></p>
+  <p><a href="http://jqueryui.com/" target="_blank">jQuery UI</a></p>
   <p><a href="http://www.position-absolute.com/articles/jquery-form-validator-because-form-validation-is-a-mess/" target="_blank">jQuery Validator</a></p>
   <p><a href="http://labs.adobe.com/technologies/spry/" target="_blank">Spry Ajax Library</a></p>
   <p>&nbsp;</p>

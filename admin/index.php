@@ -1,11 +1,12 @@
 <?php require_once('../Connections/connDBA.php'); ?>
-<?php loginCheck("User,Administrator"); ?>
+<?php loggedIn() ? true : redirect($root  . "login.php?accesscheck=" . urlencode($_SERVER['REQUEST_URI'])); ?>
 <?php
 //Process the agenda
-	if (isset($_POST['action']) && $_POST['action'] == "setCompletion" && !empty($_POST['id']) && (!empty($_POST['oldValue']) || $_POST['oldValue'] == "0")) {
+	if (isset($_POST['action']) && $_POST['action'] == "setAvaliability" && !empty($_POST['id'])) {
 		$id = $_POST['id'];
 		$option = $_POST['option'];
-		$oldValue = $_POST['oldValue'];
+		$oldValuePrep = explode("_", $id);
+		$oldValue = $oldValuePrep['1'];
 		
 		$oldDataGrabber = mysql_query("SELECT * FROM `collaboration` WHERE `id` = '{$id}'", $connDBA);
 		$oldData = mysql_fetch_array($oldDataGrabber);
@@ -48,8 +49,6 @@
 		}
 		
 		mysql_query("UPDATE `collaboration` SET `completed` = '{$status}' WHERE `id` = '{$id}'", $connDBA);
-		
-		header("Location: index.php");
 		exit;
 	}
 	
@@ -197,7 +196,7 @@
 				
 				mysql_query("UPDATE `collaboration` SET `name` = '{$names}', `date` = '{$dates}', `comment` = '{$comments}' WHERE `id` = '{$id}'", $connDBA);
 				
-				header("Location: index.php?message=deleted");
+				header("Location: index.php?message=deletedComment");
 				exit;
 		//If all comments are deleted
 			} else {
@@ -218,58 +217,32 @@
 <head>
 <?php title("Staff Home Page"); ?>
 <?php headers(); ?>
-<?php liveSubmit(); ?>
-<?php customCheckbox("checkbox"); ?>
+<?php customCheckbox(); ?>
 <?php validate(); ?>
 <?php tinyMCESimple(); ?>
-<script type="text/javascript">
-<?php
-//Load validation for non-conventional form IDs
-	$formGrabber = query("SELECT * FROM `collaboration` WHERE `type` = 'File Share' OR `type` = 'Poll' OR `type` = 'Forum'", "raw");
-	
-	while ($form = mysql_fetch_array($formGrabber)) {
-		echo "$(document).ready(function() {
-	$(\"#validate_" . $form['id'] . "\").validationEngine()
-});";
-	}
-?>
-</script>
+<script src="../javascripts/jQuery/adminAssist.jquery.js" type="text/javascript"></script>
 </head>
-<body<?php bodyClass(); ?>>
+<body>
 <?php tooltip(); ?>
 <?php topPage(); ?>
-<h2>Staff Home Page</h2>
+<h1>Staff Home Page</h1>
+<p>This page is the main collaboration hub of this site. Check here regularly for updates and announcements.</p>
+<p>&nbsp;</p>
 <?php
-//Display an uploading progress div
-	echo "<div id=\"errorBox\" class=\"errorBox\" style=\"display:none;\">Some fields are incomplete. Please scroll up to correct them.</div><div class=\"uploading\" id=\"progress\" style=\"display:none;\">Uploading in progress</div>";
-	
-//Display message updates
-	if (isset($_GET['message'])) {
-		if ($_GET['message'] == "deleted") {
-			 successMessage("The file was deleted");
-		} elseif ($_GET['message'] == "uploaded") {
-			successMessage("The file was uploaded");
-		} elseif ($_GET['message'] == "poll") {
-			successMessage("Your poll was collected");
-		} elseif ($_GET['message'] == "comment") {
-			successMessage("Your comment was added");
-		} elseif ($_GET['message'] == "deletedComment") {
-			successMessage("The comment was deleted");
-		} elseif ($_GET['message'] == "deletedAll") {
-			successMessage("All comments were deleted");
-		} else {
-			echo "<p>&nbsp;</p>";
-		}
-	} else {
-		echo "<p>&nbsp;</p>";
-	}
-
 //Display the toolbar, if the user is an administrator
 	if ($_SESSION['MM_UserGroup'] == "Administrator") {
-		echo "<div class=\"toolBar\"><a class=\"toolBarItem editTool\" href=\"collaboration/index.php\">Edit View</a></div><br />";
+		echo "<div class=\"toolBar\">
+<a class=\"toolBarItem announcementLink\" href=\"manage_announcement.php\">Create Announcement</a>
+<a class=\"toolBarItem agenda\" href=\"manage_agenda.php\">Create Agenda</a>
+<a class=\"toolBarItem fileShare\" href=\"manage_files.php\">Create File Share</a>
+<a class=\"toolBarItem statistics\" href=\"manage_poll.php\">Create a Poll</a>
+<a class=\"toolBarItem feedback\" href=\"manage_forum.php\">Create a Forum</a>
+</div>
+<br />
+";
 	}
-//Display annoumcements, file share, agenda, and polling modules
-	$itemsCheck = mysql_query("SELECT * FROM `collaboration`", $connDBA);
+//Display announcements, file share, agenda, forum and polling modules
+	$itemsCheck = mysql_query("SELECT * FROM `collaboration` WHERE `visible` = 'on'", $connDBA);
 	
 	if (mysql_fetch_array($itemsCheck)) {
 		$time = getdate();
@@ -291,41 +264,53 @@
 			switch ($type) {
 			//If this is an agenda module
 				case "Agenda" :
-					$values = unserialize($item['task']);
+					$totalComplete = 0;
 					$task = unserialize($item['task']);
+					$description = unserialize($item['description']);
 					$assignee = unserialize($item['assignee']);
 					$dueDate = unserialize($item['dueDate']);
 					$priority = unserialize($item['priority']);
 					$completed = unserialize($item['completed']);
 					
-					echo "<div class=\"agendaContent\"><p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>" . stripslashes($item['content']) . "<br />
-					<table class=\"dataTable\">";
-						echo "<tr>";
-							echo "<th class=\"tableHeader\">Task</th>";
-							echo "<th class=\"tableHeader\" width=\"200\">Assignee</th>";
-							echo "<th class=\"tableHeader\" width=\"200\">Due Date</th>";
-							echo "<th class=\"tableHeader\" width=\"100\">Priority</th>";
-							echo "<th class=\"tableHeader\" width=\"100\">Completion</th>";
-						echo "</tr>";
+					echo "
+
+<!-- Agenda: " . stripslashes($item['title']) . " -->
+<div class=\"agendaContent\">
+<p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>
+" . stripslashes($item['content']) . "
+<div class=\"progressBar\" style=\"width:200px; height:20px;\"></div>
+<span class=\"percentage\"></span>
+<br />
+<br />
 					
-					for($count = 0; $count <= sizeof($values) - 1; $count++) {
-						if ($assignee[$count] != "anyone") {
-							$assignedUser = $assignee[$count];
-							$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$assignedUser}'", $connDBA);
-							$user = mysql_fetch_array($userGrabber);
-						}
-						
-						echo "<tr";
-						if ($count & 1) {echo " class=\"even\">";} else {echo " class=\"odd\">";}
-							echo "<td>" . stripslashes($task[$count]) . "</td>";
-							
-							if ($assignee[$count] != "anyone") {
-								echo "<td>" . $user['firstName'] . " " . $user['lastName'] . "</td>";
+<table class=\"dataTable\">
+<tr>
+<th class=\"tableHeader\" width=\"20\"></th>
+<th class=\"tableHeader\">Task</th>
+<th class=\"tableHeader\" width=\"200\">Assignees</th>
+<th class=\"tableHeader\" width=\"200\">Due Date</th>
+<th class=\"tableHeader\" width=\"100\">Priority</th>
+<th class=\"tableHeader\" width=\"100\">Completion</th>
+</tr>
+
+";
+					
+					for($count = 0; $count <= sizeof($task) - 1; $count++) {
+						echo "<!-- Agenda Task: " . stripslashes($task[$count]) . " -->
+<tr";
+						if ($count & 1) {echo " class=\"even\">\n";} else {echo " class=\"odd\">\n";}
+							if (empty($description[$count])) {
+								echo "<td class=\"description\">&nbsp;</td>\n";
 							} else {
-								echo "<td>Anyone</td>";
+								echo "<td class=\"description\">
+<a href=\"javascript:;\" class=\"action description\" onmouseover=\"Tip('View comments for this task');\" onmouseout=\"UnTip('');\"></a>
+<div class=\"contentHide\">" . stripslashes($description[$count]) . "</div>
+</td>\n";
 							}
 							
-							echo "<td>";
+							echo "<td class=\"taskName\">" . stripslashes($task[$count]) . "</td>\n";
+							echo "<td class=\"assignees\">" . $assignee[$count] . "</td>\n";
+							echo "<td class=\"dueDate\">";
 							
 							if ($dueDate[$count] == "") {
 								echo "<span class=\"notAssigned\">None</span>";
@@ -333,44 +318,61 @@
 								echo $dueDate[$count];
 							}
 							
-							echo "</td>";
-							echo "<td>";
+							echo "</td>\n";
+							echo "<td class=\"priority\">";
 							
 							switch($priority[$count]) {
-								case "1" : echo "Low"; break;
-								case "2" : echo "Normal"; break;
-								case "3" : echo "High"; break;
+								case "1" : echo "<span style=\"color:#666666\">Low</span>"; break;
+								case "2" : echo "<span style=\"color:#0000FF\">Normal</span>"; break;
+								case "3" : echo "<span style=\"color:#FF0000\">High</span>"; break;
 							}
 							
-							echo "</td>";
-							echo "<td><form name=\"completion\" action=\"index.php\" method=\"post\"><input type=\"hidden\" name=\"action\" value=\"setCompletion\"><input type=\"hidden\" name=\"id\" value=\"" . $item['id'] . "\"><input type=\"hidden\" name=\"oldValue\" value=\"" . $count . "\"><div align=\"center\"><a href=\"#option" . $item['id'] . $count . "\" class=\"checked";
+							echo "</td>\n";
+							echo "<td>
+<div align=\"center\">
+<a href=\"javascript:;\" class=\"checkbox ";
 							
 							if (is_array($completed) && !empty($completed[$count])) {
-								echo "\"></a><div class=\"contentHide\"><input type=\"checkbox\" name=\"option\" id=\"option" . $item['id'] . $count . "\" value=\"" . $count . "\" onclick=\"Spry.Utils.submitForm(this.form);\" checked=\"checked\"></div>";
+								$totalComplete++;
+								
+								echo "checked";
 							} else {
-								echo " unchecked\"></a><div class=\"contentHide\"><input type=\"checkbox\" name=\"option\" id=\"option" . $item['id'] . $count . "\" value=\"" . $count . "\" onclick=\"Spry.Utils.submitForm(this.form);\"></div>";
+								echo "unchecked";
 							}
 							
-							echo "</div></form></td>";
-						echo "</tr>";
-						
-						if ($assignee[$count] != "anyone") {
-							unset($userGrabber);
-							unset($user);
-						}
+							echo "\" id=\"" . $item['id'] . "_" . $count . "\"></a>
+</div>
+</td>
+</tr>
+";
 					}
 					
-					echo "</table></div>";
+					echo "</table>
+<input type=\"hidden\" class=\"totalItems\" value=\"" . (sizeof($task) - 1) . "\" />
+<input type=\"hidden\" class=\"totalComplete\" value=\"" . $totalComplete . "\" />
+</div>\n";
 					break;	
 				
 			//If this is an announcement
 				case "Announcement" :
-					echo "<div class=\"announcementContent\"><p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>" . stripslashes($item['content']) . "</div>";
+					echo "
+
+<!-- Announcement: " . stripslashes($item['title']) . " -->
+<div class=\"announcementContent\">
+<p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>
+" . stripslashes($item['content']) . "
+</div>\n";
 					break;
 			
 			//If this is a file share module
 				case "File Share" :
-					echo "<div class=\"fileShareContent\"><p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>" . stripslashes($item['content']) . "";
+					echo "
+
+<!-- File Share: " . stripslashes($item['title']) . " -->
+<div class=\"fileShareContent\">
+<p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>
+" . stripslashes($item['content']) . "
+";
 					
 					if (is_array(unserialize($item['directories']))) {
 						$directories = unserialize($item['directories']);
@@ -379,11 +381,12 @@
 							$filesDirectory = scandir("files/" . $categoryKey);
 							$count = 1;
 							
-							echo "<br /><table class=\"dataTable\">";
-								echo "<tr>";
+							echo "<br />
+<table class=\"dataTable\">
+<tr>";
 									echo "<th class=\"tableHeader\">" . $categoryArray . "</th>";
 									
-									if (privileges("deleteFile") == "true") {
+									if ($item["canDelete"] == "1" || $_SESSION['MM_UserGroup'] == "Administrator") {
 										echo "<th width=\"75\" class=\"tableHeader\">Delete</th>";
 									}
 									
@@ -416,7 +419,7 @@
 										
 										echo "<td><a href=\"gateway.php/files/" . $categoryKey . "/" . $files . "\" target=\"_blank\">" . stripslashes($name) . "</a></td>";
 										
-										if (privileges("deleteFile") == "true") {
+										if ($item["canDelete"] == "1" || $_SESSION['MM_UserGroup'] == "Administrator") {
 											echo "<td width=\"75\"><a class=\"action smallDelete\" href=\"index.php?action=delete&directory=" . $categoryKey . "&name=" . urlencode($files) . "\" onmouseover=\"Tip('Click to delete &quot;<strong>" . addslashes($name) . "</strong>&quot;');\" onmouseout=\"UnTip();\" onclick=\"return confirm('This action cannot be undone. Continue?');\"></a></td>";
 										}
 										
@@ -433,8 +436,13 @@
 							unset($filesResult);
 						}
 						
-						if (privileges("uploadFile") == "true") {
+						if ($item["canAdd"] == "1" || $_SESSION['MM_UserGroup'] == "Administrator") {
 							echo "<br /><br />";
+							
+							if ($item["canAdd"] == "0" && $_SESSION['MM_UserGroup'] == "Administrator") {								
+								echo "<span class=\"notAssigned\">Only administrators can upload files</span>";
+							}
+							
 							echo "<form id=\"validate_" . $item['id'] . "\" action=\"index.php\" method=\"post\" enctype=\"multipart/form-data\" onsubmit=\"return errorsOnSubmit(this, 'file_" . $item['id'] . "');\"><h2>Upload file</h2><blockquote><p><input type=\"file\" name=\"file\" id=\"file_" . $item['id'] . "\" size=\"50\" class=\"validate[required]\"><br />Max file size: " . ini_get('upload_max_filesize') . "</p></blockquote><h2>Select category</h2><blockquote><p><select name=\"category\" id=\"category" . $item['id'] . "\" class=\"validate[required]\"><option value=\"\">- Select -</option>";
 							$directories = unserialize($item['directories']);
 							
@@ -453,8 +461,7 @@
 					
 			//If this is a polling module
 				case "Poll" : 
-					echo "<div class=\"pollContent\"><p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>" . stripslashes($item['content']);
-					
+				//Grab all of the necessary data
 					$polled = false;
 					$count = 0;
 					$questions = unserialize($item['questions']);
@@ -463,6 +470,7 @@
 					$userData = userData();
 					$keys = array_keys($questions);
 					
+				//Check to see if this user has already polled
 					if (is_array($responses)) {
 						foreach($responses as $test) {
 							if (in_array($userData['id'], explode(",", $test['participant']))) {
@@ -472,22 +480,45 @@
 						}
 					}
 					
+					echo "
+
+<!-- Poll: " . stripslashes($item['title']) . " -->					
+<div class=\"pollContent\">
+<p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>
+" . stripslashes($item['content']) . "
+";
+					
+				//If the user hasn't polled, then show the options
 					if ($polled == false) {
-						echo "<br />Select your answer:<blockquote><form id=\"validate_" . $item['id'] . "\" action=\"index.php\" method=\"post\" onsubmit=\"return errorsOnSubmit(this);\">";
-						echo "<input type=\"hidden\" name=\"poll\" value=\"" . $item['id'] . "\">";
+						echo "
+<br />
+Select your answer:
+<blockquote>
+<input type=\"hidden\" name=\"poll\" value=\"" . $item['id'] . "\">
+";
 						
 						foreach ($questions as $question) {
-							echo "<label><input type=\"radio\" name=\"poll_" . $item['id'] . "\" id=\"" . $item['id'] . "_" . $count . "\" value=\"" . $keys[$count] . "\" class=\"validate[required]\">" . $question . "</label><br />";
+							echo "<!-- Poll Option: " . $question . " -->
+<label><input type=\"radio\" name=\"poll_" . $item['id'] . "\" id=\"" . $item['id'] . "_" . $count . "\" value=\"" . $keys[$count] . "\" class=\"validate[required]\">" . $question . "</label>
+<br />
+";
 							
 							$count ++;
 						}
 						
-						echo "<br /><input type=\"submit\" name=\"submit_" . $item['id'] . "\" id=\"submit\" value=\"Submit\" />";
-						echo "</form></blockquote>";
+						echo "<br />
+<input type=\"submit\" name=\"submit_" . $item['id'] . "\" id=\"submit\" value=\"Submit\" />
+</blockquote>
+";
 					}
 					
-					echo "<br /><br /><table>";
+					echo "<br />
+<br />
+
+<table>
+";
 					
+				//Display the poll results
 					$count = 0;
 					
 					foreach (array_keys($questions) as $question) {						
@@ -512,33 +543,46 @@
 								$percent = "100";
 							}
 							
-							echo "<tr>";
-							echo "<td width=\"350\">";
-							echo "<span style=\"border:thin black solid; display:block; width:100%; text-decoration: none;\"><span style=\"background-color:#090; display:block; width:" . $percent . "%; text-decoration: none;\">&nbsp;</span></span>";
-							echo "(" . $size . "/" . $toalReplies . ") ";
-							echo prepare($questions[$question]) . "<br />";
-							echo "</td></tr>";
+							echo "<!-- Poll Result: " . prepare($questions[$question]) . " -->
+<tr>
+<td width=\"350\">
+<span style=\"border:thin black solid; display:block; width:100%; text-decoration: none;\">
+<span style=\"background-color:#090; display:block; width:" . $percent . "%; text-decoration: none;\">&nbsp;</span>
+</span>
+(" . $size . "/" . $toalReplies . ") " .  prepare($questions[$question]) . "
+</td>
+</tr>
+";
 						} else {
-							echo "<tr>";
-							echo "<td width=\"350\">";
-							echo "<span style=\"border:thin black solid; display:block; width:100%; text-decoration: none;\"><span style=\"background-color:#090; display:block; width:0%; text-decoration: none;\">&nbsp;</span></span>";
-							echo "(0/" . $toalReplies . ") ";
-							echo prepare($questions[$question]) . "<br />";
-							echo "</td></tr>";
+							echo "<!-- Poll Result: " . prepare($questions[$question]) . " -->
+<tr>
+<td width=\"350\">
+<span style=\"border:thin black solid; display:block; width:100%; text-decoration: none;\">
+<span style=\"background-color:#090; display:block; width:0%; text-decoration: none;\">&nbsp;</span>
+</span>
+(0/" . $toalReplies . ") " . prepare($questions[$question]) . "
+</td>
+</tr>
+";
 						}
 						
 						$count ++;
 					}
 					
-					echo "</table>";
-					
-					echo "</div>";
+					echo "
+</table>
+</div>";
 					
 					break;
 				
 			//If this is a forum module	
 				case "Forum" : 
-					echo "<div class=\"commentBox\"><p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>" . stripslashes($item['content']) . "<br />";
+					echo "
+
+<!-- Forum: " . stripslashes($item['title']) . " -->	
+<div class=\"commentBox\">
+<p class=\"itemTitle\">" . stripslashes($item['title']) . "</p>
+" . stripslashes($item['content']) . "<br />";
 					
 					$arrayCheck = unserialize($item['comment']);
 					

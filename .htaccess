@@ -7,5 +7,6 @@
 	deny from all
 </Files>
 
-ErrorDocument 403 /includes/access_deny.php?error=403
-ErrorDocument 404 /includes/access_deny.php?error=404
+ErrorDocument 403 /admin/includes/access_deny.php?error=403
+ErrorDocument 404 /admin/includes/access_deny.php?error=404
+

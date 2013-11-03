@@ -1,6 +1,7 @@
 <?php
 session_start();
 ob_start();
+error_reporting(0);
 
 /* Begin core functions */
 	//Root address for entire site
@@ -85,7 +86,10 @@ ob_start();
 		$siteStyleGrabber = mysql_fetch_array(mysql_query("SELECT * FROM siteprofiles", $connDBA));
 		$siteStyle = $siteStyleGrabber['style'];
 		
-		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $root . "styles/common/universal.css\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"" . $root . "styles/themes/" . $siteStyle . "\" /><link type=\"";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $root . "styles/common/universal.css\" />
+<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $root . "styles/themes/" . $siteStyle . "\" />
+<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $root . "styles/jQuery/jquery-ui.custom.css\" />
+<link type=\"";
 		
 		$iconExtensionGrabber = mysql_query("SELECT * FROM siteprofiles", $connDBA);
 		$iconExtension = mysql_fetch_array($iconExtensionGrabber);
@@ -100,16 +104,26 @@ ob_start();
 		echo "\" rel=\"shortcut icon\" href=\"" . $root . "images/icon." . $iconExtension['iconType'] . "\" />";
 		
 		$requestURL = $_SERVER['REQUEST_URI'];
+		
 		if (strstr($requestURL, "enable_javascript.php")) {
 			//Do nothing
 		} else {
-			echo "<noscript><meta http-equiv=\"refresh\" content=\"0; url=" . $root . "enable_javascript.php\"></noscript>";
-		}
-		$requestURL = $_SERVER['REQUEST_URI'];
-		if (strstr($requestURL, "enable_javascript.php")) {
-			echo "<script type=\"text/javascript\">window.location = \"index.php\"</script>
+			echo "
+<noscript><meta http-equiv=\"refresh\" content=\"0; url=" . $root . "enable_javascript.php\"></noscript>
 ";
 		}
+		
+		$requestURL = $_SERVER['REQUEST_URI'];
+		
+		if (strstr($requestURL, "enable_javascript.php")) {
+			echo "
+<script type=\"text/javascript\">window.location = \"index.php\"</script>
+";
+		}
+		
+		echo "<script type=\"text/javascript\" src=\"" . $root . "javascripts/jQuery/jquery.min.js\"></script>
+<script type=\"text/javascript\" src=\"" . $root . "javascripts/jQuery/jquery-ui.custom.min.js\"></script>
+";
 	}
 	
 	//Include user login status
@@ -187,6 +201,7 @@ ob_start();
 	function navigation($URL, $linkBack) {
 		global $connDBA;
 		global $root;
+		global $strippedRoot;
 		
 		$requestURL = $_SERVER['REQUEST_URI'];
 		echo "<div id=\"navbar_bg\"><div class=\"navbar clearfix\"><div class=\"breadcrumb\"><div class=\"menu\"><ul class=\"headerNavigation\">";
@@ -686,7 +701,6 @@ ob_start();
 		$footer= mysql_fetch_array($footerGrabber);
 		
 		echo stripslashes($footer['siteFooter']) . "</div></div></div>";
-		echo "<hr /><p>The Bell News Magazine thanks our host:</p><script type=\"text/javascript\" src=\"http://links.ismywebsite.com?i=3871\"></script>";
 		echo "<script type=\"text/javascript\">
 
   var _gaq = _gaq || [];
@@ -778,7 +792,7 @@ ob_start();
 			$loginFormAction = $_SERVER['PHP_SELF'];
 			
 			if (isset($_GET['accesscheck'])) {
-				$_SESSION['PrevUrl'] = $_GET['accesscheck'];
+				$_SESSION['PrevUrl'] = urlencode(urldecode($_GET['accesscheck']));
 			}
 			
 			if (isset($_POST['username'])) {
@@ -792,15 +806,12 @@ ob_start();
 					$success = "";
 					$failure = "";
 					
-					/*
-					Disabled
 					if (isset($_GET['accesscheck'])) {
 						$success .= "http://" . $_SERVER['HTTP_HOST'] . urldecode($_GET['accesscheck']);
 					} else {
-						$success .= "admin/index.php";
-					}*/
+						$success .= $root . "admin/index.php";
+					}
 					
-					$success .= "admin/index.php";
 					$IPAddress = $_SERVER['REMOTE_ADDR'];
 					$timeStamp = strtotime("-1 day");
 					
@@ -811,13 +822,16 @@ ob_start();
 						$secuirty = mysql_fetch_array($secuirtyGrabber);
 						
 						if (intval($secuirty['failedLogins']) <= $number) {
-							redirect($root . "login.php?expired=true");
-							exit;
+							if (isset($_GET['accesscheck'])) {
+								redirect($root . "login.php?expired=true&accesscheck=" . urlencode(urldecode($_GET['accesscheck'])));
+							} else {
+								redirect($root . "login.php?expired=true");
+							}
 						}
 					}
 				} else {
 					$success = "";
-					$failure = "login.php?alert=true";
+					$failure = $root . "login.php?alert=true";	
 					$timeStamp = strtotime("now");
 					$IPAddress = $_SERVER['REMOTE_ADDR'];
 					
@@ -837,10 +851,19 @@ ob_start();
 						$secuirty = mysql_fetch_array($secuirtyGrabber);
 						
 						if (intval($secuirty['failedLogins']) <= $number) {
-							redirect($root . "login.php?expired=true");
+							if (isset($_GET['accesscheck'])) {
+								redirect($root . "login.php?expired=true&accesscheck=" . urlencode(urldecode($_GET['accesscheck'])));
+							} else {
+								redirect($root . "login.php?expired=true");
+							}
+							
 							exit;
 						} else {
-							$failure .= "&remaining=" . sprintf(intval($secuirty['failedLogins']) - $number);
+							if (isset($_GET['accesscheck'])) {
+								$failure .= "&remaining=" . sprintf(intval($secuirty['failedLogins']) - $number) . "&accesscheck=" . urlencode(urldecode($_GET['accesscheck']));
+							} else {
+								$failure .= "&remaining=" . sprintf(intval($secuirty['failedLogins']) - $number);
+							}
 						}
 					}
 				}
@@ -873,15 +896,10 @@ ob_start();
 					  $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
 				  }
 				  
-				  if (!isset($_GET['accesscheck'])) {
-					  header("Location: " . $root . $MM_redirectLoginSuccess);
-					  exit;
-				  } else {
-					  header ("Location: " . $success);
-					  exit;
-				  }
+				  header ("Location: " . $success);
+				  exit;
 				} else {
-				  header("Location: " . $root . $MM_redirectLoginFailed);
+				  header("Location: " . $failure);
 				  exit;
 				}
 			}
@@ -916,18 +934,15 @@ ob_start();
 		  return $isValid; 
 		}
 		
-		$MM_restrictGoTo = "" . $root . "login.php";
+		//$MM_restrictGoTo = $root . "login.php";
 		if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) { 
-		  setcookie("userStatus", "", time()-1000000000);  
-		  unset($_SESSION['MM_Username']);
-		  unset($_SESSION['MM_Usergroup']);
-		  $MM_qsChar = "?";
-		  $MM_referrer = $_SERVER['PHP_SELF'];
+		  /*$MM_qsChar = "?";
+		  $MM_referrer = $_SERVER['REQUEST_URI'];
 		  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
 		  if (isset($QUERY_STRING) && strlen($QUERY_STRING) > 0) 
 		  $MM_referrer .= "?" . $QUERY_STRING;
-		  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
-		  header("Location: ". $MM_restrictGoTo); 
+		  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);*/
+		  header("Location: " . $root . "admin/index.php"); 
 		  exit;
 		}
 	}
@@ -955,11 +970,8 @@ ob_start();
 		global $connDBA;
 		global $root;
 		
-		echo "<link rel=\"stylesheet\" href=\"" . $root . "styles/common/validatorStyle.css\" type=\"text/css\">";
-		echo "<script src=\"" . $root . "javascripts/validation/validatorCore.js\" type=\"text/javascript\"></script>";
-		echo "<script src=\"" . $root . "javascripts/validation/validatorOptions.js\" type=\"text/javascript\"></script>";
-		echo "<script src=\"" . $root . "javascripts/validation/runValidator.js\" type=\"text/javascript\"></script>";
-		echo "<script src=\"" . $root . "javascripts/validation/formErrors.js\" type=\"text/javascript\"></script>";
+		echo "<link rel=\"stylesheet\" href=\"" . $root . "styles/jQuery/validationEngine.jquery.css\" type=\"text/css\">
+<script src=\"" . $root . "javascripts/jQuery/jquery.validationEngine.min.js\" type=\"text/javascript\"></script>";
 	}
 	
 	//Include a life updater script
@@ -972,16 +984,11 @@ ob_start();
 	}
 	
 	//Include the custom checkbox script
-	function customCheckbox($type) {
+	function customCheckbox() {
 		global $connDBA;
 		global $root;
 		
-		echo "<script src=\"" . $root . "javascripts/customCheckbox/checkboxCore.js\" type=\"text/javascript\"></script>";
-		if ($type == "checkbox") {
-			echo "<script src=\"" . $root . "javascripts/customCheckbox/runCheckbox.js\" type=\"text/javascript\"></script>";
-		} elseif ($type == "visible") {
-			echo "<script src=\"" . $root . "javascripts/customCheckbox/runVisible.js\" type=\"text/javascript\"></script>";
-		}
+		echo "<script src=\"" . $root . "javascripts/jQuery/custom_checkbox.jquery.js\" type=\"text/javascript\"></script>";
 	}
 	
 	//Insert live error script
@@ -2629,7 +2636,7 @@ ob_start();
 		if (privileges("edit" . $privilegeType) == "true") {
 			echo "<td width=\"75\"><form name=\"reorder\" action=\"" . $_SERVER['REQUEST_URI'] . "\"><input type=\"hidden\" name=\"id\" value=\"" . $itemLoopData['id'] . "\"><input type=\"hidden\" name=\"currentPosition\" value=\"";
 			
-			if ($table == "pages" && isset($_GET['category']) && exist("pages", "parentPage", $_GET['category'])) {
+			if ($table == "pages" && isset($_GET['category']) && $_GET['category'] !== "0" && exist("pages", "parentPage", $_GET['category'])) {
 				echo $itemLoopData['subPosition'];
 			} else {
 				echo $itemLoopData['position'];

@@ -94,6 +94,7 @@
 
 		if (extension($targetFile) == "png" || extension($targetFile) == "bmp" || extension($targetFile) == "jpg" || extension($targetFile) == "gif") {
 			move_uploaded_file($tempFile, $uploadDir . "/" . "banner.png");
+			
 			if (isset ($_POST['return'])) {
 				header ("Location: site_setup_wizard.php");
 				exit;

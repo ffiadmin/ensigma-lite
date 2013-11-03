@@ -28,7 +28,6 @@ h6.main {
 }
 
 .clearfix:after {
-  /* content: "<!-- -->";  */
   content: ".";
   display: block;
   height: 0;
@@ -679,7 +678,8 @@ a.skip:focus, a.skip:active {
 	}
 	
 	div.toolBarAlert {
-		background:url(../../images/admin_icons/alert.png) #EEEEEE no-repeat left;
+		background:url(../../images/common/icons_sprite.png) #EEEEEE no-repeat;
+		background-position:-198px 0px;
 		padding-left:45px;
 		min-height:35px;
 		vertical-align:middle;
@@ -1002,8 +1002,17 @@ a.skip:focus, a.skip:active {
 		outline: none;
 		cursor:pointer;
 	}
+	
 	.unchecked {
 		background: url(../../images/common/x.png) no-repeat;
+		height: 16px;
+		display: block;
+		padding: 1px 0px 0px;
+		color: #666666;
+		text-decoration: none;
+		width: 16px;
+		font: 12px Tahoma, Arial, Helvetica, sans-serif;
+		outline: none;
 		cursor:pointer;
 	}
 	
@@ -1132,6 +1141,14 @@ a.skip:focus, a.skip:active {
 		padding: 1px 8px 1px 20px;
 		background:url(../../images/admin_icons/smallAdd.png) no-repeat left;
 		cursor:pointer;
+	}
+	
+	a.description {
+		background:url(../../images/admin_icons/announcement.png) no-repeat center;
+	}
+	
+	a.noDescription {
+		background:url(../../images/admin_icons/no_description.png) no-repeat center;
 	}
 /* End data table and table contents */
 
@@ -1280,6 +1297,90 @@ a.skip:focus, a.skip:active {
 		font-weight:bolder;
 	}
 /* End naviagtion styles */
+
+/* Begin email navigation styles */
+	div.emailContainer {
+		height:160px;
+	}
+	
+	a.emailBase {
+		height:150px;
+		width:321px;
+		padding:0px 160px 134px 161px;
+		background-repeat:no-repeat;
+		margin:0px 10px 0px 10px;
+	}
+	
+	a.emailAll {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px 0px;
+	}
+	
+	a.emailAll:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px 0px;
+	}
+	
+	a.emailSelected {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px -150px;
+	}
+	
+	a.emailSelected:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px -150px;
+	}
+	
+	a.emailRole {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px -300px;
+	}
+	
+	a.emailRole:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px -300px;
+	}
+	
+	a.emailHistory {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px -450px;
+	}
+	
+	a.emailHistory:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px -450px;
+	}
+	
+	a.automatedEmail {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px -600px;
+	}
+	
+	a.automatedEmail:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px -600px;
+	}
+	
+	a.welcomeEmail {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px -750px;
+	}
+	
+	a.welcomeEmail:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px -750px;
+	}
+	
+	a.goodbyeEmail {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:0px -900px;
+	}
+	
+	a.goodbyeEmail:hover {
+		background-image:url(../../images/common/email_sprite.png);
+		background-position:-321px -900px;
+	}
+/* End email navigation styles */
 
 /* Begin list styles */
 	.homeBullet {
