@@ -173,11 +173,11 @@
 						}
 					}
 				}
-				
-				mysql_query($editPageQuery, $connDBA);
-				header ("Location: index.php?updated=page");
-				exit;
 			}
+			
+			mysql_query($editPageQuery, $connDBA);
+			header ("Location: index.php?updated=page");
+			exit;
 		}
 	} 
 ?>

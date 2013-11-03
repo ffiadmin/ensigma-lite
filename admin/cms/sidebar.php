@@ -148,8 +148,19 @@
 ?>
 <a class="toolBarItem back" href="index.php">Back to Pages</a>
 <?php
-	if ($itemGrabber !== 0) {
-	echo "<a class=\"toolBarItem search\" href=\"../../index.php\">Preview this Site</a>";
+	$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
+	$settings = mysql_fetch_array($settingsGrabber);
+	
+	if ($settings["autoPublishSideBar"] == "1") {
+		$itemAccessCheck = mysql_query("SELECT * FROM `sidebar`", $connDBA);
+	} else {
+		$itemAccessCheck = mysql_query("SELECT * FROM `sidebar` WHERE `published` != '0'", $connDBA);
+	}
+	
+	$itemAccess = mysql_fetch_array($itemAccessCheck);
+	
+	if ($itemAccess) {
+		echo "<a class=\"toolBarItem search\" href=\"../../index.php\">Preview this Site</a>";
 	}
 ?>
 </div>
@@ -179,7 +190,8 @@
 		} elseif (privileges("publishSideBar") == "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishSideBar") == "true") {
 			successMessage("The box was successfully updated");
 		} elseif (privileges("publishSideBar") != "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishSideBar") != "true") {
-			successMessage("The box was successfully updated. An administrator must approve the update before the update can be displayed.");
+			//successMessage("The box was successfully updated. An administrator must approve the update before the update can be displayed.");
+			successMessage("The box was successfully updated.");
 		} elseif ($_SESSION['MM_UserGroup'] == "Administrator") {
 			successMessage("The box was successfully updated");
 		} elseif(privileges("autoPublishSideBar") == "true") {
@@ -334,7 +346,7 @@
 		
 		echo "</tr></tbody></table>";
 	 } else {
-		echo "<div class=\"noResults\">This site has no items. <a href=\"manage_item.php\">Create one now</a>.</div>";
+		echo "<div class=\"noResults\">This site has no items. <a href=\"manage_sidebar.php\">Create one now</a>.</div>";
 	 } 
 ?>
 <?php footer(); ?>

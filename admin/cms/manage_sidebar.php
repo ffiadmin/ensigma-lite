@@ -79,7 +79,7 @@
 	}
 	
 //Process the form
-	if (isset($_POST['submit']) && !empty ($_POST['title']) && !empty($_POST['type'])) {	
+	if (isset($_POST['submit']) && !empty ($_POST['title'])) {	
 		if (!isset ($sideBar)) {
 			$title = mysql_real_escape_string($_POST['title']);
 			$content = mysql_real_escape_string($_POST['content']);
@@ -108,7 +108,6 @@
 			$sideBar = $_GET['id'];
 			$title = mysql_real_escape_string($_POST['title']);
 			$content = mysql_real_escape_string($_POST['content']);
-			$type = $_POST['type'];
 			
 			$sideBarDataGrabber = mysql_query ("SELECT * FROM sidebar WHERE `id` = '{$sideBar}' LIMIT 1", $connDBA);
 			$sideBarData = mysql_fetch_array($sideBarDataGrabber);
@@ -124,7 +123,7 @@
 				header("Location: sidebar.php");
 				exit;
 			} elseif (($sideBarData['title'] !== $_POST['title'] || $sideBarData['type'] !== $_POST['type']) || ($sideBarData['title'] !== $_POST['title'] && $sideBarData['type'] !== $_POST['type']) && $sideBarData[$contentEditor] === $_POST['content']) {
-				$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+				$editSideBarQuery = "UPDATE sidebar SET title = '{$title}' WHERE `id` = '{$sideBar}'";
 				
 				mysql_query($editSideBarQuery, $connDBA);
 				header ("Location: sidebar.php");
@@ -133,49 +132,49 @@
 				if (isset($_GET['content'])) {	
 					if ($sideBarData['published'] != "0") {
 						if ($sideBarData['display'] == "1") {			
-							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
 						} else {
-							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+							$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
 						}
 					} else {
-						$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '0', message = '', {$contentEditor} = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+						$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '0', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$sideBar}'";
 					}
 				} else {
 					if ($sideBarData['published'] = "2") {
 						if ($sideBarData['display'] == "1") {
 							if (privileges("publishSideBar") == "true") {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
 							} else {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content2 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
 						} else {
 							if (privileges("publishSideBar") == "true") {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							} else {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1',  message = '', content1 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1',  message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
 						}
 					} else {
 						if ($sideBarData['display'] == "1") {
 							if (privileges("publishSideBar") == "true") {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							} else {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content1 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content1 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
 						} else {
 							if (privileges("publishSideBar") == "true") {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
 							} else {
-								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content2 = '{$content}', type = '{$type}' WHERE `id` = '{$sideBar}'";
+								$editSideBarQuery = "UPDATE sidebar SET title = '{$title}', published = '1', message = '', content2 = '{$content}' WHERE `id` = '{$sideBar}'";
 							}
 						}
 					}
 				}
-				
-				mysql_query($editSideBarQuery, $connDBA);
-				header ("Location: sidebar.php?updated=item");
-				exit;
 			}
+			
+			mysql_query($editSideBarQuery, $connDBA);
+			header ("Location: sidebar.php?updated=item");
+			exit;
 		}
 	} 
 ?>
@@ -225,28 +224,18 @@
 			?> />
           </p>
         </blockquote>
-        <p>Type<span class="require">*</span>: <img src="../../images/admin_icons/help.png" alt="Help" width="17" height="17" onmouseover="Tip('The type of content that will be displayed in the text box.<br />Different ones will be avaliable at different times, <br />depending on their current use.<br /><br /><strong>Custom Content</strong> - A box which can contain any desired content.<br /><strong>Login</strong> - A box with a pre-built form to log in a user.')" onmouseout="UnTip()" /></p>
-        <?php
-		//Grab the sidebar items to ensure there aren't any unnecessary duplicates
-			$sideBarGrabber = mysql_query("SELECT * FROM sidebar", $connDBA);
-			$login = "";
-			
-			while ($sideBarResults = mysql_fetch_array($sideBarGrabber)) {
-				if ($sideBarResults['type'] == "Login")	{
-					$login = "true";
-				}
-			}
-		?>
+        <p>Type<?php if (!isset($item)) {echo "<span class=\"require\">*</span>";} ?>: <img src="../../images/admin_icons/help.png" alt="Help" width="17" height="17" onmouseover="Tip('The type of content that will be displayed in the text box.<br />Different ones will be avaliable at different times, <br />depending on their current use.<br /><br /><strong>Custom Content</strong> - A box which can contain any desired content.<br /><strong>Login</strong> - A box with a pre-built form to log in a user.')" onmouseout="UnTip()" /></p>
         <blockquote>
           <p>
-            <select name="type" id="type" class="validate[required]" onchange="toggleTypeDiv(this.value);">
-              <option value="Custom Content"<?php if (isset ($item) && $item['type'] == "Custom Content") {echo " selected=\"selected\"";} else {echo " selected=\"selected\"";} ?>>Custom Content</option><option value="Login"
               <?php
-				  if ($item['type'] == "Login") {
-					  echo " selected=\"selected\"";
+				  if (isset($item) && $item['type'] == "Login") {
+					  echo "<strong>Login</strong>";
+				  } elseif (isset($item) && $item['type'] == "Custom Content") {
+					  echo "<strong>Custom Content</strong>";
+				  } else {
+					  echo "<select name=\"type\" id=\"type\" class=\"validate[required]\" onchange=\"toggleTypeDiv(this.value);\"><option value=\"Custom Content\">Custom Content</option><option value=\"Login\" >Login</option></select>";
 				  }
 			  ?>
-            >Login</option></select>
           </p>
         </blockquote>
       </blockquote>

@@ -168,8 +168,16 @@ ob_start();
 		switch ($URL) {
 		//If this is the public website navigation bar
 			case "public" :
-				$pageData = mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position ASC", $connDBA);	
-				$lastPageCheck = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position DESC LIMIT 1", $connDBA));
+				$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
+				$settings = mysql_fetch_array($settingsGrabber);
+				
+				if ($settings['autoPublishPage'] == "1") {
+					$pageData = mysql_query("SELECT * FROM pages WHERE visible = 'on' ORDER BY position ASC", $connDBA);	
+					$lastPageCheck = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE visible = 'on' ORDER BY position DESC LIMIT 1", $connDBA));
+				} else {
+					$pageData = mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position ASC", $connDBA);	
+					$lastPageCheck = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position DESC LIMIT 1", $connDBA));
+				}
 				$count = 1;
 				
 				if (isset ($_GET['page'])) {

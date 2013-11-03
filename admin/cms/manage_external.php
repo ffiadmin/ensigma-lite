@@ -169,11 +169,11 @@
 						}
 					}
 				}
-				
-				mysql_query($editTabQuery, $connDBA);
-				header ("Location: external.php?updated=tab");
-				exit;
 			}
+			
+			mysql_query($editTabQuery, $connDBA);
+			header ("Location: external.php?updated=tab");
+			exit;
 		}
 	} 
 ?>

@@ -159,7 +159,8 @@
 		} elseif (privileges("publishStaffPage") == "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishStaffPage") == "true") {
 			successMessage("The page was successfully updated");
 		} elseif (privileges("publishStaffPage") != "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishStaffPage") != "true") {
-			successMessage("The page was successfully updated. An administrator must approve the update before the update can be displayed.");
+			//successMessage("The page was successfully updated. An administrator must approve the update before the update can be displayed.");
+			successMessage("The page was successfully updated.");
 		} elseif ($_SESSION['MM_UserGroup'] == "Administrator") {
 			successMessage("The page was successfully updated");
 		} elseif(privileges("autoPublishStaffPage") == "true") {

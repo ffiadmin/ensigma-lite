@@ -136,7 +136,7 @@
 <div class="catDivider three">Finish</div>
 <div class="stepContent">
   <blockquote>
-    <p><input name="finish" id="finish" onclick="MM_goToURL('parent','index.php');return document.MM_returnValue" value="Finish" type="button"></p>
+    <p><input name="finish" id="finish" onclick="MM_goToURL('parent','<?php if ($_SESSION['MM_UserGroup'] == "User") {echo "../index.php";} else {echo "index.php";} ?>');return document.MM_returnValue" value="Finish" type="button"></p>
   </blockquote>
 </div>
 <?php footer(); ?>

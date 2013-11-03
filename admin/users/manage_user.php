@@ -78,12 +78,6 @@
 				exit;
 			}
 		} else {
-			$adminCheck = mysql_query("SELECT * FROM `users` WHERE `role` = 'Administrator'", $connDBA);
-			if (mysql_num_rows($adminCheck) == "1" && $role != "Administrator") {
-				header("Location: index.php?message=noAdmin");
-				exit;
-			}
-			
 			mysql_query("INSERT INTO `users`(
 						id, active, firstName, lastName, userName, passWord, changePassword, emailAddress1, emailAddress2, emailAddress3, role
 						) VALUES (

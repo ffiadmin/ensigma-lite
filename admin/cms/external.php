@@ -148,7 +148,18 @@
 <div class="code">
 &lt;div align=&quot;center&quot;&gt;&lt;iframe src=&quot;<?php echo $root; ?>external.php&quot; width=&quot;320&quot; height=&quot;240&quot; frameborder=&quot;0&quot;&gt;&lt;/div&gt;</div><br />
 <?php
-	if (privileges("createExternal") == "true" || privileges("editExternal") == "true" || privileges("deleteExternal") == "true" || $tabGrabber !== 0) {
+	$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
+	$settings = mysql_fetch_array($settingsGrabber);
+
+	if ($settings["autoPublishExternal"] == "1") {
+		$tabAccessCheck = mysql_query("SELECT * FROM `external`", $connDBA);
+	} else {
+		$tabAccessCheck = mysql_query("SELECT * FROM `external` WHERE `published` != '0'", $connDBA);
+	}
+	
+	$tabAccess = mysql_fetch_array($tabAccessCheck);
+	
+	if (privileges("createExternal") == "true" || privileges("editExternal") == "true" || privileges("deleteExternal") == "true") {
 		echo "<div class=\"toolBar\">";
 	}
 
@@ -158,11 +169,11 @@
 	
 	echo "<a class=\"toolBarItem back\" href=\"index.php\">Back to Pages</a>";
 	
-	if ($tabGrabber !== 0) {
+	if ($tabAccess) {
 		echo "<a class=\"toolBarItem search\" href=\"javascript:void\"onclick=\"MM_openBrWindow('../../external.php','','status=yes,scrollbars=yes,resizable=yes,width=320,height=240')\">Preview this Content</a>";
 	}
 	
-	if (privileges("createExternal") == "true" || privileges("editExternal") == "true" || privileges("deleteExternal") == "true" || $tabGrabber !== 0) {
+	if (privileges("createExternal") == "true" || privileges("editExternal") == "true" || privileges("deleteExternal") == "true") {
 		echo "</div>";
 	}
 
@@ -192,7 +203,8 @@
 			} elseif (privileges("publishExternal") == "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishExternal") == "true") {
 				successMessage("The tab was successfully updated");
 			} elseif (privileges("publishExternal") != "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishExternal") != "true") {
-				successMessage("The tab was successfully updated. An administrator must approve the update before the update can be displayed.");
+				//successMessage("The tab was successfully updated. An administrator must approve the update before the update can be displayed.");
+				successMessage("The tab was successfully updated.");
 			} elseif ($_SESSION['MM_UserGroup'] == "Administrator") {
 				successMessage("The tab was successfully updated");
 			} elseif(privileges("autoPublishExternal") == "true") {
@@ -339,7 +351,7 @@
 			echo "<div class=\"noResults\">This site has no external content.";
 			
 			if (privileges("createExternal") == "true") {
-				echo " <a href=\"manage_tab.php\">Create a new tab now</a>.</div>";
+				echo " <a href=\"manage_external.php\">Create a new tab now</a>.</div>";
 			} else {
 				echo " You do not have the privileges to create a tab.";
 			}
