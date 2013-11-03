@@ -2,9 +2,9 @@
 <?php loginCheck("Administrator"); ?>
 <?php
 //Check for failed logins
-	$loginsCheck = mysql_query("SELECT * FROM `failedLogins`", $connDBA);
+	$loginsCheck = mysql_query("SELECT * FROM `failedlogins`", $connDBA);
 	
-	if (exist("failedLogins")) {
+	if (exist("failedlogins")) {
 		$logins = "exist";
 	} else {
 		$logins = "empty";
@@ -30,7 +30,7 @@
 		echo "<div class=\"noResults\">No failed logins have taken place</div>";
 //If logins exist
 	} else {
-		$loginsGrabber = mysql_query("SELECT * FROM `failedLogins`", $connDBA);
+		$loginsGrabber = mysql_query("SELECT * FROM `failedlogins`", $connDBA);
 		$count = 1;
 		
 		echo "<table class=\"dataTable\">

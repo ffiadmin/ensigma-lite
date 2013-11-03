@@ -15,8 +15,12 @@
 		if ($userData) {
 			$passwordPrep = randomValue(10, "alphanum");
 			$password = encrypt($passwordPrep);
+			$siteName = query("SELECT * FROM `siteprofiles` WHERE `id` = '1'");
+			$from = prepare($siteName['siteName']) . "<no-reply@" . $_SERVER['HTTP_HOST'] . ">";
+			$header = "From: " . $from;
+			
 			mysql_query ("UPDATE `users` SET `password` = '{$password}', `changePassword` = 'on' WHERE `userName` = '{$userName}' AND `emailAddress1` = '{$emailAddress}'", $connDBA);
-			mail($userData['firstName'] . " " . $userData['lastName'] . " <" . $userData['emailAddress1'] . ">", "Password Reset", "Your password has been been set to: \"" . $passwordPrep . "\". Please login with this password, and you will be prompted to change this to a more suitable password.");
+			mail($userData['firstName'] . " " . $userData['lastName'] . " <" . $userData['emailAddress1'] . ">", prepare($siteName['siteName']) . " - Password Reset", "Your password has been been set to: \"" . $passwordPrep . "\". Please login with this password, and you will be prompted to change this to a more suitable password.", $header);
 			
 			header("Location: forgot_password.php?message=processed");
 			exit;
@@ -40,7 +44,7 @@
 <?php
 //Display message updates
 	if (isset($_GET['message'])) {
-		successMessage("If the user name and password you entered were correct, then an email has been sent to you with instructions on how to change your password. Click <a href=\"login.php\">here to login</a>.");
+		successMessage("If the user name and email address you entered were correct, then an email has been sent to you with instructions on how to change your password. Click <a href=\"login.php\">here to login</a>.");
 	} else {
 		echo "<p>&nbsp;</p>";
 	}

@@ -789,10 +789,10 @@ ob_start();
 					$IPAddress = $_SERVER['REMOTE_ADDR'];
 					$timeStamp = strtotime("-1 day");
 					
-					if (mysql_query("SELECT * FROM `failedLogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA)) {
-						$numberPrep = mysql_query("SELECT * FROM `failedLogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA);
+					if (mysql_query("SELECT * FROM `failedlogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA)) {
+						$numberPrep = mysql_query("SELECT * FROM `failedlogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA);
 						$number = mysql_num_rows($numberPrep);
-						$secuirtyGrabber = mysql_query("SELECT * FROM `siteProfiles` WHERE `id` = '1'", $connDBA);
+						$secuirtyGrabber = mysql_query("SELECT * FROM `siteprofiles` WHERE `id` = '1'", $connDBA);
 						$secuirty = mysql_fetch_array($secuirtyGrabber);
 						
 						if (intval($secuirty['failedLogins']) <= $number) {
@@ -806,7 +806,7 @@ ob_start();
 					$timeStamp = strtotime("now");
 					$IPAddress = $_SERVER['REMOTE_ADDR'];
 					
-					mysql_query("INSERT INTO `failedLogins` (
+					mysql_query("INSERT INTO `failedlogins` (
 								`id`, `timeStamp`, `IPAddress`, `userName`
 								) VALUES (
 								NULL, '{$timeStamp}', '{$IPAddress}', '{$loginUsername}'
@@ -815,10 +815,10 @@ ob_start();
 					$IPAddress = $_SERVER['REMOTE_ADDR'];
 					$timeStamp = strtotime("-1 day");
 					
-					if (mysql_query("SELECT * FROM `failedLogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA)) {
-						$numberPrep = mysql_query("SELECT * FROM `failedLogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA);
+					if (mysql_query("SELECT * FROM `failedlogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA)) {
+						$numberPrep = mysql_query("SELECT * FROM `failedlogins` WHERE `IPAddress` = '{$IPAddress}' AND `timeStamp` > '{$timeStamp}'", $connDBA);
 						$number = mysql_num_rows($numberPrep);
-						$secuirtyGrabber = mysql_query("SELECT * FROM `siteProfiles` WHERE `id` = '1'", $connDBA);
+						$secuirtyGrabber = mysql_query("SELECT * FROM `siteprofiles` WHERE `id` = '1'", $connDBA);
 						$secuirty = mysql_fetch_array($secuirtyGrabber);
 						
 						if (intval($secuirty['failedLogins']) <= $number) {
