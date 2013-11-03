@@ -35,25 +35,45 @@
 			$dueDate = mysql_real_escape_string(serialize($_POST['dueDate']));
 			$priority = mysql_real_escape_string(serialize($_POST['priority']));
 		
-		//Ensure times are not inferior if the dates are the same
+		//Ensure times are not inferior, the dates are the same, and all dates are set
+			if (empty($fromDate) || empty($toDate) || empty($_POST['toggleAvailability'])) {
+				$fromDate = "";
+				$fromTime = "";
+				$toDate = "";
+				$toTime = "";
+			}
+			
 			if ($fromDate == $toDate && !empty($fromDate) && !empty($toDate)) {
 				$fromTimeArray = explode(":", $fromTime);
 				$toTimeArray = explode(":", $toTime);
 				
 				if ($fromTime == $toTime) {
-					header("Location: manage_agenda.php?message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_agenda.php?message=inferior";
 				}
 				
 				if ($toTimeArray[0] < $fromTimeArray[0]) {
-					header("Location: manage_agenda.php?message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_agenda.php?message=inferior";
 				} elseif ($toTimeArray[0] == $fromTimeArray[0]) {					
 					if ($toTimeArray[1] < $fromTimeArray[1]) {
-						header("Location: manage_agenda.php?message=inferior");
-						exit;
+						$fromDate = "";
+						$fromTime = "";
+						$toDate = "";
+						$toTime = "";
+						$redirect = "Location: manage_agenda.php?message=inferior";
 					}
+				} else {
+					$redirect = "Location: index.php?added=agenda";
 				}
+			} else {
+				$redirect = "Location: index.php?added=agenda";
 			}
 			
 			$positionGrabber = mysql_query ("SELECT * FROM `collaboration` ORDER BY position DESC", $connDBA);
@@ -67,7 +87,14 @@
 							)";
 							
 			mysql_query($newAgendaQuery, $connDBA);
-			header ("Location: index.php?added=agenda");
+			
+			if ($redirect == "Location: manage_agenda.php?message=inferior") {
+				$redirectIDGrabber = mysql_query("SELECT * FROM `collaboration` WHERE `title` = '{$title}' AND `content` = '{$content}' AND `type` = 'Agenda' LIMIT 1", $connDBA);
+				$redirectID = mysql_fetch_array($redirectIDGrabber);
+				$redirect .= "&id=" . $redirectID['id'];
+			}
+			
+			header ($redirect);
 			exit;
 		} else {
 			$agenda = $_GET['id'];
@@ -82,7 +109,14 @@
 			$dueDate = mysql_real_escape_string(serialize($_POST['dueDate']));
 			$priority = mysql_real_escape_string(serialize($_POST['priority']));
 			
-		//Ensure times are not inferior if the dates are the same
+		//Ensure times are not inferior, the dates are the same, and all dates are set
+			if (empty($fromDate) || empty($toDate) || empty($_POST['toggleAvailability'])) {
+				$fromDate = "";
+				$fromTime = "";
+				$toDate = "";
+				$toTime = "";
+			}
+			
 			if ($fromDate == $toDate && !empty($fromDate) && !empty($toDate)) {
 				$id = $_GET['id'];
 				$type = $_GET['type'];
@@ -90,25 +124,38 @@
 				$toTimeArray = explode(":", $toTime);
 				
 				if ($fromTime == $toTime) {
-					header("Location: manage_agenda.php?id=" . $id . "&type=" . $type . "&message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_agenda.php?message=inferior&id=" . $id;
 				}
 				
 				if ($toTimeArray[0] < $fromTimeArray[0]) {
-					header("Location: manage_agenda.php?id=" . $id . "&type=" . $type . "&message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_agenda.php?message=inferior&id=" . $id;
 				} elseif ($toTimeArray[0] == $fromTimeArray[0]) {
 					if ($toTimeArray[1] < $fromTimeArray[1]) {
-						header("Location: manage_agenda.php?id=" . $id . "&type=" . $type . "&message=inferior");
-						exit;
+						$fromDate = "";
+						$fromTime = "";
+						$toDate = "";
+						$toTime = "";
+						$redirect = "Location: manage_agenda.php?message=inferior&id=" . $id;
 					}
+				} else {
+					$redirect = "Location: index.php?updated=agenda";
 				}
+			} else {
+				$redirect = "Location: index.php?updated=agenda";
 			}
 				
 			$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `dueDate` = '{$dueDate}', `priority` = '{$priority}' WHERE `id` = '{$agenda}'";
 			
 			mysql_query($editAgendaQuery, $connDBA);
-			header ("Location: index.php?updated=agenda");
+			header ($redirect);
 			exit;
 		}
 	} 

@@ -160,7 +160,7 @@
       <div class="catDivider alignLeft">Site Logo</div>
       <div class="stepContent">
       <blockquote>
-        <form action="site_settings.php?type=logo" method="post" enctype="multipart/form-data" id="uploadBanner" onsubmit="return errorsOnSubmit(this, 'false', 'bannerUploader', 'true', 'png.bmp.jpg.gif');">
+        <form action="site_settings.php?type=logo" method="post" enctype="multipart/form-data" id="uploadBanner" onsubmit="return errorsOnSubmit(this, 'bannerUploader', 'true', 'png.bmp.jpg.gif');">
           <div align="left">
             <?php
 			//Display current banner if it exists
@@ -320,7 +320,7 @@ px
         </div>
   </div>
       <div class="contentRight">
-      <form action="site_settings.php?type=icon" method="post" enctype="multipart/form-data" id="uploadIcon" onsubmit="return errorsOnSubmit(this, 'false', 'iconUploader', 'true', 'ico.jpg.gif');">
+      <form action="site_settings.php?type=icon" method="post" enctype="multipart/form-data" id="uploadIcon" onsubmit="return errorsOnSubmit(this, 'iconUploader', 'true', 'ico.jpg.gif');">
       <div class="catDivider one">Upload Icon</div>
       <div class="stepContent">
       <blockquote>
@@ -403,7 +403,7 @@ px
     <p>
       <?php if ($theme['style'] == "backToSchool.css") { echo "<div class=\"selectedTheme\">This is the current theme</div>";} ?>
     </p>
-    <p><img src="../../../Biomed-ed/images/preview.jpg" width="313" height="157" alt="Back to School Theme Preview" /> 
+    <p><img src="../../images/themes/back_to_school/preview.jpg" width="313" height="157" alt="Back to School Theme Preview" /> 
       <input type="button" name="chooseAmerican2" id="chooseAmerican2" value="Choose Back to School Theme" onclick="MM_goToURL('parent','site_settings.php?type=theme&amp;action=modifyTheme&amp;theme=backToSchool.css');return document.MM_returnValue" />
     </p>
     <p><strong>Binary</strong></p><?php if ($theme['style'] == "binary.css") { echo "<div class=\"selectedTheme\">This is the current theme</div>";} ?>
@@ -419,7 +419,7 @@ px
       <?php if ($theme['style'] == "chemistryLessons.css") { echo "<div class=\"selectedTheme\">This is the current theme</div>";} ?>
     </p>
     <p><img src="../../images/themes/chemistry_lessons/preview.jpg" width="315" height="156" alt="Chemistry Lessons Theme Preview" /> 
-      <input type="button" name="chooseBusiness2" id="chooseBusiness2" value="Choose Chemistry Lessons Theme" onclick="MM_goToURL('parent','site_settings.php?type=theme&amp;action=modifyTheme&amp;theme=chemistryLessons.css');return document.MM_returnValue" />
+      <input type="button" name="chooseChemistry" id="chooseChemistry" value="Choose Chemistry Lessons Theme" onclick="MM_goToURL('parent','site_settings.php?type=theme&amp;action=modifyTheme&amp;theme=chemistryLessons.css');return document.MM_returnValue" />
     </p>
     <p><strong>Digital University</strong></p><?php if ($theme['style'] == "digitalUniversity.css") { echo "<div class=\"selectedTheme\">This is the current theme</div>";} ?>
     <p><img src="../../images/themes/digital_university/preview.jpg" alt="Digitial University Theme Preview" width="314" height="136" />

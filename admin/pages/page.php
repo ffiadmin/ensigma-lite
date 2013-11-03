@@ -193,7 +193,7 @@
 		}
 	}
 	
-	title($pageInfo['title']); 
+	title(stripslashes(htmlentities($pageInfo['title']))); 
 ?>
 <?php headers(); ?>
 <?php tinyMCESimple(); ?>
@@ -227,7 +227,7 @@
 	}
 	
 //Display the page content	
-	echo "<h2>" . $pageInfo['title'] . "</h2>" . $content;
+	echo "<h2>" . stripslashes($pageInfo['title']) . "</h2>" . stripslashes($content);
 	
 //Display the comments
 	if ($commentsDisplay == "1") {
@@ -293,7 +293,7 @@
 				echo "<a class=\"action smallDelete\" href=\"page.php" . $processor . "action=delete&comment=all\" onclick=\"return confirm('This action cannot be undone. Continue?')\" onmouseover=\"Tip('Delete all comments')\" onmouseout=\"UnTip()\"></a>";
 			}
 			
-			echo "</p>";
+			echo "</p><div class=\"noResults\">No comments yet! Be the first to comment.</div>";
 		}
 		
 		if (privileges("addStaffComments") == "true") {
@@ -307,17 +307,12 @@
 			}
 			
 			echo "<form name=\"comments\" id=\"validate\" action=\"page.php" . $processor . "\" method=\"post\"><input type=\"hidden\" name=\"id\" id=\"id\" value=\"" . $user['id'] . "\" />";
-			echo "<blockquote><span id=\"commentsCheck\"><textarea name=\"comment\" id=\"comment\" style=\"width:450px;\"></textarea><span class=\"textareaRequiredMsg\"></span></span><br/><p>";
+			echo "<blockquote><textarea name=\"comment\" id=\"comment\" style=\"width:450px;\" class=\"validate[required]\"></textarea><br/><p>";
 			submit("submit", "Add Comment");
 			echo "</p></blockquote></form>";
 		}
 	}
 ?>
 <?php footer(); ?>
-<script type="text/javascript">
-<!--
-var sprytextarea1 = new Spry.Widget.ValidationTextarea("commentsCheck");
-//-->
-</script>
 </body>
 </html>

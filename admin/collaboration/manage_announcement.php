@@ -31,31 +31,51 @@
 			$toTime = $_POST['toTime'];
 			$content = mysql_real_escape_string($_POST['content']);
 		
-		//Ensure times are not inferior if the dates are the same
+		//Ensure times are not inferior, the dates are the same, and all dates are set
+			if (empty($fromDate) || empty($toDate) || empty($_POST['toggleAvailability'])) {
+				$fromDate = "";
+				$fromTime = "";
+				$toDate = "";
+				$toTime = "";
+			}
+			
 			if ($fromDate == $toDate && !empty($fromDate) && !empty($toDate)) {
 				$fromTimeArray = explode(":", $fromTime);
 				$toTimeArray = explode(":", $toTime);
 				
 				if ($fromTime == $toTime) {
-					header("Location: manage_announcement.php?message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_announcement.php?message=inferior";
 				}
 				
 				if ($toTimeArray[0] < $fromTimeArray[0]) {
-					header("Location: manage_announcement.php?message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_announcement.php?message=inferior";
 				} elseif ($toTimeArray[0] == $fromTimeArray[0]) {					
 					if ($toTimeArray[1] < $fromTimeArray[1]) {
-						header("Location: manage_announcement.php?message=inferior");
-						exit;
+						$fromDate = "";
+						$fromTime = "";
+						$toDate = "";
+						$toTime = "";
+						$redirect = "Location: manage_announcement.php?message=inferior";
 					}
+				} else {
+					$redirect = "Location: index.php?added=announcement";
 				}
+			} else {
+				$redirect = "Location: index.php?added=announcement";
 			}
 			
 			$positionGrabber = mysql_query ("SELECT * FROM `collaboration` ORDER BY position DESC", $connDBA);
 			$positionArray = mysql_fetch_array($positionGrabber);
 			$position = $positionArray{'position'}+1;
-				
+			
 			$newAnnouncementQuery = "INSERT INTO collaboration (
 								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`
 							) VALUES (
@@ -63,7 +83,14 @@
 							)";
 							
 			mysql_query($newAnnouncementQuery, $connDBA);
-			header ("Location: index.php?added=announcement");
+			
+			if ($redirect == "Location: manage_announcement.php?message=inferior") {
+				$redirectIDGrabber = mysql_query("SELECT * FROM `collaboration` WHERE `title` = '{$title}' AND `content` = '{$content}' AND `type` = 'Announcement' LIMIT 1", $connDBA);
+				$redirectID = mysql_fetch_array($redirectIDGrabber);
+				$redirect .= "&id=" . $redirectID['id'];
+			}
+			
+			header ($redirect);
 			exit;
 		} else {
 			$announcement = $_GET['id'];
@@ -74,7 +101,14 @@
 			$toTime = $_POST['toTime'];
 			$content = mysql_real_escape_string($_POST['content']);
 			
-		//Ensure times are not inferior if the dates are the same
+		//Ensure times are not inferior, the dates are the same, and all dates are set
+			if (empty($fromDate) || empty($toDate) || empty($_POST['toggleAvailability'])) {
+				$fromDate = "";
+				$fromTime = "";
+				$toDate = "";
+				$toTime = "";
+			}
+			
 			if ($fromDate == $toDate && !empty($fromDate) && !empty($toDate)) {
 				$id = $_GET['id'];
 				$type = $_GET['type'];
@@ -82,25 +116,38 @@
 				$toTimeArray = explode(":", $toTime);
 				
 				if ($fromTime == $toTime) {
-					header("Location: manage_announcement.php?id=" . $id . "&type=" . $type . "&message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_announcement.php?message=inferior&id=" . $id;
 				}
 				
 				if ($toTimeArray[0] < $fromTimeArray[0]) {
-					header("Location: manage_announcement.php?id=" . $id . "&type=" . $type . "&message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_announcement.php?message=inferior&id=" . $id;
 				} elseif ($toTimeArray[0] == $fromTimeArray[0]) {
 					if ($toTimeArray[1] < $fromTimeArray[1]) {
-						header("Location: manage_announcement.php?id=" . $id . "&type=" . $type . "&message=inferior");
-						exit;
+						$fromDate = "";
+						$fromTime = "";
+						$toDate = "";
+						$toTime = "";
+						$redirect = "Location: manage_announcement.php?message=inferior&id=" . $id;
 					}
+				} else {
+					$redirect = "Location: index.php?updated=announcement";
 				}
+			} else {
+				$redirect = "Location: index.php?updated=announcement";
 			}
 				
 			$editAnnouncementQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}' WHERE `id` = '{$announcement}'";
 			
 			mysql_query($editAnnouncementQuery, $connDBA);
-			header ("Location: index.php?updated=announcement");
+			header ($redirect);
 			exit;
 		}
 	} 
@@ -299,13 +346,12 @@
         <blockquote>
         <p>Content<span class="require">*</span>: </p>
         <blockquote>
-        <p><span id="contentCheck">
-            <textarea name="content" id="content1" cols="45" rows="5" style="width:640px; height:320px;" /><?php 
+        <p>
+            <textarea name="content" id="content1" cols="45" rows="5" style="width:640px; height:320px;" class="validate[required]" /><?php 
 				if (isset ($announcement)) {
 					echo stripslashes($announcement['content']);
 				}
 			?></textarea>
-          <span class="textareaRequiredMsg"></span></span>
           </p>
         </blockquote>
         </blockquote>
@@ -323,10 +369,5 @@
       </div>
     </form>
 <?php footer(); ?>
-<script type="text/javascript">
-<!--
-var sprytextarea1 = new Spry.Widget.ValidationTextarea("contentCheck");
-//-->
-</script>
 </body>
 </html>

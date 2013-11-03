@@ -10,52 +10,20 @@ open source, freeware, nor commercial/closed source.
 
 //Script to validate all form field types, and tie serveral validation technologies together
 
-function errorsOnSubmit(form, spry, upload, forced, extension) {
-	if (spry == false || !spry) {
-		spry = "true";
+function errorsOnSubmit(form, upload, forced, extension) {	
+	var jqueryValidate = $('#validate').validationEngine({returnIsValid:true});
+		
+	if (jqueryValidate == true) {
+		if (upload == false || !upload) {
+			return successDisplay('1', '0', '0', '1');
+		} else {
+			return uploadCheck(upload, forced, extension, 'true');
+		}
 	}
 	
-	var spryValidate = Spry.Widget.Form.validate(form);
-	var jqueryValidate = $('#validate').validationEngine({returnIsValid:true});
-	
-	if (spry != "false") {
-		if (spryValidate == true) {
-			if (jqueryValidate == true) {
-				if (upload == false || !upload) {
-					return successDisplay('1', '0', '0', '1');
-				} else {
-					return uploadCheck(upload, forced, extension, 'true');
-				}	
-			}
-			
-			if (jqueryValidate == false) {
-				return errorDisplay('1', '1', '0', '1');
-				return uploadCheck(upload, forced, extension, 'false');
-			} 
-		} else {
-			if (jqueryValidate == true) {
-				return errorDisplay('1', '1', '0', '1');
-				return uploadCheck(upload, forced, extension, 'false');
-			}
-			
-			if (jqueryValidate == false) {
-				return errorDisplay('1', '1', '0', '1');
-				return uploadCheck(upload, forced, extension, 'false');
-			}
-		}
-	} else {
-		if (jqueryValidate == true) {
-			if (upload == false || !upload) {
-				return successDisplay('1', '0', '0', '1');
-			} else {
-				return uploadCheck(upload, forced, extension, 'true');
-			}
-		}
-		
-		if (jqueryValidate == false) {
-			return errorDisplay('1', '1', '0', '1');
-			return uploadCheck(upload, forced, extension, 'false');
-		}
+	if (jqueryValidate == false) {
+		return errorDisplay('1', '1', '0', '1');
+		return uploadCheck(upload, forced, extension, 'false');
 	}
 }
 

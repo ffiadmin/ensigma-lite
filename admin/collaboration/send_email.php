@@ -274,9 +274,9 @@
     <p>
       Enter the message of the email below<span class="require">*</span>:</p>
     <blockquote>
-      <p><span id="contentCheck">
+      <p>
         <textarea name="message" id="message" cols="45" rows="5" style="width:640px; height:320px;" /></textarea>
-       <span class="textareaRequiredMsg"></span></span></p>
+      </p>
     </blockquote>
   </blockquote>
 </div>
@@ -305,10 +305,5 @@
 	}
 ?>
 <?php footer(); ?>
-<script type="text/javascript">
-<!--
-var sprytextarea1 = new Spry.Widget.ValidationTextarea("contentCheck");
-//-->
-</script>
 </body>
 </html>

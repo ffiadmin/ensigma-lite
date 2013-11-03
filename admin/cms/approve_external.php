@@ -16,13 +16,13 @@
 			$tabData = mysql_fetch_array($tabDataGrabber);
 			
 			if ($tabData['published'] == "2") {
-				die(successMessage("This tab is already published"));
+				die(successMessage("This tab is already published."));
 			}
 		} else {
-			die(errorMessage("This tab does not exist"));
+			die(errorMessage("This tab does not exist."));
 		}
 	} else {
-		die(errorMessage("The tab ID was not provided"));
+		die(errorMessage("The tab ID was not provided."));
 	}
 ?>
 <?php
@@ -107,9 +107,9 @@
   <div>
   <?php
       if ($tabData['display'] == "1") {
-          echo $tabData['content2'];
+          echo stripslashes($tabData['content2']);
       } else {
-          echo $tabData['content1'];
+          echo stripslashes($tabData['content1']);
       }
   ?>
   </div>
@@ -134,9 +134,9 @@
   <div>
   <?php
       if ($tabData['display'] == "1") {
-          echo $tabData['content1'];
+          echo stripslashes($tabData['content1']);
       } else {
-          echo $tabData['content2'];
+          echo stripslashes($tabData['content2']);
       }
   ?>
   </div>
@@ -152,7 +152,7 @@
           echo "<a class=\"smallEdit\" target=\"_blank\" href=\"manage_external.php?id=" . $tabData['id'] . "&content=1\"></a><br />";
       }
 		
-	  echo $tabData['content1'];
+	  echo stripslashes($tabData['content1']);
   ?>
 </div>
 <?php

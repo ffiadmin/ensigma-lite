@@ -679,7 +679,7 @@ a.skip:focus, a.skip:active {
 	}
 	
 	div.toolBarAlert {
-		background:url(../../../Biomed-ed/images/alert.png) #EEEEEE no-repeat left;
+		background:url(../../images/admin_icons/alert.png) #EEEEEE no-repeat left;
 		padding-left:45px;
 		min-height:35px;
 		vertical-align:middle;
@@ -1054,6 +1054,11 @@ a.skip:focus, a.skip:active {
 		text-decoration:none;
 	}
 	
+	span.homePage {
+		background:url(../../images/admin_icons/homePage.png) no-repeat left;
+		padding-left:25px;
+	}
+	
 	span.notAssigned {
 		font-style:italic;
 		text-align:center;	
@@ -1315,4 +1320,21 @@ a.skip:focus, a.skip:active {
 		padding-right: 10px;
 		text-align:right;
 	}
+	
+	div.uploading {
+		background:url(../../images/common/loading.gif) #0C3 left no-repeat;
+		padding-left: 20px;
+		width: 140px;
+		top:0px;
+		position:fixed;
+		right:45%;
+	}
+	
+	div.errorBox {
+		top:0px;
+		width: 180px;
+		position:fixed;
+		right:35%;
+	}
+		
 /* End Misc. */

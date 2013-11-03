@@ -93,6 +93,9 @@
 <?php topPage(); ?>
 <h2>Staff Home Page</h2>
 <?php
+//Display an uploading progress div
+	echo "<div id=\"errorBox\" class=\"errorBox\" style=\"display:none;\">Some fields are incomplete. Please scroll up to correct them.</div><div class=\"uploading\" id=\"progress\" style=\"display:none;\">Uploading in progress</div>";
+	
 //Display message updates
 	if (isset($_GET['message'])) {
 		if ($_GET['message'] == "deleted") {
@@ -275,11 +278,11 @@
 						
 						if (privileges("uploadFile") == "true") {
 							echo "<br /><br />";
-							echo "<form name=\"upload\" id=\"validate\" action=\"index.php\" method=\"post\" enctype=\"multipart/form-data\"><h2>Upload file</h2><blockquote><p><input type=\"file\" name=\"file\" id=\"file" . $item['id'] . "\" size=\"50\" class=\"validate[required]\"><br />Max file size: " . ini_get('upload_max_filesize') . "</p></blockquote><h2>Select category</h2><blockquote><p><select name=\"category\" id=\"category" . $item['id'] . "\" class=\"validate[required]\"><option value=\"\">- Select -</option>";
+							echo "<form id=\"validate\" action=\"index.php\" method=\"post\" enctype=\"multipart/form-data\" onsubmit=\"return errorsOnSubmit(this, 'file_" . $item['id'] . "');\"><h2>Upload file</h2><blockquote><p><input type=\"file\" name=\"file\" id=\"file_" . $item['id'] . "\" size=\"50\" class=\"validate[required]\"><br />Max file size: " . ini_get('upload_max_filesize') . "</p></blockquote><h2>Select category</h2><blockquote><p><select name=\"category\" id=\"category" . $item['id'] . "\" class=\"validate[required]\"><option value=\"\">- Select -</option>";
 							$directories = unserialize($item['directories']);
 							
 							while (list($uploadKey, $uploadArray) = each($directories)) {
-								echo "<option value=\"" . $uploadKey . "\">" . $uploadArray . "</option>";
+								echo "<option value=\"" . $uploadKey . "\">" . stripslashes(htmlentities($uploadArray)) . "</option>";
 							}
 							
 							echo "</select></p><p><input type=\"submit\" name=\"submit\" id=\"submit" . $item['id'] . "\" value=\"Upload File\" /></p></blockquote></form>";
@@ -293,7 +296,7 @@
 			}
 		}
 		
-		while($item = mysql_fetch_array($itemGrabber)) {
+		while ($item = mysql_fetch_array($itemGrabber)) {
 			if (($item['visible'] == "on" || $item['fromDate'] != "") || ($item['visible'] == "on" && $item['fromDate'] != "")) {
 				$from = strtotime($item['fromDate'] . " " . $item['fromTime']);
 				$to = strtotime($item['toDate'] . " " . $item['toTime']);

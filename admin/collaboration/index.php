@@ -152,8 +152,8 @@
 <p>&nbsp;</p>
 <div class="toolBar"><a class="toolBarItem announcementLink" href="manage_announcement.php">Create Announcement</a><a class="toolBarItem agenda" href="manage_agenda.php">Create Agenda</a><a class="toolBarItem fileShare" href="manage_files.php">Create File Share</a><a class="toolBarItem email" href="send_email.php">Send Mass Email</a></div>
 <?php 
-	if (isset ($_GET['added']) && $_GET['added'] == "announcement") {successMessage("The annoumcement was successfully added");}
-    if (isset ($_GET['updated']) && $_GET['updated'] == "announcement") {successMessage("The annoumcement was successfully updated");}
+	if (isset ($_GET['added']) && $_GET['added'] == "announcement") {successMessage("The announcement was successfully added");}
+    if (isset ($_GET['updated']) && $_GET['updated'] == "announcement") {successMessage("The announcement was successfully updated");}
 	if (isset ($_GET['added']) && $_GET['added'] == "agenda") {successMessage("The agenda was successfully added");}
     if (isset ($_GET['updated']) && $_GET['updated'] == "agenda") {successMessage("The agenda was successfully updated");}
 	if (isset ($_GET['added']) && $_GET['added'] == "files") {successMessage("The file share was successfully added");}
@@ -253,7 +253,7 @@
 		
 		echo "</tr></tbody></table>";
 	 } else {
-		echo "<div class=\"noResults\">This site has no items</div>";
+		echo "<div class=\"noResults\">This site has no items. New items can be created by selecting an item from the tool bar above.</div>";
 	 } 
 ?>
 <?php footer(); ?>

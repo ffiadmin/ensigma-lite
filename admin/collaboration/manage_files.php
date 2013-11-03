@@ -32,25 +32,45 @@
 			$content = mysql_real_escape_string($_POST['content']);
 			$category = mysql_real_escape_string(serialize($_POST['category']));
 		
-		//Ensure times are not inferior if the dates are the same
+		//Ensure times are not inferior, the dates are the same, and all dates are set
+			if (empty($fromDate) || empty($toDate) || empty($_POST['toggleAvailability'])) {
+				$fromDate = "";
+				$fromTime = "";
+				$toDate = "";
+				$toTime = "";
+			}
+			
 			if ($fromDate == $toDate && !empty($fromDate) && !empty($toDate)) {
 				$fromTimeArray = explode(":", $fromTime);
 				$toTimeArray = explode(":", $toTime);
 				
 				if ($fromTime == $toTime) {
-					header("Location: manage_files.php?message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_files.php?message=inferior";
 				}
 				
 				if ($toTimeArray[0] < $fromTimeArray[0]) {
-					header("Location: manage_files.php?message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_files.php?message=inferior";
 				} elseif ($toTimeArray[0] == $fromTimeArray[0]) {					
 					if ($toTimeArray[1] < $fromTimeArray[1]) {
-						header("Location: manage_files.php?message=inferior");
-						exit;
+						$fromDate = "";
+						$fromTime = "";
+						$toDate = "";
+						$toTime = "";
+						$redirect = "Location: manage_files.php?message=inferior";
 					}
+				} else {
+					$redirect = "Location: index.php?added=files";
 				}
+			} else {
+				$redirect = "Location: index.php?added=files";
 			}
 			
 		//Create the directories
@@ -76,7 +96,14 @@
 							)";
 							
 			mysql_query($newFilesQuery, $connDBA);
-			header ("Location: index.php?added=files");
+			
+			if ($redirect == "Location: manage_files.php?message=inferior") {
+				$redirectIDGrabber = mysql_query("SELECT * FROM `collaboration` WHERE `title` = '{$title}' AND `content` = '{$content}' AND `type` = 'File Share' LIMIT 1", $connDBA);
+				$redirectID = mysql_fetch_array($redirectIDGrabber);
+				$redirect .= "&id=" . $redirectID['id'];
+			}
+			
+			header ($redirect);
 			exit;
 		} else {
 			$files = $_GET['id'];
@@ -87,7 +114,14 @@
 			$toTime = $_POST['toTime'];
 			$content = mysql_real_escape_string($_POST['content']);
 			
-		//Ensure times are not inferior if the dates are the same
+		//Ensure times are not inferior, the dates are the same, and all dates are set
+			if (empty($fromDate) || empty($toDate) || empty($_POST['toggleAvailability'])) {
+				$fromDate = "";
+				$fromTime = "";
+				$toDate = "";
+				$toTime = "";
+			}
+			
 			if ($fromDate == $toDate && !empty($fromDate) && !empty($toDate)) {
 				$id = $_GET['id'];
 				$type = $_GET['type'];
@@ -95,19 +129,32 @@
 				$toTimeArray = explode(":", $toTime);
 				
 				if ($fromTime == $toTime) {
-					header("Location: manage_files.php?id=" . $id . "&type=" . $type . "&message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_files.php?message=inferior&id=" . $id;
 				}
 				
 				if ($toTimeArray[0] < $fromTimeArray[0]) {
-					header("Location: manage_files.php?id=" . $id . "&type=" . $type . "&message=inferior");
-					exit;
+					$fromDate = "";
+					$fromTime = "";
+					$toDate = "";
+					$toTime = "";
+					$redirect = "Location: manage_files.php?message=inferior&id=" . $id;
 				} elseif ($toTimeArray[0] == $fromTimeArray[0]) {
 					if ($toTimeArray[1] < $fromTimeArray[1]) {
-						header("Location: manage_files.php?id=" . $id . "&type=" . $type . "&message=inferior");
-						exit;
+						$fromDate = "";
+						$fromTime = "";
+						$toDate = "";
+						$toTime = "";
+						$redirect = "Location: manage_files.php?message=inferior&id=" . $id;
 					}
+				} else {
+					$redirect = "Location: index.php?updated=files";
 				}
+			} else {
+				$redirect = "Location: index.php?updated=files";
 			}
 			
 		//Update the directories
@@ -142,7 +189,7 @@
 			$editFilesQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `directories` = '{$category}' WHERE `id` = '{$files}'";
 			
 			mysql_query($editFilesQuery, $connDBA);
-			header ("Location: index.php?updated=files");
+			header ($redirect);
 			exit;
 		}
 	} 
@@ -368,7 +415,7 @@
                 //Display table rows according to what is going on			
                     if (!isset ($files)) {                        
                         echo "<tr id=\"1\" align=\"center\">";
-                            echo "<td><input type=\"hidden\" name=\"directory[]\" value=\"" . randomValue(25, "alphanum") . "\" /><input type=\"text\" name=\"category[]\" id=\"category1\" class=\"validate[required,custom[noSpecialCharacters]]\" autocomplete=\"off\" size=\"50\"></td>";
+                            echo "<td><input type=\"hidden\" name=\"directory[]\" value=\"" . randomValue(25, "alphanum") . "\" /><input type=\"text\" name=\"category[]\" id=\"category1\" class=\"validate[required]\" autocomplete=\"off\" size=\"50\"></td>";
                             echo "<td width=\"50\"><span class=\"action smallDelete\" onclick=\"deleteObject('files', '1')\"></span>";
                         echo "</tr>";
                     } else {
@@ -380,7 +427,7 @@
 							$rowID = $count++;
 							                          
 							echo "<tr id=\"" . $rowID . "\" align=\"center\">";
-                                echo "<td><input type=\"hidden\" name=\"directory[]\" value=\"" . $categoriesKey . "\" /><input type=\"text\" name=\"category[]\" id=\"category" . $rowID . "\" class=\"validate[required,custom[noSpecialCharacters]]\" autocomplete=\"off\" size=\"50\" value=\"" . htmlentities(stripslashes($categoriesArray)) . "\"></td>";
+                                echo "<td><input type=\"hidden\" name=\"directory[]\" value=\"" . $categoriesKey . "\" /><input type=\"text\" name=\"category[]\" id=\"category" . $rowID . "\" class=\"validate[required]\" autocomplete=\"off\" size=\"50\" value=\"" . htmlentities(stripslashes($categoriesArray)) . "\"></td>";
                                 echo "<td width=\"50\"><span class=\"action smallDelete\" onclick=\"deleteObject('files', '" . $rowID . "')\"></span>";
                             echo "</tr>";
                         }

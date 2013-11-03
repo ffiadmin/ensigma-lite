@@ -16,13 +16,13 @@
 			$sideBarData = mysql_fetch_array($sideBarDataGrabber);
 			
 			if ($sideBarData['published'] == "2") {
-				die(successMessage("This box is already published"));
+				die(successMessage("This box is already published."));
 			}
 		} else {
-			die(errorMessage("This box does not exist"));
+			die(errorMessage("This box does not exist."));
 		}
 	} else {
-		die(errorMessage("The box ID was not provided"));
+		die(errorMessage("The box ID was not provided."));
 	}
 ?>
 <?php
@@ -108,12 +108,12 @@
   <?php
 	  if ($sideBarData['type'] != "Login") {
 		  if ($sideBarData['display'] == "1") {
-			  echo $sideBarData['content2'];
+			  echo stripslashes($sideBarData['content2']);
 		  } else {
-			  echo $sideBarData['content1'];
+			  echo stripslashes($sideBarData['content1']);
 		  }
 	  } else {
-		  echo "The system creates a simple login form. No other content is displayed in this box.";
+		  echo "The system creates a login form. No other content is displayed in this box.";
 	  }
   ?>
   </div>
@@ -138,9 +138,9 @@
   <div>
   <?php
       if ($sideBarData['display'] == "1") {
-          echo $sideBarData['content1'];
+          echo stripslashes($sideBarData['content1']);
       } else {
-          echo $sideBarData['content2'];
+          echo stripslashes($sideBarData['content2']);
       }
   ?>
   </div>
@@ -157,9 +157,9 @@
       }
 	  
 	  if ($sideBarData['type'] != "Login") {
-		  echo $sideBarData['content1'];
+		  echo stripslashes($sideBarData['content1']);
 	  } else {
-		  echo "<p>The system creates a simple login form. No other content is displayed in this box.</p>";
+		  echo "<p>The system creates a login form. No other content is displayed in this box.</p>";
 	  }
   ?>
 </div>
