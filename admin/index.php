@@ -142,7 +142,7 @@
 		$id = $_POST['id'];
 		$itemID = $_POST['itemID'];
 		$comment = $_POST['comment_' . $itemID];
-		$date = date("D, M j, Y") . " at " . date("g:i a");
+		$date = date();
 		$oldDataGrabber = mysql_query("SELECT * FROM `collaboration` WHERE `id` = '{$itemID}'", $connDBA);
 		$oldData = mysql_fetch_array($oldDataGrabber);
 		$oldComments = unserialize($oldData['comment']);
@@ -547,10 +547,14 @@
 						
 						for ($count = 0; $count <= $values; $count++) {
 							$userID = $names[$count];
-							$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
-							$user = mysql_fetch_array($userGrabber);
 							
-							echo "<p class=\"commentTitle\">" . $user['firstName'] . " " . $user['lastName'] . " commented on " . $dates[$count];
+							if (exist("users", "id", $userID)) {
+								$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
+								$user = mysql_fetch_array($userGrabber);
+								echo "<p class=\"commentTitle\">" . $user['firstName'] . " " . $user['lastName'] . " commented on " .  date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
+							} else {
+								echo "<p class=\"commentTitle\">An unknown staff member commented on " .  date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
+							}
 							
 							if (privileges("deleteForumComments") == "true") {
 								if (isset ($_GET['page'])) {

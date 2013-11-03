@@ -32,7 +32,7 @@ tinyMCE.init({
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
 		theme_advanced_resizing : true,
-        autosave_ask_before_unload : true,
+        autosave_ask_before_unload : false,
 		editor_deselector : "noEditorSimple",
         gecko_spellcheck : false,
 	});

@@ -94,6 +94,7 @@ ob_start();
 			case "ico" : echo "image/x-icon"; break;
 			case "jpg" : echo "image/jpeg"; break;
 			case "gif" : echo "image/gif"; break;
+			case "png" : echo "image/png"; break;
 		}
 		
 		echo "\" rel=\"shortcut icon\" href=\"" . $root . "images/icon." . $iconExtension['iconType'] . "\" />";
@@ -1726,7 +1727,7 @@ ob_start();
 	//Generate the next avaliable comlum for MySQL
 	function nextLog($table, $id) {
 		$query = query("SELECT * FROM `{$table}` WHERE `id` = '{$id}'", "assoc");
-		unset($query['id'], $query['position'], $query['visible'], $query['published'], $query['display'], $query['name'], $query['date'], $query['comment'], $query['type']);
+		unset($query['id'], $query['position'], $query['parentPage'], $query['subPosition'], $query['visible'], $query['published'], $query['display'], $query['name'], $query['date'], $query['comment'], $query['type']);
 		
 		for($count = 1; $count <= sizeof($query); $count ++) {
 			if (columnExists($table, "content" . $count, $id, true)) {
@@ -1884,8 +1885,22 @@ ob_start();
 					$hierarchyUpdate = "";
 				}
 				
+			//Check to see if the comments need a comparison
+				if ($tableName == "pages" || $tableName == "staffpages") {
+					if (prepare($pageData['comments']) === $comments) {
+						$oldComments = true;
+						$newComments = true;
+					} else {
+						$oldComments = false;
+						$newComments = true;
+					}
+				} else {
+					$oldComments = true;
+					$newComments = true;
+				}
+				
 			//No changes were made, then simply log the update
-				if (prepare($pageData['title']) === prepare($_POST['title']) && prepare($pageData['content']) === prepare($_POST['content']) && prepare($pageData['comments']) === $comments) {
+				if (prepare($pageData['title']) === prepare($_POST['title']) && prepare($pageData['content']) === prepare($_POST['content']) && $oldComments === $newComments) {
 					$oldCommentsPrep = query("SELECT * FROM `{$tableName}` WHERE `id` = '{$id}' LIMIT 1");
 					$oldComments = unserialize($oldCommentsPrep['content' . $oldCommentsPrep['display']]);
 					
@@ -2064,17 +2079,16 @@ ob_start();
 					$parentPage = "";
 				}
 				
-			//If the item is moved up...
 				if ($currentPosition > $newPosition) {
-					mysql_query("UPDATE `{$table}` SET {$position} = {$position} + 1 WHERE{$parentPage} {$position} >= '{$newPosition}' AND {$position} <= '{$currentPosition}'", $connDBA);
-			//If the item is moved down...
+					mysql_query("UPDATE {$table} SET {$position} = {$position} + 1 WHERE{$parentPage} {$position} >= '{$newPosition}' AND {$position} <= '{$currentPosition}'", $connDBA);
+					mysql_query ("UPDATE {$table} SET {$position} = '{$newPosition}' WHERE id = '{$id}'", $connDBA);
 				} elseif ($currentPosition < $newPosition) {
-					query("UPDATE `{$table}` SET {$position} = {$position} - 1 WHERE{$parentPage} {$position} <= '{$newPosition}' AND {$position} >= '{$currentPosition}'", $connDBA);
+					mysql_query("UPDATE {$table} SET {$position} = {$position} - 1 WHERE{$parentPage} {$position} <= '{$newPosition}' AND {$position} >= '{$currentPosition}'", $connDBA);
+					mysql_query("UPDATE {$table} SET {$position} = '{$newPosition}' WHERE id = '{$id}'", $connDBA);
 				}
 				
-				mysql_query("UPDATE `{$table}` SET {$position} = '{$newPosition}' WHERE id = '{$id}'", $connDBA);
-				
-				redirect($redirect);
+				header ("Location: " . $redirect);
+				die;
 			}
 		}
 	}
@@ -2244,16 +2258,7 @@ ob_start();
 		echo "<style type=\"text/css\">
 		ins {background-color:#0C0;}
 		del {background-color:#903;}
-		</style></head><body class=\"overrideBackground\"><h2>" . "Approve " . ucfirst($itemType) . "</h2><p>&nbsp;</p><div class=\"toolBar\"><a class=\"toolBarItem accept\" href=\"" . $_SERVER['PHP_SELF'] . "?id=" .  $itemData['id'] . "&accepted=true\">Accept Pending Version</a>";
-	  
-	    //Only show if an update is pending
-	    if ($itemData['published'] != "0") {
-		   echo "<a class=\"toolBarItem reject\" href=\"javascript:void()\" onclick=\"reject()\">Revert to Currently Published</a>";
-	    } else {
-		   echo "<a class=\"toolBarItem reject\" href=\"javascript:void()\" onclick=\"reject()\">Reject Pending Version</a>";
-	    }
-	   
-	    echo "<div class=\"contentHide\" id=\"reject\"><form name=\"rejectReason\" id=\"validate\" method=\"post\" action=\"" . $_SERVER['REQUEST_URI'] . "\"><p>Why are you rejecting this version?</p><p><textarea name=\"comments\" id=\"comments\" cols=\"45\" rows=\"5\" style=\"width:450px;\" class=\"validate[required]\"></textarea></p><p>";
+		</style></head><body class=\"overrideBackground\"><h2>" . "Approve " . ucfirst($itemType) . "</h2><p>&nbsp;</p><div class=\"toolBar\"><a class=\"toolBarItem accept\" href=\"" . $_SERVER['PHP_SELF'] . "?id=" .  $itemData['id'] . "&accepted=true\">Accept Pending Version</a><a class=\"toolBarItem reject\" href=\"javascript:void()\" onclick=\"reject()\">Reject Pending Version</a><div class=\"contentHide\" id=\"reject\"><form name=\"rejectReason\" id=\"validate\" method=\"post\" action=\"" . $_SERVER['REQUEST_URI'] . "\"><p>Why are you rejecting this version?</p><p><textarea name=\"comments\" id=\"comments\" cols=\"45\" rows=\"5\" style=\"width:450px;\" class=\"validate[required]\"></textarea></p><p>";
 		submit("submit", "Submit");
 		echo "</p></form></div></div><br />";
 		
@@ -2490,7 +2495,7 @@ ob_start();
 					
 					if (exist("users", "id", $item['user'])) {
 						$userInfo = query("SELECT * FROM `users` WHERE `id` = '{$item['user']}'");
-						$user = prepare(ucfirst($userInfo['firstName']) . " " . ucfirst($userInfo['lastName'])) . " ";
+						$user = prepare(ucfirst($userInfo['firstName']) . " " . ucfirst($userInfo['lastName']));
 					} else {
 						$user = "Unknown";
 					}
@@ -2547,7 +2552,7 @@ ob_start();
 					$userInfo = query("SELECT * FROM `users` WHERE `id` = '{$item['user']}'");
 					$user = prepare(ucfirst($userInfo['firstName']) . " " . ucfirst($userInfo['lastName'])) . " ";
 				} else {
-					$user = "Unknown";
+					$user = "An unknown user ";
 				}
 				
 				echo "<h2>" . prepare($item['title']) . "</h2>";
@@ -2773,50 +2778,51 @@ ob_start();
 	}
 	
 	//Overall statistics
-	function stats($doAction = "false") {
+	function stats($doAction = "false", $publicSpace = "true") {
 		global $root;
 		global $connDBA;
 		
 		if ($doAction == "true") {
-			if (isset($_GET['page'])) {
-				$page = $_GET['page'];
+			$date = date("M-d-Y");
+			
+			if (exist("dailyhits", "date", $date)) {
+				mysql_query("UPDATE `dailyhits` SET `hits` = `hits`+1 WHERE `date` = '{$date}' LIMIT 1", $connDBA);
 			} else {
-				$pageDataGrabber = mysql_query("SELECT * FROM `pages` WHERE `position` = '1' LIMIT 1", $connDBA);
-				
-				if ($pageData = mysql_fetch_array($pageDataGrabber)) {
-					$page = $pageData['id'];
-				}
+				mysql_query("INSERT INTO `dailyhits` (
+							`id`, `date`, `hits`
+							) VALUES (
+							NULL, '{$date}', '1'
+							)", $connDBA);
 			}
 			
-			if (isset($page)) {
-				$settings = query("SELECT * FROM `privileges`");
-				$pagePublished = query("SELECT * FROM `pages` WHERE `id` = '{$page}' LIMIT 1");
-				
-				if ($pagePublished['published'] != "0") {
-					if (exist("pages", "id", $page)) {
-						if (exist("pagehits", "page", $page)) {
-							mysql_query("UPDATE `pagehits` SET `hits` = `hits`+1 WHERE `page` = '{$page}' LIMIT 1", $connDBA);
-						} else {
-							mysql_query("INSERT INTO `pagehits` (
-										`id`, `page`, `hits`
-										) VALUES (
-										NULL, '{$page}', '1'
-										)", $connDBA);
-						}
+			if ($publicSpace == "true") {
+				if (isset($_GET['page'])) {
+					$page = $_GET['page'];
+				} else {
+					$pageDataGrabber = mysql_query("SELECT * FROM `pages` WHERE `position` = '1' LIMIT 1", $connDBA);
+					
+					if ($pageData = mysql_fetch_array($pageDataGrabber)) {
+						$page = $pageData['id'];
 					}
 				}
 				
-				$date = date("M-d-Y");
-				$dailyCheck = mysql_query("SELECT * FROM `dailyhits` WHERE `date` = '{$date}' LIMIT 1", $connDBA);
-				
-				if (exist("dailyhits", "date", $date)) {
-					mysql_query("UPDATE `dailyhits` SET `hits` = `hits`+1 WHERE `date` = '{$date}' LIMIT 1", $connDBA);
-				} else {
-					mysql_query("INSERT INTO `dailyhits` (
-								`id`, `date`, `hits`
-								) VALUES (
-								NULL, '{$date}', '1'
-								)", $connDBA);
+				if (isset($page)) {
+					$settings = query("SELECT * FROM `privileges`");
+					$pagePublished = query("SELECT * FROM `pages` WHERE `id` = '{$page}' LIMIT 1");
+					
+					if ($pagePublished['published'] != "0") {
+						if (exist("pages", "id", $page)) {
+							if (exist("pagehits", "page", $page)) {
+								mysql_query("UPDATE `pagehits` SET `hits` = `hits`+1 WHERE `page` = '{$page}' LIMIT 1", $connDBA);
+							} else {
+								mysql_query("INSERT INTO `pagehits` (
+											`id`, `page`, `hits`
+											) VALUES (
+											NULL, '{$page}', '1'
+											)", $connDBA);
+							}
+						}
+					}
 				}
 			}
 		}

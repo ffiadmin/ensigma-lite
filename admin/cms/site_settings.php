@@ -108,7 +108,7 @@
 		echo "<p>&nbsp;</p>";
 	}
 	
-	if (isset ($_POST['updatePlacement'])) {
+	if (isset ($_POST['updatePlacement']) && !empty($_POST['paddingTopSelect']) && !empty($_POST['paddingBottomSelect']) && !empty($_POST['paddingLeftSelect']) && !empty($_POST['paddingRightSelect'])) {
 		$id = $_POST['idHidden'];
 		$imagePaddingTopEdit = $_POST['paddingTopSelect'];
 		$imagePaddingBottomEdit = $_POST['paddingBottomSelect'];
@@ -125,7 +125,7 @@
 		}
 	}
 	
-	if (isset ($_POST['updateSize'])) {		
+	if (isset ($_POST['updateSize']) && !empty($_POST['automatic']) || (!empty($_POST['height']) && !empty($_POST['width']))) {		
 		if (isset ($_POST['automatic'])) {
 			$auto = $_POST['automatic'];
 			$imageSizeQuery = "UPDATE siteprofiles SET auto = '{$auto}'";
@@ -143,7 +143,14 @@
 		}
 	}
 ?>
-<?php errorWindow("extension", "This is an unsupported file type. Supported types have one of the following extensions: &quot;.png&quot;, &quot;.bmp&quot;, &quot;.jpg&quot;, or &quot;.gif&quot;."); ?>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#placement").validationEngine()
+});
+$(document).ready(function() {
+	$("#size").validationEngine()
+});
+</script>
     <div class="layoutControl"> 
     <div class="dataLeft">
     <div class="block_course_list sideblock">
@@ -169,7 +176,7 @@
       <div class="catDivider alignLeft">Site Logo</div>
       <div class="stepContent">
       <blockquote>
-        <form action="site_settings.php?type=logo" method="post" enctype="multipart/form-data" id="uploadBanner" onsubmit="return errorsOnSubmit(this, 'bannerUploader', 'true', 'png.bmp.jpg.gif');">
+        <form action="site_settings.php?type=logo" method="post" enctype="multipart/form-data" id="validate" onsubmit="return errorsOnSubmit(this);">
           <div align="left">
             <?php
 			//Display current banner if it exists
@@ -187,7 +194,7 @@
 					} 
 				}
 			?>
-            <input name="bannerUploader" type="file" id="bannerUploader" size="50" />
+            <input name="bannerUploader" type="file" id="validate" class="validate[required,funcCall[bannerUpload]]" size="50" />
             <br />
             Max file size: <?php echo ini_get('upload_max_filesize'); ?><br />
             <br />
@@ -196,14 +203,13 @@
             <input name="cancelBanner" type="button" id="cancelBanner" onclick="MM_goToURL('parent','index.php');return document.MM_returnValue" value="Cancel" />
             </p>
           </div>
-          <?php formErrors(); ?>
         </form>
       </blockquote>
       </div>
       <div class="catDivider alignLeft">Banner Placement</div>
       <div class="stepContent">
       <blockquote>
-      <form action="site_settings.php?type=logo" method="post" name="padding" id="padding">
+      <form action="site_settings.php?type=logo" method="post" name="padding" id="placement">
         <div align="left">
           <input type="hidden" name="idHidden" value="1" />
           	  <?php
@@ -216,16 +222,16 @@
 					$imagePaddingBottom = $imagePadding['paddingBottom'];
 			  ?>
           <p><strong>Top:</strong>
-            <input name="paddingTopSelect" type="text" id="paddingTopSelect" value="<?php echo $imagePaddingTop; ?>" size="3" maxlength="3" autocomplete="off" />
+            <input name="paddingTopSelect" type="text" id="paddingTopSelect" class="validate[required,custom[onlyNumber]]" value="<?php echo $imagePaddingTop; ?>" size="3" maxlength="3" autocomplete="off" />
 px<br />
 <strong>Left:</strong>
-<input name="paddingLeftSelect" type="text" id="paddingLeftSelect" value="<?php echo $imagePaddingLeft; ?>" size="3" maxlength="3"  autocomplete="off" />
+<input name="paddingLeftSelect" type="text" id="paddingLeftSelect" class="validate[required,custom[onlyNumber]]" value="<?php echo $imagePaddingLeft; ?>" size="3" maxlength="3"  autocomplete="off" />
 px<br />
 <strong>Right:</strong>
-<input name="paddingRightSelect" type="text" id="paddingRightSelect" value="<?php echo $imagePaddingRight; ?>" size="3" maxlength="3"  autocomplete="off" />
+<input name="paddingRightSelect" type="text" id="paddingRightSelect" class="validate[required,custom[onlyNumber]]" value="<?php echo $imagePaddingRight; ?>" size="3" maxlength="3"  autocomplete="off" />
 px<br />
 <strong>Bottom:</strong>
-<input name="paddingBottomSelect" type="text" id="paddingBottomSelect" value="<?php echo $imagePaddingBottom; ?>" size="3" maxlength="3" autocomplete="off" />
+<input name="paddingBottomSelect" type="text" id="paddingBottomSelect" class="validate[required,custom[onlyNumber]]" value="<?php echo $imagePaddingBottom; ?>" size="3" maxlength="3" autocomplete="off" />
 px</p>
           <p>
             <?php submit("updatePlacement", "Update"); ?>
@@ -247,10 +253,10 @@ px</p>
 			$imageData = mysql_fetch_array($imageSizeGrabber);
 	  ?>
       Width:
-      <input name="width" type="text" id="width" value="<?php echo $imageData['width']; ?>" size="3" maxlength="3" autocomplete="off"<?php if ($imageData['auto'] == "on") {echo " disabled=\"disabled\"";} ?> />
+      <input name="width" type="text" id="width" class="validate[optional,custom[onlyNumber]]" value="<?php echo $imageData['width']; ?>" size="3" maxlength="3" autocomplete="off"<?php if ($imageData['auto'] == "on") {echo " disabled=\"disabled\"";} ?> />
 px <br />
 Height:
-<input name="height" type="text" id="height" value="<?php echo $imageData['height']; ?>" size="3" maxlength="3" autocomplete="off"<?php if ($imageData['auto'] == "on") {echo " disabled=\"disabled\"";} ?> />
+<input name="height" type="text" id="height" class="validate[optional,custom[onlyNumber]]" value="<?php echo $imageData['height']; ?>" size="3" maxlength="3" autocomplete="off"<?php if ($imageData['auto'] == "on") {echo " disabled=\"disabled\"";} ?> />
 px
 <p>
         <label><input type="checkbox" name="automatic" id="automatic" onclick="flvFTFO1('size','width,t','height,t')"<?php
@@ -330,7 +336,7 @@ px
         </div>
   </div>
       <div class="contentRight">
-      <form action="site_settings.php?type=icon" method="post" enctype="multipart/form-data" id="uploadIcon" onsubmit="return errorsOnSubmit(this, 'iconUploader', 'true', 'ico.jpg.gif');">
+      <form action="site_settings.php?type=icon" method="post" enctype="multipart/form-data" id="validate" onsubmit="return errorsOnSubmit(this, 'iconUploader', 'true', 'ico.jpg.gif');">
       <div class="catDivider one">Upload Icon</div>
       <div class="stepContent">
       <blockquote>
@@ -347,7 +353,7 @@ px
 					echo "</p>";
 				}
 			?>
-            <input name="iconUploader" type="file" id="iconUploader" size="50" />
+            <input name="iconUploader" type="file" id="iconUploader" class="validate[required,funcCall[iconUpload]]" size="50" />
             <br />
           Max file size: <?php echo ini_get('upload_max_filesize'); ?> </p>
          </blockquote>
@@ -359,7 +365,6 @@ px
           <?php submit("submitIcon", "Submit"); ?>
           <input name="cancelIcon" type="button" id="cancelIcon" onclick="MM_goToURL('parent','index.php');return document.MM_returnValue" value="Cancel" />
         </p>
-          <?php formErrors(); ?>
       </blockquote>
       </div>
       </form>
@@ -668,17 +673,19 @@ px
   <blockquote>
     <p>Select the security type:</p>
     <blockquote>
-      <p><label><input type="radio" name="securityType" id="securityType_0" value="auto" onchange="securityFeatures(this.value)"<?php
+    	<p>
+        <select name="securityType" onchange="securityFeatures(this.value)">
+        <option value="auto"<?php
 	  	if ($security['saptcha'] == "auto") {
-			echo " checked=\"checked\"";
+			echo " selected=\"selected\"";
 		}
-	  ?> />Automatically Generated</label> 
-      Questions<br />
-      <label><input type="radio" name="securityType" id="securityType_1" value="custom" onchange="securityFeatures(this.value)"<?php
+	  ?>>Automatically Generated</option>
+      	<option value="custom"<?php
 	  	if ($security['saptcha'] == "custom") {
-			echo " checked=\"checked\"";
+			echo " selected=\"selected\"";
 		}
-	  ?> />Custom Question</label><br />
+	  ?>>Custom Question</option>
+      </select>
       </p>
     </blockquote>
   </blockquote>

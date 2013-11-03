@@ -137,7 +137,7 @@
 		if (loggedIn() || $secure == "true") {
 			$id = $_POST['id'];
 			$comment = $_POST['comment'];
-			$date = date("D, M j, Y") . " at " . date("g:i a");
+			$date = time();
 			
 			if ($pageID == "") {
 				$oldDataGrabber = mysql_query("SELECT * FROM `pages` WHERE `position` = '1'", $connDBA);
@@ -387,11 +387,16 @@
 				
 				if (is_numeric($names[$count])) {
 					$userID = $names[$count];
-					$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
-					$user = mysql_fetch_array($userGrabber);
-					echo "<p class=\"commentTitle\">" . $user['firstName'] . " " . $user['lastName'] . " commented on " . $dates[$count];
+					
+					if (exist("users", "id", $userID)) {
+						$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
+						$user = mysql_fetch_array($userGrabber);
+						echo "<p class=\"commentTitle\">" . $user['firstName'] . " " . $user['lastName'] . " commented on " .  date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
+					} else {
+						echo "<p class=\"commentTitle\">An unknown staff member commented on " .  date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
+					}
 				} else {
-					echo "<p class=\"commentTitle\">" . $names[$count] . " commented on " . $dates[$count];
+					echo "<p class=\"commentTitle\">" . $names[$count] . " commented on " . date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
 				}
 				
 				if (isset($_SESSION['MM_UserGroup'])) {
@@ -455,7 +460,7 @@
 				echo "<input type=\"hidden\" name=\"questionID\" value=\"" . $question['id'] . "\" />";
 				echo "<input type=\"text\" name=\"security\" id=\"" . $question['id'] . "\" class=\"validate[required,ajax[ajaxName]]\" size=\"50\" autocomplete=\"off\"  /></blockquote>";
 			} else {
-				echo "<p>Security Question:</p><blockquote><p>" . strip_tags($security['question']) . "</p></blockquote><p>Your Answer:</p><blockquote>";
+				echo "<p>Security Question:</p><blockquote><p>" . prepare(strip_tags($security['question'])) . "</p></blockquote><p>Your Answer:</p><blockquote>";
 				echo "<input type=\"text\" name=\"security\" id=\"security\" class=\"validate[required,ajax[ajaxName]]\" size=\"50\" autocomplete=\"off\" /></blockquote>";
 			}
 			

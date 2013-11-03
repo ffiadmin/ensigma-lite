@@ -53,6 +53,12 @@
 						"alertText":"* Incorrect answer",
 						"alertTextOk":"* Correct answer",	
 						"alertTextLoad":"* Loading, please wait"},	
+					"bannerUpload":{
+						"nname":"bannerUpload",
+						"alertText":"* Invalid file type"},
+					"iconUpload":{
+						"nname":"iconUpload",
+						"alertText":"* Invalid file type"},
 					"onlyLetter":{
 						"regex":"/^[a-zA-Z\ \']+$/",
 						"alertText":"* Letters only"},

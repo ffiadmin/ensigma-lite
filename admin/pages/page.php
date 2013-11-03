@@ -68,10 +68,10 @@
 			$pageID = $_GET['page'];
 			$id = $_POST['id'];
 			$comment = $_POST['comment'];
-			$date = date("D, M j, Y") . " at " . date("g:i a");
+			$date = time();
 			
 			if ($pageID == "") {
-					$oldDataGrabber = mysql_query("SELECT * FROM `staffpages` WHERE `position` = '1'", $connDBA);
+				$oldDataGrabber = mysql_query("SELECT * FROM `staffpages` WHERE `position` = '1'", $connDBA);
 			} else {
 				$oldDataGrabber = mysql_query("SELECT * FROM `staffpages` WHERE `id` = '{$pageID}'", $connDBA);
 			}
@@ -243,12 +243,17 @@
 			echo "</p>";
 			
 			for ($count = 0; $count <= $values; $count++) {
-				$userID = $names[$count];
-				$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
-				$user = mysql_fetch_array($userGrabber);
-				
 				echo "<div class=\"commentBox\">";
-				echo "<p class=\"commentTitle\">" . $user['firstName'] . " " . $user['lastName'] . " commented on " . $dates[$count];
+				
+				$userID = $names[$count];
+				
+				if (exist("users", "id", $userID)) {
+					$userGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
+					$user = mysql_fetch_array($userGrabber);
+					echo "<p class=\"commentTitle\">" . $user['firstName'] . " " . $user['lastName'] . " commented on " .  date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
+				} else {
+					echo "<p class=\"commentTitle\">An unknown staff member commented on " .  date("l, M j, Y \\a\\t h:i:s A", $dates[$count]);
+				}
 				
 				if (privileges("deleteStaffComments") == "true") {
 					if (isset ($_GET['page'])) {

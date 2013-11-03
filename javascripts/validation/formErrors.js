@@ -134,3 +134,71 @@ function successDisplay(errorClear, progressShow, errorWinClear, errorClearRetur
 		return true;
 	}
 }
+
+function bannerUpload () {
+	var formName = document.getElementById('validate');
+	var extensionInput = "png,bmp,jpg,gif";
+	var extensionSplit = extensionInput.split(",");
+	var possibleExtensions = extensionSplit.length - 1;
+	var returnType = false;
+	
+	for (var count = 0; count <= formName.elements.length; count ++) {
+		var type = formName.elements[count].type;
+		
+		if (type === "file") {				
+			var fileCheck = formName.elements[count].value;
+			
+			if (fileCheck !== "") {
+				var extensionPrep = fileCheck.split(".");
+				var extension = extensionPrep[extensionPrep.length - 1].toLowerCase();
+				
+				for (var i in extensionSplit) {		
+					if (extension === extensionSplit[i]) {		
+						return true;
+						break;
+					} else {						
+						if (i == possibleExtensions) {
+							return false;
+						}
+					}
+				}
+			} else {
+				return false;
+			}
+		}
+	}
+}
+
+function iconUpload () {
+	var formName = document.getElementById('validate');
+	var extensionInput = "png,ico,jpg,gif";
+	var extensionSplit = extensionInput.split(",");
+	var possibleExtensions = extensionSplit.length - 1;
+	var returnType = false;
+	
+	for (var count = 0; count <= formName.elements.length; count ++) {
+		var type = formName.elements[count].type;
+		
+		if (type === "file") {				
+			var fileCheck = formName.elements[count].value;
+			
+			if (fileCheck !== "") {
+				var extensionPrep = fileCheck.split(".");
+				var extension = extensionPrep[extensionPrep.length - 1].toLowerCase();
+				
+				for (var i in extensionSplit) {		
+					if (extension === extensionSplit[i]) {		
+						return true;
+						break;
+					} else {						
+						if (i == possibleExtensions) {
+							return false;
+						}
+					}
+				}
+			} else {
+				return false;
+			}
+		}
+	}
+}

@@ -72,6 +72,9 @@
 	
 	pagesDirectory('0');
 ?>
-<?php footer("public"); ?>
+<?php
+	stats("true", "false");
+	footer("public");
+?>
 </body>
 </html>

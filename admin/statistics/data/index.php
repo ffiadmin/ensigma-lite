@@ -59,7 +59,7 @@
 						$pagePrep = mysql_fetch_array($pageGrabber);
 						$page = unserialize($pagePrep['content' . $pagePrep['display']]);
 						
-						echo "<set name=\"" . stripslashes($page['title']) . "\" value=\"" . $statistics['hits'] . "\" hoverText=\"" . stripslashes($page['title']) . " (" . $statistics['hits'] . " Hits)\"/>";
+						echo "<set name=\"" . prepare($page['title'], true, true) . "\" value=\"" . $statistics['hits'] . "\" hoverText=\"" . prepare($page['title'], true, true) . " (" . $statistics['hits'] . " Hits)\"/>";
 					}
 					
 					echo "</graph>";

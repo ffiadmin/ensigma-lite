@@ -4,7 +4,7 @@
 //Check for failed logins
 	$loginsCheck = mysql_query("SELECT * FROM `failedLogins`", $connDBA);
 	
-	if (mysql_fetch_array($loginsCheck)) {
+	if (exist("failedLogins")) {
 		$logins = "exist";
 	} else {
 		$logins = "empty";
