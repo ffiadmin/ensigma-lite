@@ -148,19 +148,8 @@
 ?>
 <a class="toolBarItem back" href="index.php">Back to Pages</a>
 <?php
-	$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
-	$settings = mysql_fetch_array($settingsGrabber);
-	
-	if ($settings["autoPublishSideBar"] == "1") {
-		$itemAccessCheck = mysql_query("SELECT * FROM `sidebar`", $connDBA);
-	} else {
-		$itemAccessCheck = mysql_query("SELECT * FROM `sidebar` WHERE `published` != '0'", $connDBA);
-	}
-	
-	$itemAccess = mysql_fetch_array($itemAccessCheck);
-	
-	if ($itemAccess) {
-		echo "<a class=\"toolBarItem search\" href=\"../../index.php\">Preview this Site</a>";
+	if ($itemGrabber !== 0) {
+	echo "<a class=\"toolBarItem search\" href=\"../../index.php\">Preview this Site</a>";
 	}
 ?>
 </div>
@@ -190,8 +179,7 @@
 		} elseif (privileges("publishSideBar") == "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishSideBar") == "true") {
 			successMessage("The box was successfully updated");
 		} elseif (privileges("publishSideBar") != "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishSideBar") != "true") {
-			//successMessage("The box was successfully updated. An administrator must approve the update before the update can be displayed.");
-			successMessage("The box was successfully updated.");
+			successMessage("The box was successfully updated. An administrator must approve the update before the update can be displayed.");
 		} elseif ($_SESSION['MM_UserGroup'] == "Administrator") {
 			successMessage("The box was successfully updated");
 		} elseif(privileges("autoPublishSideBar") == "true") {
@@ -283,7 +271,7 @@
 				echo "</select></form></td>";
 			}
 			
-			echo "<td width=\"200\">" . commentTrim(25, $itemData['title']) . "</td>";
+			echo "<td width=\"200\">" . commentTrim(30, $itemData['title']) . "</td>";
 			echo "<td width=\"150\">" . $itemData['type'] . "</td>";
 			echo "<td>";
 			
@@ -296,13 +284,13 @@
 							if ($itemData['type'] == "Login") {
 								echo "<span class=\"notAssigned\">None</span>";
 							} else {
-								echo commentTrim(50, $itemData['content1']);
+								echo commentTrim(100, $itemData['content1']);
 							}
 						} else {
 							if ($itemData['type'] == "Login") {
 								echo "<span class=\"notAssigned\">None</span>";
 							} else {
-								echo commentTrim(50, $itemData['content2']);
+								echo commentTrim(100, $itemData['content2']);
 							}
 						}
 					}
@@ -314,13 +302,13 @@
 					if ($itemData['type'] == "Login") {
 						echo "<span class=\"notAssigned\">None</span>";
 					} else {
-						echo commentTrim(50, $itemData['content1']);
+						echo commentTrim(100, $itemData['content1']);
 					}
 				} else {
 					if ($itemData['type'] == "Login") {
 						echo "<span class=\"notAssigned\">None</span>";
 					} else {
-						echo commentTrim(50, $itemData['content2']);
+						echo commentTrim(100, $itemData['content2']);
 					}
 				}
 			}
@@ -331,7 +319,7 @@
 				if (privileges("publishSideBar") == "true") {
 					echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_sidebar.php?id=" . $itemData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($itemData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 				} else {
-					if ($itemData['published'] != "0" || $itemData['message'] == "1") {
+					if ($itemData['published'] != "0") {
 						echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_sidebar.php?id=" . $itemData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($itemData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 					} else {
 						echo "<td width=\"50\"><span class=\"action noEdit\" onmouseover=\"Tip('This box must be approved first')\" onmouseout=\"UnTip()\"></span></td>";
@@ -346,7 +334,7 @@
 		
 		echo "</tr></tbody></table>";
 	 } else {
-		echo "<div class=\"noResults\">This site has no items. <a href=\"manage_sidebar.php\">Create one now</a>.</div>";
+		echo "<div class=\"noResults\">This site has no items. <a href=\"manage_item.php\">Create one now</a>.</div>";
 	 } 
 ?>
 <?php footer(); ?>

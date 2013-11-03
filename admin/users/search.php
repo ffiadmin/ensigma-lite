@@ -388,9 +388,7 @@
 					<th width=\"50\" class=\"tableHeader\">Delete</th>
 					
 				</tr>";
-				
 			$number = 1;
-			
 			while(($userData = mysql_fetch_array($userGrabber)) && ($number <= $userNumber)) {
 				echo "<tr";
 				//Alternate the color of each row.
@@ -398,7 +396,7 @@
 				echo "<td width=\"200\"><a href=\"profile.php?id=" . $userData['id'] . "\">";
 				
 				if ($_GET['searchMethod'] == "lastName") {
-					echo str_ireplace($_GET['keywords'], "<span class=\"searchKeywords\">" . strtolower($_GET['keywords']) . "</span>", $userData['lastName']);	
+					echo str_ireplace($_GET['keywords'], "<span class=\"searchKeywords\">" . strtolower($_GET['keywords']) . "</span>", $lastNameArray[$count]);	
 				} else {
 					echo $userData['lastName'];
 				}

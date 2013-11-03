@@ -9,7 +9,6 @@
 <?php
 //Check to see if pages exist
 	$pageCheck = mysql_query("SELECT * FROM pages WHERE `position` = 1", $connDBA);
-	
 	if (mysql_fetch_array($pageCheck)) {
 		$pageGrabber = mysql_query("SELECT * FROM pages ORDER BY position ASC", $connDBA);
 	} else {
@@ -155,18 +154,7 @@
 <p>This is the pages control panel, where you can add, edit, delete, and reorder pages.</p>
 <p>&nbsp;</p>
 <?php
-	$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
-	$settings = mysql_fetch_array($settingsGrabber);
-	
-	if ($settings["autoPublishPage"] == "1") {
-		$pageAccessCheck = mysql_query("SELECT * FROM `pages`", $connDBA);
-	} else {
-		$pageAccessCheck = mysql_query("SELECT * FROM `pages` WHERE `published` != '0'", $connDBA);
-	}
-	
-	$pageAccess = mysql_fetch_array($pageAccessCheck);
-	
-	if (privileges("createPage") == "true" || privileges("siteSettings") == "true" || privileges("createSideBar") == "true" || privileges("editSideBar") == "true" || privileges("deleteSideBar") == "true" || privileges("sideBarSettings") == "true" || privileges("viewStatistics") == "true" || $pageAccess) {
+	if (privileges("createPage") == "true" || privileges("siteSettings") == "true" || privileges("createSideBar") == "true" || privileges("editSideBar") == "true" || privileges("deleteSideBar") == "true" || privileges("sideBarSettings") == "true" || privileges("viewStatistics") == "true" || $pageGrabber !== 0) {
 		echo "<div class=\"toolBar\">";
 	}
 
@@ -188,13 +176,13 @@
 	
 	if (privileges("viewStatistics") == "true") {
 		echo "<a class=\"toolBarItem statistics\" href=\"../statistics/index.php\">Statistics</a>";
-	}
+	}	
 	
-	if ($pageAccess) {
+	if ($pageGrabber !== 0) {
 		echo "<a class=\"toolBarItem search\" href=\"../../index.php\">Preview this Site</a>";
 	}
 	
-	if (privileges("createPage") == "true" || privileges("siteSettings") == "true" || privileges("createSideBar") == "true" || privileges("editSideBar") == "true" || privileges("deleteSideBar") == "true" || privileges("sideBarSettings") == "true" || privileges("viewStatistics") == "true" || $pageAccess) {
+	if (privileges("createPage") == "true" || privileges("siteSettings") == "true" || privileges("createSideBar") == "true" || privileges("editSideBar") == "true" || privileges("deleteSideBar") == "true" || privileges("sideBarSettings") == "true" || privileges("viewStatistics") == "true" || $pageGrabber !== 0) {
 		echo "</div>";
 	}
 
@@ -223,8 +211,7 @@
 		} elseif (privileges("publishPage") == "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishPage") == "true") {
 			successMessage("The page was successfully updated");
 		} elseif (privileges("publishPage") != "true" && $_SESSION['MM_UserGroup'] == "User" && privileges("autoPublishPage") != "true") {
-			//successMessage("The page was successfully updated. An administrator must approve the update before the update can be displayed.");
-			successMessage("The page was successfully updated.");
+			successMessage("The page was successfully updated. An administrator must approve the update before the update can be displayed.");
 		} elseif ($_SESSION['MM_UserGroup'] == "Administrator") {
 			successMessage("The page was successfully updated");
 		} elseif(privileges("autoPublishPage") == "true") {
@@ -332,9 +319,9 @@
 					echo "<td width=\"200\">";
 					
 					if ($pageData['position'] == "1") {
-						echo "<span class=\"homePage\">" . commentTrim(25, $pageData['title']) . "</span>";
+						echo "<span class=\"homePage\">" . commentTrim(30, $pageData['title']) . "</span>";
 					} else {
-						echo commentTrim(25, $pageData['title']);
+						echo commentTrim(30, $pageData['title']);
 					}
 					
 					echo "</td>";
@@ -342,9 +329,9 @@
 					echo "<td width=\"200\">";
 					
 					if ($pageData['position'] == "1") {
-						echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a></span>";
+						echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a></span>";
 					} else {
-						echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a>";
+						echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a>";
 					}
 					
 					echo "</td>";
@@ -353,9 +340,9 @@
 				echo "<td width=\"200\">";
 				
 				if ($pageData['position'] == "1") {
-					echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a></span>";
+					echo "<span class=\"homePage\"><a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a></span>";
 				} else {
-					echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(25, $pageData['title']) . "</a>";
+					echo "<a href=\"../../index.php?page=" . $pageData['id'] . "\" onmouseover=\"Tip('Preview the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\">" . commentTrim(30, $pageData['title']) . "</a>";
 				}
 				
 				echo "</td>";
@@ -369,9 +356,9 @@
 						echo "<span class=\"notAssigned\">Waiting for approval</span>";
 					} else {
 						if ($pageData['display'] == "1") {
-							echo commentTrim(75, $pageData['content1']);
+							echo commentTrim(100, $pageData['content1']);
 						} else {
-							echo commentTrim(75, $pageData['content2']);
+							echo commentTrim(100, $pageData['content2']);
 						}
 					}
 				} else {
@@ -391,7 +378,7 @@
 				if (privileges("publishPage") == "true") {
 					echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_page.php?id=" . $pageData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 				} else {
-					if ($pageData['published'] != "0" || $pageData['message'] == "1") {
+					if ($pageData['published'] != "0") {
 						echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_page.php?id=" . $pageData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($pageData['title']) . "</strong> page')\" onmouseout=\"UnTip()\"></a></td>";
 					} else {
 						echo "<td width=\"50\"><span class=\"action noEdit\" onmouseover=\"Tip('This page must be approved first')\" onmouseout=\"UnTip()\"></span></td>";

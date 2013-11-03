@@ -168,16 +168,8 @@ ob_start();
 		switch ($URL) {
 		//If this is the public website navigation bar
 			case "public" :
-				$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
-				$settings = mysql_fetch_array($settingsGrabber);
-				
-				if ($settings['autoPublishPage'] == "1") {
-					$pageData = mysql_query("SELECT * FROM pages WHERE visible = 'on' ORDER BY position ASC", $connDBA);	
-					$lastPageCheck = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE visible = 'on' ORDER BY position DESC LIMIT 1", $connDBA));
-				} else {
-					$pageData = mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position ASC", $connDBA);	
-					$lastPageCheck = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position DESC LIMIT 1", $connDBA));
-				}
+				$pageData = mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position ASC", $connDBA);	
+				$lastPageCheck = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE visible = 'on' AND `published` != '0' ORDER BY position DESC LIMIT 1", $connDBA));
 				$count = 1;
 				
 				if (isset ($_GET['page'])) {
@@ -477,42 +469,6 @@ ob_start();
 /* End site layout functions */
 	
 /* Begin login management functions */
-//A function to encrypt a string
-	function encrypt($string) {
-		$search = str_split(" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890`~!@#$%^&*()-_=+[{]}|;:',<.>/?\\\"");
-		$replace = str_split(" B)3Z/~8tr;`y%oJ{X(Mx}2kDc=7<AaSCzNh&5n\"[Il!@gRP]\\$mwb?#4p*0eK6QLHdEv^,Uj:-|9O'qsufY>1iFTGVW.+_");
-		$encrypt = "";
-		
-		foreach(str_split($string) as $segement) {
-			if ($segement == "") {
-				$encrypt .= " ";
-			} else {
-				$key = array_keys($search, $segement);
-				$encrypt .= $replace[$key['0']];
-			}
-		}
-		
-		return base64_encode(gzdeflate($encrypt));
-	}
-	
-//A function to decrypt a string
-	function decrypt($string) {
-		$search = str_split(" B)3Z/~8tr;`y%oJ{X(Mx}2kDc=7<AaSCzNh&5n\"[Il!@gRP]\\$mwb?#4p*0eK6QLHdEv^,Uj:-|9O'qsufY>1iFTGVW.+_");
-		$replace = str_split(" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890`~!@#$%^&*()-_=+[{]}|;:',<.>/?\\\"");
-		$decrypt = "";
-		
-		foreach(str_split(gzinflate(base64_decode($string))) as $segement) {
-			if ($segement == "") {
-				$decrypt .= " ";
-			} else {
-				$key = array_keys($search, $segement);
-				$decrypt .= $replace[$key['0']];
-			}
-		}
-		
-		return $decrypt;
-	}
-	
 	//Login a user
 	function login() {
 		global $connDBA;
@@ -555,7 +511,7 @@ ob_start();
 			
 			if (isset($_POST['username'])) {
 				$loginUsername=$_POST['username'];
-				$password=encrypt($_POST['password']);
+				$password=$_POST['password'];
 				$MM_fldUserAuthorization = "role";
 				
 				$userRoleGrabber = mysql_query("SELECT * FROM `users` WHERE `userName` = '{$loginUsername}' AND `passWord` = '{$password}'");
@@ -1199,23 +1155,17 @@ ob_start();
 			}
 			
 			if (isset($page)) {
-				$settingsGrabber = mysql_query("SELECT * FROM `privileges`", $connDBA);
-				$settings = mysql_fetch_array($settingsGrabber);
-				$pagePublishedGrabber = mysql_query("SELECT * FROM `pages` WHERE `position` = '1' LIMIT 1", $connDBA);
-				$pagePublished = mysql_fetch_array($pagePublishedGrabber);
 				$pageCheck = mysql_query("SELECT * FROM `pagehits` WHERE `page` = '{$page}' LIMIT 1", $connDBA);
 				
-				if ($settings['autoPublishPage'] == "1" || $pagePublished['published'] != "0") {
-					if ($result = mysql_fetch_array($pageCheck)) {
-						$newHit = $result['hits']+1;
-						mysql_query("UPDATE `pagehits` SET `hits` = '{$newHit}' WHERE `page` = '{$page}' LIMIT 1", $connDBA);
-					} else {
-						mysql_query("INSERT INTO `pagehits` (
-									`id`, `page`, `hits`
-									) VALUES (
-									NULL, '{$page}', '1'
-									)", $connDBA);
-					}
+				if ($result = mysql_fetch_array($pageCheck)) {
+					$newHit = $result['hits']+1;
+					mysql_query("UPDATE `pagehits` SET `hits` = '{$newHit}' WHERE `page` = '{$page}' LIMIT 1", $connDBA);
+				} else {
+					mysql_query("INSERT INTO `pagehits` (
+								`id`, `page`, `hits`
+								) VALUES (
+								NULL, '{$page}', '1'
+								)", $connDBA);
 				}
 				
 				$date = date("M-d-Y");
@@ -1247,9 +1197,9 @@ ob_start();
 		if ($userData['changePassword'] == "on" && !strstr($URL, "logout.php")) {
 		//Process the form
 			if (isset ($_POST['submitPassword']) && !empty($_POST['oldPassword']) && !empty($_POST['newPassword']) && !empty($_POST['confirmPassword'])) {
-				$oldPassword = encrypt($_POST['oldPassword']);
-				$newPassword = encrypt($_POST['newPassword']);
-				$confirmPassword = encrypt($_POST['confirmPassword']);
+				$oldPassword = $_POST['oldPassword'];
+				$newPassword = $_POST['newPassword'];
+				$confirmPassword = $_POST['confirmPassword'];
 				$passwordGrabber = mysql_query("SELECT * FROM `users` WHERE `userName` = '{$userName}' AND `passWord` = '{$oldPassword}'", $connDBA);
 				$password = mysql_fetch_array($passwordGrabber);
 				
@@ -1277,7 +1227,7 @@ ob_start();
 			echo "</head><body>";
 			topPage();
 			
-			echo "<form name=\"updatePassword\" id=\"validate\" action=\"" . $_SERVER['PHP_SELF'] . "\" method=\"post\" onsubmit=\"return errorsOnSubmit(this)\"><h2>Change Password</h2><p>You are required to change your password before using this site.</p>";
+			echo "<form name=\"updatePassword\" id=\"validate\" action=\"" . $_SERVER['PHP_SELF'] . "\" method=\"post\" onsubmit=\"return errorsOnSubmit(this)\"><h2>Change Password</h2><p>You are rquired to change your password before using this site.</p>";
 			
 			if (isset($_GET['password']) && $_GET['password'] == "error") {
 				errorMessage("Either your old password is incorrect, or your new password does not match.");
@@ -1287,7 +1237,7 @@ ob_start();
 				echo "<p>&nbsp;</p>";
 			}
 			
-			echo "<blockquote><p>Current password<span class=\"require\">*</span>:</p><blockquote><input type=\"password\" name=\"oldPassword\" id=\"oldPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required]\" /></blockquote><p>New password<span class=\"require\">*</span>:</p><blockquote><input type=\"password\" name=\"newPassword\" id=\"newPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30]]\" /></blockquote><p>Confirm new password<span class=\"require\">*</span>:</p><blockquote><input type=\"password\" name=\"confirmPassword\" id=\"confirmPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30],confirm[newPassword]]\" /><p>&nbsp;</p><p></blockquote><input type=\"submit\" name=\"submitPassword\" id=\"submitPassword\" value=\"Submit\" /></p>";
+			echo "<p>Current password:</p><blockquote><input type=\"password\" name=\"oldPassword\" id=\"oldPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required]\" /></blockquote><p>New password:</p><blockquote><input type=\"password\" name=\"newPassword\" id=\"newPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30]]\" /></blockquote><p>Confirm new password:</p><blockquote><input type=\"password\" name=\"confirmPassword\" id=\"confirmPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30],confirm[newPassword]]\" /><p>&nbsp;</p><p><input type=\"submit\" name=\"submitPassword\" id=\"submitPassword\" value=\"Submit\" /></p>";
 			formErrors();
 			echo "</blockquote></form>";
 			footer();

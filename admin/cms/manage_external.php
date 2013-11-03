@@ -31,7 +31,7 @@
 		if ($tabCheck = mysql_fetch_array($tabGrabber)) {
 			$tab = $tabCheck;
 			
-			if (privileges("publishExternal") != "true" && $tabCheck['published'] == "0" && $tabCheck['message'] != "1") {
+			if (privileges("publishExternal") != "true" && $tabCheck['published'] == "0") {
 				header ("Location: external.php");
 				exit;
 			}
@@ -117,29 +117,29 @@
 				$contentEditor = "content2";
 			}
 			
-			if (stripslashes($tabData['title']) === $_POST['title'] && stripslashes($tabData[$contentEditor]) === $_POST['content']) {
+			if ($tabData['title'] === $_POST['title'] && $tabData[$contentEditor] === $_POST['content']) {
 			//Redirect back to the main page, no changes were made
 				header("Location: external.php");
 				exit;
-			} elseif (stripslashes($tabData['title']) !== $_POST['title'] && stripslashes($tabData[$contentEditor]) === $_POST['content']) {
+			} elseif ($tabData['title'] !== $_POST['title'] && $tabData[$contentEditor] === $_POST['content']) {
 				$editSideBarQuery = "UPDATE external SET title = '{$title}' WHERE `id` = '{$tab}'";
 				
 				mysql_query($editSideBarQuery, $connDBA);
 				header ("Location: external.php");
 				exit;
 			} else {
-				if (isset($_GET['content'])) {
+				if (isset($_GET['content'])) {	
 					if ($tabData['published'] != "0") {
 						if ($tabData['display'] == "1") {			
-							$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$tab}'";
+							$editTabQuery = "UPDATE external SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$tab}'";
 						} else {
-							$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$tab}'";
+							$editTabQuery = "UPDATE external SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$tab}'";
 						}
 					} else {
-						$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$tab}'";
+						$editTabQuery = "UPDATE external SET title = '{$title}', published = '0', message = '', {$contentEditor} = '{$content}' WHERE `id` = '{$tab}'";
 					}
 				} else {
-					if ($tabData['published'] == "2") {
+					if ($tabData['published'] = "2") {
 						if ($tabData['display'] == "1") {
 							if (privileges("publishExternal") == "true") {
 								$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$tab}'";
@@ -153,33 +153,27 @@
 								$editTabQuery = "UPDATE external SET title = '{$title}', published = '1',  message = '', content1 = '{$content}' WHERE `id` = '{$tab}'";
 							}
 						}
-					} elseif ($tabData['published'] == "1") {
+					} else {
 						if ($tabData['display'] == "1") {
 							if (privileges("publishExternal") == "true") {
 								$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}' WHERE `id` = '{$tab}'";
 							} else {
-								$editTabQuery = "UPDATE external SET title = '{$title}', published = '1', message = '', content2 = '{$content}' WHERE `id` = '{$tab}'";
-							}
-						} else {
-							if (privileges("publishSideBar") == "true") {
-								$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$tab}'";
-							} else {
 								$editTabQuery = "UPDATE external SET title = '{$title}', published = '1', message = '', content1 = '{$content}' WHERE `id` = '{$tab}'";
 							}
-						}
-					} else {
-						if (privileges("publishSideBar") == "true") {
-							$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}' WHERE `id` = '{$tab}'";
 						} else {
-							$editTabQuery = "UPDATE external SET title = '{$title}', published = '0', message = '', content1 = '{$content}' WHERE `id` = '{$tab}'";
+							if (privileges("publishExternal") == "true") {
+								$editTabQuery = "UPDATE external SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}' WHERE `id` = '{$tab}'";
+							} else {
+								$editTabQuery = "UPDATE external SET title = '{$title}', published = '1', message = '', content2 = '{$content}' WHERE `id` = '{$tab}'";
+							}
 						}
 					}
 				}
+				
+				mysql_query($editTabQuery, $connDBA);
+				header ("Location: external.php?updated=tab");
+				exit;
 			}
-			
-			mysql_query($editTabQuery, $connDBA);
-			header ("Location: external.php?updated=tab");
-			exit;
 		}
 	} 
 ?>
@@ -210,21 +204,29 @@
       <?php if (isset ($tab)) {echo "Edit the \"" . $tab['title'] . "\" Tab";} else {echo "Create New Tab";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($tab)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($tab['title'])) . "</strong>\"";} else {echo "create a new tab";} ?>.</p>
-<?php
-//Let users know an update is pending if one is pending
-	if (isset ($tab) && !isset($_GET['content'])) {
-		if ($tab['published'] == "1" && privileges("publishExternal") != "true") {
-			alert("An more recent version of this tab is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version.");
-		} elseif ($tab['published'] == "1" && privileges("publishExternal") == "true") {
-			alert("An more recent version of this tab is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version. Please <a href=\"external.php\" onclick=\"MM_openBrWindow('approve_external.php?id=" . $tab['id'] . "','','status=yes,scrollbars=yes,resizable=yes,width=640,height=480')\">approve the newer version</a> if you wish to see the results.");
+	<?php
+	//Let users know an update is pending if one is pending
+		if (isset ($tab) && !isset($_GET['content'])) {
+			if ($tab['published'] == "1" && privileges("publishExternal") != "true") {
+				alert("An more recent version of this tab is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version.");
+			} elseif ($tab['published'] == "1" && privileges("publishExternal") == "true") {
+				alert("An more recent version of this tab is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version. Please <a href=\"external.php\" onclick=\"MM_openBrWindow('approve_external.php?id=" . $tab['id'] . "','','status=yes,scrollbars=yes,resizable=yes,width=640,height=480')\">approve the newer version</a> if you wish to see the results.");
+			} else {
+				echo "<p>&nbsp;</p>";
+			}
 		} else {
 			echo "<p>&nbsp;</p>";
 		}
-	} else {
-		echo "<p>&nbsp;</p>";
-	}
-?>
-    <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" name="manageTab" id="validate" onsubmit="return errorsOnSubmit(this);">
+	?>
+    <form action="manage_external.php<?php 
+		if (isset ($tab)) {
+			echo "?id=" . $tab['id'];
+		}
+		
+		if (isset($_GET['content'])) {
+			echo "&content=" . $_GET['content'];
+		}
+	?>" method="post" name="manageTab" id="validate" onsubmit="return errorsOnSubmit(this);">
       <div class="catDivider one">Content</div>
       <div class="stepContent">
       <blockquote>

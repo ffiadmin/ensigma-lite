@@ -403,7 +403,7 @@ px
     <p>
       <?php if ($theme['style'] == "backToSchool.css") { echo "<div class=\"selectedTheme\">This is the current theme</div>";} ?>
     </p>
-    <p><img src="../../images/themes/back_to_school/preview.jpg" width="313" height="157" alt="Back to School Theme Preview" /> 
+    <p><img src="../../../biomed-ed/images/preview.jpg" width="313" height="157" alt="Back to School Theme Preview" /> 
       <input type="button" name="chooseAmerican2" id="chooseAmerican2" value="Choose Back to School Theme" onclick="MM_goToURL('parent','site_settings.php?type=theme&amp;action=modifyTheme&amp;theme=backToSchool.css');return document.MM_returnValue" />
     </p>
     <p><strong>Binary</strong></p><?php if ($theme['style'] == "binary.css") { echo "<div class=\"selectedTheme\">This is the current theme</div>";} ?>

@@ -13,10 +13,9 @@
 		$userData = mysql_fetch_array($userDataGrabber);
 		
 		if ($userData) {
-			$passwordPrep = randomValue(10, "alphanum");
-			$password = encrypt($passwordPrep);
+			$password = randomValue(10, "alphanum");
 			mysql_query ("UPDATE `users` SET `password` = '{$password}', `changePassword` = 'on' WHERE `userName` = '{$userName}' AND `emailAddress1` = '{$emailAddress}'", $connDBA);
-			mail($userData['firstName'] . " " . $userData['lastName'] . " <" . $userData['emailAddress1'] . ">", "Password Reset", "Your password has been been set to: \"" . $passwordPrep . "\". Please login with this password, and you will be prompted to change this to a more suitable password.");
+			mail($userData['firstName'] . " " . $userData['lastName'] . " <" . $userData['emailAddress1'] . ">", "Password Reset", "Your password has been been set to: \"" . $password . "\". Please login with this password, and you will be prompted to change this to a more suitable password.");
 			
 			header("Location: forgot_password.php?message=processed");
 			exit;
@@ -46,22 +45,22 @@
 ?>
 <form name="resetPassword" id="validate" action="forgot_password.php" method="post" onsubmit="return errorsOnSubmit(this)">
 <blockquote>
-<p>User name<span class="require">*</span>:</p>
+<p>User name:</p>
 <blockquote>
   <p>
     <input type="text" name="userName" id="userName" size="50" autocomplete="off" class="validate[required]" />
   </p>
 </blockquote>
-<p>Email Address<span class="require">*</span>:</p>
+<p>Email Address:</p>
 <blockquote>
   <p>
     <input type="text" name="emailAddress" id="emailAddress" size="50" autocomplete="off" class="validate[required,custom[email]]" />
   </p>
-</blockquote>
   <p>
     <input type="submit" name="submit" id="submit" value="Submit" />
   </p>
   <?php formErrors(); ?>
+</blockquote>
 </blockquote>
 </form>
 <?php footer(); ?>

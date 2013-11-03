@@ -32,20 +32,6 @@
 			exit;
 		}
 	}
-	
-//Change the user's password
-	if (($user['userName'] === $_SESSION['MM_Username'] || $_SESSION['MM_UserGroup'] == "Administrator") && isset($_GET['action']) && $_GET['action'] == "changePassword") {
-		$id = $_GET['id'];
-		
-		if ($_SESSION['MM_UserGroup'] == "Administrator") {
-			header("Location: manage_user.php?id=" . $id . "#password");
-			exit;
-		} else {
-			mysql_query ("UPDATE `users` SET `changePassword` = 'on' WHERE `id` = '{$id}'", $connDBA);
-			header("Location: ../index.php");
-			exit;
-		}
-	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -88,15 +74,6 @@
     <td width="200"><div align="right">User Name:</div></td>
     <td><?php echo $user['userName']; ?></td>
   </tr>
-  <?php
-  //If the user is allowed to change their password
-		if ($user['userName'] === $_SESSION['MM_Username'] || $_SESSION['MM_UserGroup'] == "Administrator") {
-			echo "<tr>
-				<td><div align=\"right\">Password:</div></td>
-				<td><a href=\"profile.php?id=" . $user['id'] . "&action=changePassword\">Change Password</a></td>
-			</tr>";
-		}
-  ?>
   <tr>
     <td><div align="right">Role:</div></td>
     <td><?php echo $user['role']; ?></td>
@@ -159,7 +136,7 @@
 <div class="catDivider three">Finish</div>
 <div class="stepContent">
   <blockquote>
-    <p><input name="finish" id="finish" onclick="MM_goToURL('parent','<?php if ($_SESSION['MM_UserGroup'] == "User") {echo "../index.php";} else {echo "index.php";} ?>');return document.MM_returnValue" value="Finish" type="button"></p>
+    <p><input name="finish" id="finish" onclick="MM_goToURL('parent','index.php');return document.MM_returnValue" value="Finish" type="button"></p>
   </blockquote>
 </div>
 <?php footer(); ?>

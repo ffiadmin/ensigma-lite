@@ -193,7 +193,7 @@
 		}
 	}
 	
-	title(stripslashes(htmlentities($pageInfo['title']))); 
+	title($pageInfo['title']); 
 ?>
 <?php headers(); ?>
 <?php tinyMCESimple(); ?>
@@ -227,7 +227,7 @@
 	}
 	
 //Display the page content	
-	echo "<h2>" . stripslashes($pageInfo['title']) . "</h2>" . stripslashes($content);
+	echo "<h2>" . $pageInfo['title'] . "</h2>" . $content;
 	
 //Display the comments
 	if ($commentsDisplay == "1") {

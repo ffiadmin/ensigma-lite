@@ -31,7 +31,7 @@
 		if ($pageCheck = mysql_fetch_array($pageGrabber)) {
 			$page = $pageCheck;
 			
-			if (privileges("publishPage") != "true" && $pageCheck['published'] == "0" && $pageCheck['message'] != "1") {
+			if (privileges("publishPage") != "true" && $pageCheck['published'] == "0") {
 				header ("Location: index.php");
 				exit;
 			}
@@ -125,25 +125,25 @@
 				$commentsEditor = "comments2";
 			}
 			
-			if (stripslashes($pageData['title']) === $_POST['title'] && stripslashes($pageData[$contentEditor]) === $_POST['content'] && stripslashes($pageData[$commentsEditor]) === stripslashes($comments)) {
+			if ($pageData['title'] === $_POST['title'] && $pageData[$contentEditor] === $_POST['content'] && $pageData[$commentsEditor] === $_POST['comments']) {
 			//Redirect back to the main page, no changes were made
 				header("Location: index.php");
 				exit;
-			} elseif (stripslashes($pageData['title']) !== $_POST['title'] && stripslashes($pageData[$contentEditor]) === $_POST['content'] && stripslashes($pageData[$commentsEditor]) === stripslashes($comments)) {
+			} elseif ($pageData['title'] !== $_POST['title'] && $pageData[$contentEditor] === $_POST['content'] && $pageData[$commentsEditor] === $_POST['comments']) {
 				$editPageQuery = "UPDATE pages SET title = '{$title}' WHERE `id` = '{$page}'";
 			} else {
 				if (isset($_GET['content'])) {	
 					if ($pageData['published'] != "0") {
 						if ($pageData['display'] == "1") {			
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
+							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
 						} else {
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
+							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
 						}
 					} else {
-						$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
+						$editPageQuery = "UPDATE pages SET title = '{$title}', published = '0', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
 					}
 				} else {
-					if ($pageData['published'] == "2") {
+					if ($pageData['published'] = "2") {
 						if ($pageData['display'] == "1") {
 							if (privileges("publishPage") == "true") {
 								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
@@ -157,7 +157,7 @@
 								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1',  message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
 							}
 						}
-					} elseif ($pageData['published'] == "1") {
+					} else {
 						if ($pageData['display'] == "1") {
 							if (privileges("publishPage") == "true") {
 								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
@@ -171,19 +171,13 @@
 								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
 							}
 						}
-					} else {
-						if (privileges("publishPage") == "true") {
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-						} else {
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '0', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-						}
 					}
 				}
+				
+				mysql_query($editPageQuery, $connDBA);
+				header ("Location: index.php?updated=page");
+				exit;
 			}
-			
-			mysql_query($editPageQuery, $connDBA);
-			header ("Location: index.php?updated=page");
-			exit;
 		}
 	} 
 ?>
@@ -228,7 +222,15 @@
 			echo "<p>&nbsp;</p>";
 		}
 	?>
-    <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" name="managePage" id="validate" onsubmit="return errorsOnSubmit(this);">
+    <form action="manage_page.php<?php 
+		if (isset ($page)) {
+			echo "?id=" . $page['id'];
+		}
+		
+		if (isset($_GET['content'])) {
+			echo "&content=" . $_GET['content'];
+		}
+	?>" method="post" name="managePage" id="validate" onsubmit="return errorsOnSubmit(this);">
       <div class="catDivider one">Content</div>
       <div class="stepContent">
       <blockquote>
