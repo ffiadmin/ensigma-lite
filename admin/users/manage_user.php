@@ -72,6 +72,9 @@
 				if ($oldGroup != $role) {
 					header("Location: " . $root . "logout.php?action=relogin");
 					exit;
+				} else {
+					header ("Location: index.php?message=userEdited");
+					exit;
 				}
 			} else {
 				header ("Location: index.php?message=userEdited");

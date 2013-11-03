@@ -1235,7 +1235,7 @@ ob_start();
 			echo "</head><body>";
 			topPage();
 			
-			echo "<form name=\"updatePassword\" id=\"validate\" action=\"" . $_SERVER['PHP_SELF'] . "\" method=\"post\" onsubmit=\"return errorsOnSubmit(this)\"><h2>Change Password</h2><p>You are rquired to change your password before using this site.</p>";
+			echo "<form name=\"updatePassword\" id=\"validate\" action=\"" . $_SERVER['PHP_SELF'] . "\" method=\"post\" onsubmit=\"return errorsOnSubmit(this)\"><h2>Change Password</h2><p>You are required to change your password before using this site.</p>";
 			
 			if (isset($_GET['password']) && $_GET['password'] == "error") {
 				errorMessage("Either your old password is incorrect, or your new password does not match.");
@@ -1245,7 +1245,7 @@ ob_start();
 				echo "<p>&nbsp;</p>";
 			}
 			
-			echo "<p>Current password:</p><blockquote><input type=\"password\" name=\"oldPassword\" id=\"oldPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required]\" /></blockquote><p>New password:</p><blockquote><input type=\"password\" name=\"newPassword\" id=\"newPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30]]\" /></blockquote><p>Confirm new password:</p><blockquote><input type=\"password\" name=\"confirmPassword\" id=\"confirmPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30],confirm[newPassword]]\" /><p>&nbsp;</p><p><input type=\"submit\" name=\"submitPassword\" id=\"submitPassword\" value=\"Submit\" /></p>";
+			echo "<blockquote><p>Current password<span class=\"require\">*</span>:</p><blockquote><input type=\"password\" name=\"oldPassword\" id=\"oldPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required]\" /></blockquote><p>New password<span class=\"require\">*</span>:</p><blockquote><input type=\"password\" name=\"newPassword\" id=\"newPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30]]\" /></blockquote><p>Confirm new password<span class=\"require\">*</span>:</p><blockquote><input type=\"password\" name=\"confirmPassword\" id=\"confirmPassword\" size=\"50\" autocomplete=\"off\" class=\"validate[required,length[6,30],confirm[newPassword]]\" /><p>&nbsp;</p><p><input type=\"submit\" name=\"submitPassword\" id=\"submitPassword\" value=\"Submit\" /></p>";
 			formErrors();
 			echo "</blockquote></form>";
 			footer();

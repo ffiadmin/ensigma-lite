@@ -45,13 +45,13 @@
 ?>
 <form name="resetPassword" id="validate" action="forgot_password.php" method="post" onsubmit="return errorsOnSubmit(this)">
 <blockquote>
-<p>User name:</p>
+<p>User name<span class="require">*</span>:</p>
 <blockquote>
   <p>
     <input type="text" name="userName" id="userName" size="50" autocomplete="off" class="validate[required]" />
   </p>
 </blockquote>
-<p>Email Address:</p>
+<p>Email Address<span class="require">*</span>:</p>
 <blockquote>
   <p>
     <input type="text" name="emailAddress" id="emailAddress" size="50" autocomplete="off" class="validate[required,custom[email]]" />
