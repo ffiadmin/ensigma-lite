@@ -1,0 +1,7 @@
+<Files ~ "\.(htaccess)$">
+	order deny,allow
+	deny from all
+</Files>
+
+ErrorDocument 403 /EnsigmaLite/includes/access_deny.php?error=403
+ErrorDocument 404 /EnsigmaLite/includes/access_deny.php?error=404
