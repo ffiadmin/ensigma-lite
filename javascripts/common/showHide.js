@@ -13,3 +13,32 @@ function toggleTypeDiv(field) {
 		}
 	}
 }
+
+function reject() {
+	var reject = document.getElementById('reject');
+	
+	if (reject.className == "contentHide") {
+		reject.className = "contentShow";
+	} else {
+		reject.className = "contentHide";
+	}
+}
+
+function securityFeatures(input) {
+	var auto = document.getElementById('auto');
+	var custom = document.getElementById('custom');
+	var question = document.getElementById('question');
+	var answer = document.getElementById('answer');
+	
+	if (input == "auto") {
+		auto.className = "contentShow";
+		custom.className = "contentHide";
+		question.className = "";
+		answer.className = "";
+	} else {
+		auto.className = "contentHide";
+		custom.className = "contentShow";
+		question.className = "validate[required]";
+		answer.className = "validate[required]";
+	}
+}

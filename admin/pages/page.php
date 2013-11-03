@@ -18,55 +18,47 @@
 		$pagesExist = 0;
 	}
 	
-//If no page URL variable is defined, then choose the first page
+//If no page URL variable is defined, then choose the home page
 	if (!isset ($_GET['page']) || $_GET['page'] == "") {
-	//Grab the page data	 
-		$pageInfo = mysql_fetch_array(mysql_query("SELECT * FROM staffpages WHERE position = '1'", $connDBA));
+	//Grab the page data
+		$pageInfoPrep = mysql_fetch_array(mysql_query("SELECT * FROM staffpages WHERE position = '1' AND `published` != '0'", $connDBA));
+		$pageInfo = unserialize($pageInfoPrep['content' . $pageInfoPrep['display']]);
 		
-	//Redirect if an incorrect page displays
-		$pageCheckGrabber = mysql_query("SELECT * FROM staffpages WHERE position = '1'", $connDBA);
-		$pageCheckArray = mysql_fetch_array($pageCheckGrabber);
-		$pageCheckResult = $pageCheckArray['position'];
-		
-		if (isset ($pageCheckResult)) {
-			if (privileges("autoPublishStaffPage") == "true") {
-				$pageCheck = 1;
+	//Hide the admin menu if an incorrect page displays		
+		if ($pagesExist == "1") {
+			$privilegesCheckGrabber = mysql_query("SELECT * FROM privileges WHERE id = '1'", $connDBA);
+			$privilegesCheck = mysql_fetch_array($privilegesCheckGrabber);
+			
+			if ($pageInfoPrep['published'] == "0") {
+				$pageCheck = 0;
 			} else {
-				if ($pageCheckArray['published'] != "0")  {
-					$pageCheck = 1;
-				} else {
-					header("Location: index.php");
-					exit;
-				}
+				$pageCheck = 1;
 			}
 		} else {
-			header("Location: index.php");
-			exit;
+			$pageCheck = 0;
 		}
 	} else {		
 	//Grab the page data
 		$getPageID = $_GET['page'];
-		$pageInfo = mysql_fetch_array(mysql_query("SELECT * FROM staffpages WHERE id = {$getPageID}", $connDBA));
+		$pageInfoPrep = mysql_fetch_array(mysql_query("SELECT * FROM staffpages WHERE id = {$getPageID}", $connDBA));
+		$pageInfo = unserialize($pageInfoPrep['content' . $pageInfoPrep['display']]);
 		
-	//Redirect if an incorrect page displays
+	//Hide the admin menu if an incorrect page displays
 		$pageCheckGrabber = mysql_query("SELECT * FROM staffpages WHERE id = {$getPageID}", $connDBA);
 		$pageCheckArray = mysql_fetch_array($pageCheckGrabber);
 		$pageCheckResult = $pageCheckArray['position'];
 		
 		if (isset ($pageCheckResult)) {
-			if (privileges("autoPublishStaffPage") == "true") {
-				$pageCheck = 1;
+			$privilegesCheckGrabber = mysql_query("SELECT * FROM privileges WHERE id = '1'", $connDBA);
+			$privilegesCheck = mysql_fetch_array($privilegesCheckGrabber);
+			
+			if ($pageCheckArray['published'] == "0") {
+				$pageCheck = 0;
 			} else {
-				if ($pageCheckArray['published'] != "0")  {
-					$pageCheck = 1;
-				} else {
-					header("Location: index.php");
-					exit;
-				}
+				$pageCheck = 1;
 			}
 		} else {
-			header("Location: index.php");
-			exit;
+			redirect("index.php");
 		}	
 	}
 	
@@ -178,22 +170,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <?php
-	$grabContent = $pageInfo['display'];
-
-	if ($pageInfo == 0 && $pagesExist == 0) {
+	if (($pageInfo == 0 && $pagesExist == 0) || $pageCheck == 0) {
 		header("Location: index.php");
 		exit;
+	} elseif ($pageInfoPrep == 0 && $pagesExist == 1) {
+		$title = "Page Not Found";
+		$content = "<p>The page you are looking for was not found on our system</p><p>&nbsp;</p><p align=\"center\"><input type=\"button\" name=\"continue\" id=\"continue\" value=\"Continue\" onclick=\"history.go(-1)\" /></p>";
 	} else {
-		if ($pageInfo['display'] == "1") {
-			$content = $pageInfo['content1'];
-			$commentsDisplay = $pageInfo['comments1'];
-		} else {
-			$content = $pageInfo['content2'];
-			$commentsDisplay = $pageInfo['comments2'];
-		}
+		$title = $pageInfo['title'];
+		$content = $pageInfo['content'];
+		$commentsDisplay = $pageInfo['comments'];
 	}
 	
-	title(stripslashes(htmlentities($pageInfo['title']))); 
+	title(stripslashes(htmlentities($title))); 
 ?>
 <?php headers(); ?>
 <?php tinyMCESimple(); ?>
@@ -209,7 +198,7 @@
 		echo "<div class=\"toolBar\">";
 		
 		if (privileges("editStaffPage") == "true") {
-			echo "<a class=\"toolBarItem editTool\" href=\"manage_page.php?id=" . $pageInfo['id'] . "\">Edit This Page</a>";
+			echo "<a class=\"toolBarItem editTool\" href=\"manage_page.php?id=" . $pageInfoPrep['id'] . "\">Edit This Page</a>";
 		}
 		
 		echo "<a class=\"toolBarItem back\" href=\"index.php\">Back to Staff Pages</a></div>";
@@ -231,13 +220,13 @@
 	
 //Display the comments
 	if ($commentsDisplay == "1") {
-		$arrayCheck = unserialize($pageInfo['comment']);
+		$arrayCheck = unserialize($pageInfoPrep['comment']);
 		
 		if (is_array($arrayCheck) && !empty($arrayCheck)) {
-			$values = sizeof(unserialize($pageInfo['date'])) - 1;
-			$names = unserialize($pageInfo['name']);
-			$dates = unserialize($pageInfo['date']);
-			$comments = unserialize($pageInfo['comment']);
+			$values = sizeof(unserialize($pageInfoPrep['date'])) - 1;
+			$names = unserialize($pageInfoPrep['name']);
+			$dates = unserialize($pageInfoPrep['date']);
+			$comments = unserialize($pageInfoPrep['comment']);
 			
 			echo "<p>&nbsp;</p><p class=\"homeDivider\">Comments";
 			

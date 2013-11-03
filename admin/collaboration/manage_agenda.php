@@ -81,9 +81,9 @@
 			$position = $positionArray{'position'}+1;
 				
 			$newAgendaQuery = "INSERT INTO collaboration (
-								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`
+								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`, `name`, `date`, `comment`
 							) VALUES (
-								NULL, '{$position}', 'on', 'Agenda', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '{$assignee}', '{$task}', '{$dueDate}', '{$priority}', '', ''
+								NULL, '{$position}', 'on', 'Agenda', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '{$assignee}', '{$task}', '{$dueDate}', '{$priority}', '', '', '', '', ''
 							)";
 							
 			mysql_query($newAgendaQuery, $connDBA);
@@ -151,8 +151,23 @@
 			} else {
 				$redirect = "Location: index.php?updated=agenda";
 			}
+			
+		//Delete old agenda statuses			
+			if (!empty($_POST['removeData']) || is_numeric($_POST['removeData'])) {
+				$oldAgenda = query("SELECT * FROM `collaboration` WHERE `id` = '{$agenda}'");
+				$completed = unserialize($oldAgenda['completed']);
+				$removeData = explode(",", $_POST['removeData']);
+				sort($removeData);
 				
-			$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `dueDate` = '{$dueDate}', `priority` = '{$priority}' WHERE `id` = '{$agenda}'";
+				for($count = 0; $count <= sizeof($removeData) - 1; $count ++) {
+					unset($completed[$removeData[$count]]);
+				}
+				
+				$completed = mysql_real_escape_string(serialize(array_merge($completed)));
+				$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `dueDate` = '{$dueDate}', `priority` = '{$priority}', `completed` = '{$completed}' WHERE `id` = '{$agenda}'";
+			} else {
+				$editAgendaQuery = "UPDATE collaboration SET `fromDate` = '{$fromDate}', `fromTime` = '{$fromTime}', `toDate` = '{$toDate}', `toTime` = '{$toTime}', `title` = '{$title}', `content` = '{$content}', `assignee` = '{$assignee}', `task` = '{$task}', `dueDate` = '{$dueDate}', `priority` = '{$priority}' WHERE `id` = '{$agenda}'";
+			}
 			
 			mysql_query($editAgendaQuery, $connDBA);
 			header ($redirect);
@@ -326,7 +341,7 @@
             <option value="11:30"<?php if (isset ($agenda) && $agenda['toTime'] == "11:30") {echo " selected=\"selected\"";} ?>>11:30 am</option>
             <option value="12:00"<?php if (isset ($agenda) && $agenda['toTime'] == "12:00") {echo " selected=\"selected\"";} ?>>12:00 pm</option>
             <option value="12:30"<?php if (isset ($agenda) && $agenda['toTime'] == "12:30") {echo " selected=\"selected\"";} ?>>12:30 pm</option>
-            <option value="13:00"<?php if (isset ($agenda) && $agenda['toTime'] == "12:00") {echo " selected=\"selected\"";} elseif (!isset ($agenda)) {echo " selected=\"selected\"";} elseif ($agenda['toTime'] == "") {echo " selected=\"selected\"";} ?>>1:00 pm</option>
+            <option value="13:00"<?php if (isset ($agenda) && $agenda['toTime'] == "13:00") {echo " selected=\"selected\"";} elseif (!isset ($agenda)) {echo " selected=\"selected\"";} elseif ($agenda['toTime'] == "") {echo " selected=\"selected\"";} ?>>1:00 pm</option>
             <option value="13:30"<?php if (isset ($agenda) && $agenda['toTime'] == "13:30") {echo " selected=\"selected\"";} ?>>1:30 pm</option>
             <option value="14:00"<?php if (isset ($agenda) && $agenda['toTime'] == "14:00") {echo " selected=\"selected\"";} ?>>2:00 pm</option>
             <option value="14:30"<?php if (isset ($agenda) && $agenda['toTime'] == "14:30") {echo " selected=\"selected\"";} ?>>2:30 pm</option>
@@ -401,12 +416,18 @@
 						
 						echo "<tr id=\"" . $rowID . "\" align=\"center\">";
 							echo "<td><input type=\"text\" name=\"task[]\" id=\"task" . $rowID . "\" class=\"validate[required]\" autocomplete=\"off\" size=\"40\" value=\"" . htmlentities(stripslashes($tasks[$count])) . "\"></td>";
-							echo "<td width=\"200\"><select name=\"assignee[]\" id=\"assignee" . $rowID . "\" class=\"validate[required]\"><option value=\"\">- Select -</option><option value=\"anyone\">Anyone</option>";
+							echo "<td width=\"200\"><select name=\"assignee[]\" id=\"assignee" . $rowID . "\" class=\"validate[required]\"><option value=\"\">- Select -</option><option value=\"anyone\"";
+							
+							if ($assignees[$count] == "anyone") {
+								echo " selected=\"selected\"";
+							}
+							
+							echo ">Anyone</option>";
 							
 							while ($users = mysql_fetch_array($usersGrabber)) {
 								echo "<option value=\"" . $users['id'] . "\"";
 								
-								if ($assignees[$count] = $users['id']) {
+								if ($assignees[$count] == $users['id']) {
 									echo " selected=\"selected\"";
 								}
 								
@@ -416,12 +437,14 @@
 							echo "</select></td>";
 							echo "<td width=\"200\"><input type=\"text\" name=\"dueDate[]\" id=\"dueDate" . $rowID . "\" class=\"dueDate\" value=\"" . htmlentities(stripslashes($dueDates[$count])) . "\" readonly=\"readonly\" /></td>";
 							echo "<td width=\"100\"><select name=\"priority[]\" id=\"priority" . $rowID . "\"><option value=\"1\""; if ($priorities[$count] == "1") {echo " selected=\"selected\"";} echo ">Low</option><option value=\"2\""; if ($priorities[$count] == "2") {echo " selected=\"selected\"";} echo ">Normal</option><option value=\"3\""; if ($priorities[$count] == "3") {echo " selected=\"selected\"";} echo ">High</option></select></td>";
-							echo "<td width=\"50\"><span class=\"action smallDelete\" onclick=\"deleteObject('agenda', '" . $rowID . "')\"></span>";
+							echo "<td width=\"50\"><span class=\"action smallDelete\" onclick=\"deleteObject('agenda', '" . $rowID . "', '" . $count . "');\"></span>";
 						echo "</tr>";
 													
 						unset($usersGrabber);
 						unset($users);
 					}
+					
+					echo "<input type=\"hidden\" name=\"removeData\" id=\"removeData\"  value=\"\" />";
 				}
 			?>
         </table>

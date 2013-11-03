@@ -150,7 +150,7 @@
 <h2>Collaboration</h2>
 <p>Communication can be established to registered users via announcements and mass emails.</p>
 <p>&nbsp;</p>
-<div class="toolBar"><a class="toolBarItem announcementLink" href="manage_announcement.php">Create Announcement</a><a class="toolBarItem agenda" href="manage_agenda.php">Create Agenda</a><a class="toolBarItem fileShare" href="manage_files.php">Create File Share</a><a class="toolBarItem email" href="send_email.php">Send Mass Email</a></div>
+<div class="toolBar"><a class="toolBarItem announcementLink" href="manage_announcement.php">Create Announcement</a><a class="toolBarItem agenda" href="manage_agenda.php">Create Agenda</a><a class="toolBarItem fileShare" href="manage_files.php">Create File Share</a><a class="toolBarItem statistics" href="manage_poll.php">Create a Poll</a><a class="toolBarItem feedback" href="manage_forum.php">Create a Forum</a><a class="toolBarItem email" href="send_email.php">Send Mass Email</a></div>
 <?php 
 	if (isset ($_GET['added']) && $_GET['added'] == "announcement") {successMessage("The announcement was successfully added");}
     if (isset ($_GET['updated']) && $_GET['updated'] == "announcement") {successMessage("The announcement was successfully updated");}
@@ -158,6 +158,10 @@
     if (isset ($_GET['updated']) && $_GET['updated'] == "agenda") {successMessage("The agenda was successfully updated");}
 	if (isset ($_GET['added']) && $_GET['added'] == "files") {successMessage("The file share was successfully added");}
     if (isset ($_GET['updated']) && $_GET['updated'] == "files") {successMessage("The file share was successfully updated");}
+	if (isset ($_GET['added']) && $_GET['added'] == "poll") {successMessage("The poll was successfully added");}
+    if (isset ($_GET['updated']) && $_GET['updated'] == "poll") {successMessage("The poll was successfully updated");}
+	if (isset ($_GET['added']) && $_GET['added'] == "forum") {successMessage("The forum was successfully added");}
+    if (isset ($_GET['updated']) && $_GET['updated'] == "forum") {successMessage("The forum was successfully updated");}
 	if (isset ($_GET['email']) && $_GET['email'] == "success") {successMessage("The email was successfully sent");}
 	if (!isset ($_GET['updated']) && !isset ($_GET['added']) && !isset ($_GET['email'])) {echo "<br />";}
 ?>
@@ -240,6 +244,8 @@
 				case "Agenda" : echo "agenda"; break;
 				case "Announcement" : echo "announcement"; break;
 				case "File Share" : echo "files"; break;
+				case "Poll" : echo "poll"; break;
+				case "Forum" : echo "forum"; break;
 			}
 			
 			echo ".php?id=" . $itemData['id'] . "\" onmouseover=\"Tip('Edit the <strong>" . htmlentities($itemData['title']) . "</strong> item')\" onmouseout=\"UnTip()\"></a></td>"; 

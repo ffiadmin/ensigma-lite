@@ -9,13 +9,18 @@
 </head>
 <body<?php bodyClass(); ?>>
 <?php topPage("public"); ?>
+<h4><a href="index.php">Home</a> &#9658 Login</h4>
       <form method="post" action="login.php<?php if (isset($_GET['accesscheck'])) {echo "?accesscheck=" .  urlencode($_GET['accesscheck']);} ?>" name="login" id="validate">
         <h1>Login</h1>
         <p>Login with your username and password to access your account.</p>
           <?php
 		//Display a login failed alert
-			if (isset($_GET['alert'])) {
-				errorMessage("Your user name or password is incorrect.");
+			if (isset($_GET['alert']) && isset($_GET['remaining'])) {
+				errorMessage("Your user name or password is incorrect. You may try logging in <strong>" . $_GET['remaining'] . "</strong> more time(s).");
+			}
+			
+			if (isset($_GET['expired'])) {
+				errorMessage("You have excedded the maxmium number of failed logins allowed for a 24 hour period. Please wait 24 hours before trying again.");
 			}
 			
 			if (isset($_GET['accesscheck'])) {

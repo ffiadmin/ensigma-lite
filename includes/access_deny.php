@@ -3,13 +3,7 @@
 //Grab the sidebar
 	$settingsGrabber = mysql_query("SELECT * FROM `privileges` WHERE `id` = '1'", $connDBA);
 	$settings = mysql_fetch_array($settingsGrabber);
-	
-	if ($settings['autoPublishSideBar'] == "1") {
-		$sideBarCheck = mysql_query("SELECT * FROM sidebar WHERE visible = 'on'", $connDBA);
-	} else {
-		$sideBarCheck = mysql_query("SELECT * FROM sidebar WHERE visible = 'on' AND published != '0'", $connDBA);
-	}
-	
+	$sideBarCheck = mysql_query("SELECT * FROM sidebar WHERE visible = 'on' AND published != '0'", $connDBA);
 	$sideBarResult = mysql_fetch_array($sideBarCheck);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -21,6 +15,15 @@
 
 <body<?php bodyClass(); ?>>
 <?php topPage(); ?>
+<h4>
+<?php
+	if (loggedIn()) {
+		echo "<a href=\"" . $root . "admin/index.php\">Home</a> ";
+	} else {
+		echo "<a href=\"" . $root . "index.php\">Home</a> ";
+	}
+?>
+&#9658 Error Page</h4>
 <?php
 //Use the layout control if the page is displaying a sidebar
 	$sideBarLocationGrabber = mysql_query("SELECT * FROM siteprofiles WHERE id = '1'", $connDBA);
@@ -52,11 +55,7 @@
 
 //Display the sidebar
 	if ($sideBarResult) {
-		if ($settings['autoPublishSideBar'] == "1") {
-			$sideBarCheck = mysql_query("SELECT * FROM sidebar WHERE visible = 'on'", $connDBA);
-		} else {
-			$sideBarCheck = mysql_query("SELECT * FROM sidebar WHERE visible = 'on' AND published != '0'", $connDBA);
-		}
+		$sideBarCheck = mysql_query("SELECT * FROM sidebar WHERE visible = 'on' AND published != '0' ORDER BY `position` ASC", $connDBA);
 		
 		echo "</div><div class=\"";
 		
@@ -68,29 +67,25 @@
 		
 		echo "\"><br /><br /><br />";
 		
-		while ($sideBar = mysql_fetch_array($sideBarCheck)) {
-			if ($sideBar['display'] == "1") {
-				$content = stripslashes($sideBar['content1']);
-			} else {
-				$content = stripslashes($sideBar['content2']);
-			}
+		while ($sideBarPrep = mysql_fetch_array($sideBarCheck)) {
+			$sideBar = unserialize($sideBarPrep['content' . $sideBarPrep['display']]);
 			
-			switch ($sideBar['type']) {
+			switch ($sideBarPrep['type']) {
 			//If this is a custom content box
 				case "Custom Content" : 				
 					if (!isset($_SESSION['MM_Username'])) {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . $content . "</div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . stripslashes($sideBar['content']) . "</div></div>";
 					} elseif (isset($_SESSION['MM_Username']) && privileges("editSideBar") != "true") {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . $content . "</div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . stripslashes($sideBar['content']) . "</div></div>";
 					} elseif (isset($_SESSION['MM_Username']) && privileges("editSideBar") == "true") {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/manage_sidebar.php?id=" . $sideBar['id'] . "\"></a></h2></div></div><div class=\"content\">" . stripslashes($content) . "</div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/sidebar/manage_sidebar.php?id=" . $sideBarPrep['id'] . "\"></a></h2></div></div><div class=\"content\">" . stripslashes($sideBar['content']) . "</div></div>";
 					} break;
 			//If this is a login box	
 				case "Login" : 
 					if (!isset($_SESSION['MM_Username'])) {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\"><form id=\"login\" name=\"login\" method=\"post\" action=\"index.php\"><div align=\"center\"><div style=\"width:75%;\"><p>User name: <input type=\"text\" name=\"username\" id=\"username\" autocomplete=\"off\" /><br />Password: <input type=\"password\" name=\"password\" id=\"password\" autocomplete=\"off\" /></p><p><input type=\"submit\" name=\"submit\" id=\"submit\" value=\"Login\" /></p></div></div></form></div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "</h2></div></div><div class=\"content\">" . stripslashes($sideBar['content']) . "<form id=\"login\" name=\"login\" method=\"post\" action=\"index.php\"><div align=\"center\"><div style=\"width:75%;\"><p>User name: <input type=\"text\" name=\"username\" id=\"username\" autocomplete=\"off\" /><br />Password: <input type=\"password\" name=\"password\" id=\"password\" autocomplete=\"off\" /></p><p><input type=\"submit\" name=\"submit\" id=\"submit\" value=\"Login\" /></p></div></div></form></div></div>";
 					} elseif (isset($_SESSION['MM_Username']) && privileges("editSideBar") == "true") {
-						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/manage_sidebar.php?id=" . $sideBar['id'] . "\"></a></h2></div></div></div>";
+						echo "<div class=\"block_course_list sideblock\"><div class=\"header\"><div class=\"title\"><h2>" . stripslashes($sideBar['title']) . "&nbsp;<a class=\"smallEdit\" href=\"admin/cms/sidebar/manage_sidebar.php?id=" . $sideBarPrep['id'] . "\"></a></h2></div></div><div class=\"content\">" . stripslashes($sideBar['content']) . "<p><strong>You are already logged in.</strong></p></div></div>";
 					} break;
 			  }
 		}

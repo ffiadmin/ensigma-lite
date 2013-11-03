@@ -19,6 +19,9 @@
 //If the site meta page is requested
 	} elseif (isset ($_GET['type']) && ($_GET['type'] == "meta")) {
 		$meta = "meta is requested";
+//If the site security page is requested
+	} elseif (isset($_GET['type']) && ($_GET['type'] == "security")) {
+		$security = "security is requested";
 //If the list of settings is requested
 	} elseif (!isset ($_GET['type'])) {
 		$settings = "settings are requested";
@@ -43,6 +46,9 @@
 //If the site meta page is requested
 	} elseif (isset ($meta)) {
 		$title = "Modify Site Information";
+//If the site security page is requested
+	} elseif (isset($security)) {
+		$title = "Security Settings";
 	} else {
 		$title = "Select Settings";
 	}
@@ -52,6 +58,7 @@
 <?php validate(); ?>
 <?php tinyMCESimple(); ?>
 <script src="../../javascripts/common/enableDisable.js" type="text/javascript"></script>
+<script src="../../javascripts/common/showHide.js" type="text/javascript"></script>
 <script src="../../javascripts/common/goToURL.js" type="text/javascript"></script>
 </head>
 <body<?php bodyClass(); ?>>
@@ -70,6 +77,7 @@
   <li class="arrowBullet"><a href="site_settings.php?type=icon">Browser Icon</a></li>
   <li class="arrowBullet"><a href="site_settings.php?type=meta">Site Information</a></li>
   <li class="arrowBullet"><a href="site_settings.php?type=theme">Theme</a></li>
+  <li class="arrowBullet"><a href="site_settings.php?type=security">Security</a></li>
 </ul>
 </blockquote>
 <?php
@@ -152,6 +160,7 @@
               <li class="arrowBullet"><a href="site_settings.php?type=icon">Browser Icon</a></li>
               <li class="arrowBullet"><a href="site_settings.php?type=meta">Site Information</a></li>
               <li class="arrowBullet"><a href="site_settings.php?type=theme">Theme</a></li>
+              <li class="arrowBullet"><a href="site_settings.php?type=security">Security</a></li>
             </ul>
             </div>
       </div>
@@ -263,7 +272,7 @@ px
 //If the browiser icon page is requested
 	} elseif (isset ($icon)) { 
 ?>
-      <p>Modify the browser icon displayed on the top-left of the browser window or the current tab. A browser icon may have one of the following extenstions : &quot;.ico&quot;, &quot;.jpg&quot;, or &quot;.gif&quot;. Below is an example of a browser icon:
+      <p>Modify the browser icon displayed on the top-left of the browser window or the current tab. A browser icon may have one of the following extensions : &quot;.ico&quot;, &quot;.jpg&quot;, or &quot;.gif&quot;. Below is an example of a browser icon:
       <br />
       <br />
       <img src="../../images/admin_icons/faviconExample.jpg" alt="Browser Icon" /></p>
@@ -315,6 +324,7 @@ px
                   <li class="arrowBullet"><a href="site_settings.php?type=icon">Browser Icon</a></li>
                   <li class="arrowBullet"><a href="site_settings.php?type=meta">Site Information</a></li>
                   <li class="arrowBullet"><a href="site_settings.php?type=theme">Theme</a></li>
+                  <li class="arrowBullet"><a href="site_settings.php?type=security">Security</a></li>
                 </ul>
           </div>
         </div>
@@ -389,6 +399,7 @@ px
           <li class="arrowBullet"><a href="site_settings.php?type=icon">Browser Icon</a></li>
           <li class="arrowBullet"><a href="site_settings.php?type=meta">Site Information</a></li>
           <li class="arrowBullet"><a href="site_settings.php?type=theme">Theme</a></li>
+          <li class="arrowBullet"><a href="site_settings.php?type=security">Security</a></li>
         </ul>
   </div>
 </div>
@@ -514,6 +525,7 @@ px
                   <li class="arrowBullet"><a href="site_settings.php?type=icon">Browser Icon</a></li>
                   <li class="arrowBullet"><a href="site_settings.php?type=meta">Site Information</a></li>
                   <li class="arrowBullet"><a href="site_settings.php?type=theme">Theme</a></li>
+                  <li class="arrowBullet"><a href="site_settings.php?type=security">Security</a></li>
                 </ul>
           </div>
         </div>
@@ -596,7 +608,152 @@ px
       </div>
       </div>
       </div>
-      </form>
+</form>
+<?php 
+//If the site security page is requested
+	} elseif (isset ($security)) { 
+?>
+<?php 
+//Modify the security settings
+	if (isset($_POST['modifySecurity']) && !empty($_POST['securityType'])) {
+		$type = $_POST['securityType'];
+		$failedLogins = $_POST['logins'];
+		
+		if ($type == "auto") {
+			query("UPDATE `siteprofiles` SET `saptcha` = '{$type}', `failedLogins` = '{$failedLogins}' WHERE `id` = '1'");
+			redirect("index.php?updated=security");
+		} else {
+			if (!empty($_POST['question']) && !empty($_POST['answer'])) {
+				$question = mysql_real_escape_string($_POST['question']);
+				$answer = mysql_real_escape_string($_POST['answer']);
+				
+				query("UPDATE `siteprofiles` SET `saptcha` = '{$type}', `question` = '{$question}', `answer` = '{$answer}', `failedLogins` = '{$failedLogins}' WHERE `id` = '1'");
+				redirect("index.php?updated=security");
+			}
+		}
+	}
+?>
+<p>This is the site security page. Most of the security is handled automatically. However, the saptcha for the comments section may need configuration. Saptcha is a section under the comments section for the general public to answer before a comment is posted. This ensures that the commenter is human, not an automatic robot which can excessively spam the comments section. Furthermore, you can ask a question which can only be answered by a select group.</p>
+<p>Farther down is a setting which will enable you to set how failed logins a user may have in a 24 hour period. This setting is important as it limits a hacker from trying random user names and passwords.</p>
+<p>&nbsp;</p>
+<form name="security" id="validate" action="site_settings.php?type=security" method="post">
+<?php
+//Select form information
+	$security = query("SELECT * FROM `siteprofiles` WHERE id = '1'");
+?>
+<div class="layoutControl">
+<div class="dataLeft">
+<div class="block_course_list sideblock">
+      <div class="header">
+        <div class="title">
+          <h2>Navigation</h2>
+        </div>
+      </div>
+      <div class="content">
+        <p>Modify other settings within this site:</p>
+        <ul>
+          <li class="homeBullet"><a href="index.php">Back to Home</a></li>
+          <li class="arrowBullet"><a href="site_settings.php?type=logo">Site Logo</a></li>
+          <li class="arrowBullet"><a href="site_settings.php?type=icon">Browser Icon</a></li>
+          <li class="arrowBullet"><a href="site_settings.php?type=meta">Site Information</a></li>
+          <li class="arrowBullet"><a href="site_settings.php?type=theme">Theme</a></li>
+          <li class="arrowBullet"><a href="site_settings.php?type=security">Security</a></li>
+        </ul>
+  </div>
+</div>
+</div>
+<div class="contentRight">
+<div class="catDivider one">Comments Security Type</div>
+<div class="stepContent">
+  <blockquote>
+    <p>Select the security type:</p>
+    <blockquote>
+      <p><label><input type="radio" name="securityType" id="securityType_0" value="auto" onchange="securityFeatures(this.value)"<?php
+	  	if ($security['saptcha'] == "auto") {
+			echo " checked=\"checked\"";
+		}
+	  ?> />Automatically Generated</label> 
+      Questions<br />
+      <label><input type="radio" name="securityType" id="securityType_1" value="custom" onchange="securityFeatures(this.value)"<?php
+	  	if ($security['saptcha'] == "custom") {
+			echo " checked=\"checked\"";
+		}
+	  ?> />Custom Question</label><br />
+      </p>
+    </blockquote>
+  </blockquote>
+</div>
+<div class="catDivider two"><span class="catDivider one">Comments</span> Security Settings</div>
+<div class="stepContent">
+  <blockquote>
+  	<div id="auto"<?php
+	  	if ($security['saptcha'] == "custom") {
+			echo " class=\"contentHide\"";
+		}
+	  ?>>
+    <p>This option asks a simple question which can be answered by the general population, such as &quot;What is 1 + 1&quot;. This option is recommended if you wish the comments section to be used by anyone.</p>
+    <div class="noResults">No input is required.</div>
+    </div>
+   </blockquote>
+   <blockquote>
+   <div id="custom"<?php
+	  	if ($security['saptcha'] == "auto") {
+			echo " class=\"contentHide\"";
+		}
+	  ?>>
+    <p>This option enables you to create a custom question. This option is recommended if you wish the comments section to be used by a selected group of people. If this is the case, try asking a question that only this group will know the answer.</p>
+    <p>Question<span class="require">*</span>:</p>
+    <blockquote>
+      <p><input type="text" name="question" id="question" size="50" autocomplete="off" class="validate[required]" value="<?php
+	  	echo prepare($security['question'], true, true)
+	  ?>" /></p>
+    </blockquote>
+    <p>Answer (case will be ignored)<span class="require">*</span>:</p>
+    <blockquote>
+      <p>
+        <input type="text" name="answer" id="answer" size="50" autocomplete="off" class="validate[required]" value="<?php
+	  	echo prepare($security['answer'], true, true)
+	  ?>" />
+      </p>
+    </blockquote>
+  </div>
+  </blockquote>
+</div>
+<div class="catDivider three">Failed Login Security</div>
+<div class="stepContent">
+  <blockquote>
+    <p>
+      Set number of failed logins:</p>
+    <blockquote>
+      <p>
+        <select name="logins" id="logins">
+          <option value="1"<?php if ($security['failedLogins'] == "1") { echo " selected=\"selected\""; } ?>>One</option>
+          <option value="2"<?php if ($security['failedLogins'] == "2") { echo " selected=\"selected\""; } ?>>Two</option>
+          <option value="3"<?php if ($security['failedLogins'] == "3") { echo " selected=\"selected\""; } ?>>Three</option>
+          <option value="4"<?php if ($security['failedLogins'] == "4") { echo " selected=\"selected\""; } ?>>Four</option>
+          <option value="5"<?php if ($security['failedLogins'] == "5") { echo " selected=\"selected\""; } ?>>Five</option>
+          <option value="6"<?php if ($security['failedLogins'] == "6") { echo " selected=\"selected\""; } ?>>Six</option>
+          <option value="7"<?php if ($security['failedLogins'] == "7") { echo " selected=\"selected\""; } ?>>Seven</option>
+          <option value="8"<?php if ($security['failedLogins'] == "8") { echo " selected=\"selected\""; } ?>>Eight</option>
+          <option value="9"<?php if ($security['failedLogins'] == "9") { echo " selected=\"selected\""; } ?>>Nine</option>
+          <option value="10"<?php if ($security['failedLogins'] == "10") { echo " selected=\"selected\""; } ?>>Ten</option>
+        </select>
+      </p>
+    </blockquote>
+  </blockquote>
+</div>
+<div class="catDivider four">Submit</div>
+<div class="stepContent">
+  <blockquote>
+    <p>
+      <input type="submit" name="modifySecurity" id="modifySecurity" value="Submit" />
+      <input name="cancelMeta2" type="button" id="cancelSecurity" onclick="MM_goToURL('parent','index.php');return document.MM_returnValue" value="Cancel" />
+    </p>
+  </blockquote>
+</div>
+</div>
+</div>
+</form>
 <?php } ?>
 <?php footer(); ?>
 </body>

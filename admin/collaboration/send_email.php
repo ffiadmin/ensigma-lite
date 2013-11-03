@@ -15,8 +15,8 @@
 		$toImport = $_POST['toImport'];
 		$subject = stripslashes($_POST['subject']);
 		$priority = $_POST['priority'];
-		$bodyGrabber = "<html><head><title>" . $subject . "</title></head><body>" . stripslashes($_POST['message']) . "</body></html>";
-		$body = str_ireplace("\"" . $strippedRoot, "\"" . $root, $bodyGrabber);
+		$body = "<html><head><title>" . $subject . "</title></head><body>" . stripslashes($_POST['message']) . "</body></html>";
+		//$body = str_ireplace("\"" . $strippedRoot, "\"" . $root, $bodyGrabber);
 		
 	//Select the site name to conceal the "to" list
 		$siteNameGrabber = mysql_query("SELECT * FROM `siteprofiles` WHERE `id` = '1'", $connDBA);
@@ -28,25 +28,6 @@
 		} elseif ($toDetirmine == "all") {
 			$toGrabber = mysql_query("SELECT * FROM `users` ORDER BY `firstName` ASC", $connDBA);
 			$to = "";
-			
-			while($toData = mysql_fetch_array($toGrabber)) {
-				$to .= $toData['firstName'] . " " . $toData['lastName'] . " <" . $toData['emailAddress1'] . ">,";
-			}
-		} elseif ($toDetirmine == "organizations") {
-			$toArray = explode(",", $toImport);
-			$toArraySize = sizeof($toArray);
-			$to = "";
-			
-			for ($count = 0; $count <= $toArraySize; $count++) {
-				$organization = $toArraySize[$count];
-				$toGrabber = mysql_query("SELECT * FROM `users` WHERE `organization` = '{$organization}'", $connDBA);
-				
-				while($toData = mysql_fetch_array($toGrabber)) {
-					$to .= $toData['firstName'] . " " . $toData['lastName'] . " <" . $toData['emailAddress1'] . ">,";
-				}
-			}
-		} elseif ($toDetirmine == "allOrganizations") {
-			$toGrabber = mysql_query("SELECT * FROM `users` WHERE `organization` != '1'", $connDBA);
 			
 			while($toData = mysql_fetch_array($toGrabber)) {
 				$to .= $toData['firstName'] . " " . $toData['lastName'] . " <" . $toData['emailAddress1'] . ">,";
@@ -64,6 +45,8 @@
 					$to .= $toData['firstName'] . " " . $toData['lastName'] . " <" . $toData['emailAddress1'] . ">,";
 				}
 			}
+		} else {
+			redirect($_SERVER['PHP_SELF']);
 		}
 		
 	//Generate the header
@@ -84,33 +67,33 @@
 					   "Content-Transfer-Encoding: 7bit\n\n" .
 					   $body . "\n\n";
 		
-	if (is_uploaded_file($_FILES['attachment']['tmp_name'])) {
-		//Grab the attachment
-			$fileTempName = $_FILES['attachment']['tmp_name'];
-			$fileType = $_FILES['attachment']['type'];
-			$fileName = basename($_FILES['attachment'] ['name']);	
-		
-		//Grab the attachment info
-			$file = fopen($fileTempName, 'rb');
-			$data = fread($file, filesize($fileTempName));
-			fclose ($file);	
+		if (is_uploaded_file($_FILES['attachment']['tmp_name'])) {
+			//Grab the attachment
+				$fileTempName = $_FILES['attachment']['tmp_name'];
+				$fileType = $_FILES['attachment']['type'];
+				$fileName = basename($_FILES['attachment'] ['name']);	
 			
-		//Processing			
-			$data = chunk_split(base64_encode($data));
+			//Grab the attachment info
+				$file = fopen($fileTempName, 'rb');
+				$data = fread($file, filesize($fileTempName));
+				fclose ($file);	
+				
+			//Processing			
+				$data = chunk_split(base64_encode($data));
+				$message .= "--{$mimeBoundary}\n" .
+							"Content-Type: {$fileType};\n" . 
+							" name = \"{$fileName}\"\n" . 
+							"Content-Transfer-Encoding: base64\n\n" . 
+							$data . "\n\n" .    
+							"--{$mimeBoundary}--\n";
+		} else {
 			$message .= "--{$mimeBoundary}\n" .
-						"Content-Type: {$fileType};\n" . 
-						" name = \"{$fileName}\"\n" . 
+						"Content-Type:  text/html;\n" . 
+						" name = \"attachment.html\"\n" . 
 						"Content-Transfer-Encoding: base64\n\n" . 
-						$data . "\n\n" .    
+						chunk_split(base64_encode($body)) . "\n\n" .    
 						"--{$mimeBoundary}--\n";
-	} else {
-		$message .= "--{$mimeBoundary}\n" .
-					"Content-Type:  text/html;\n" . 
-					" name = \"{$fileName}\"\n" . 
-					"Content-Transfer-Encoding: base64\n\n" . 
-					chunk_split(base64_encode($body)) . "\n\n" .    
-					"--{$mimeBoundary}--\n";
-	}
+		}
 		
 	//Processor
 		$mailTo = explode(",", $to);
@@ -118,10 +101,13 @@
 		foreach ($mailTo as $to) {
 		 	mail($to, $subject, $message, $header);
 		}
-			
-	//Display a confirmation
-		header ("Location: index.php?email=success");
-		exit;
+		
+	//Redirect
+		if (!headers_sent()) {
+			header("Location: index.php?email=success", true);
+		} else {
+			require_once("index.php?email=success");
+		}
 	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -147,7 +133,7 @@
 		echo "<blockquote><p><a href=\"send_email.php?type=user\">Selected Users</a> - Only selected users will recieve this email<br /><a href=\"send_email.php?type=all\">All Users</a> - All registered users will recieve this email<br /><a href=\"send_email.php?type=roles\">Selected Roles</a> - All users with a selected role will recieve this email</p></blockquote>";
 	} else {
 ?>
-<form action="send_email.php?type=<?php echo $_GET['type']; ?>" method="post" enctype="multipart/form-data" name="sendEmail" id="validate" onsubmit="return errorsOnSubmit(this, true, 'attachment', false);">
+<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" enctype="multipart/form-data" name="sendEmail" id="validate" onsubmit="return errorsOnSubmit(this, true, 'attachment', false);">
 <div class="catDivider one">Settings</div>
 <div class="stepContent">
 <blockquote>

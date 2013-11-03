@@ -41,18 +41,18 @@
 						"alertText":"* No special characters allowed"},	
 					"noSpecialCharactersSpaces":{
 						"regex":"/^[0-9a-zA-Z]+$/",
-						"alertText":"* No special characters allowed"},	
+						"alertText":"* No special characters allowed"},
 					"ajaxUser":{
 						"file": document.location.href + "?validate=true",
 						"extraData":"name=eric",
 						"alertTextOk":"* This user is available",	
 						"alertTextLoad":"* Loading, please wait",
-						"alertText":"* This user is already taken"},	
+						"alertText":"* This user is already taken"},
 					"ajaxName":{
-						"file": document.location.href + "?validate=true",
-						"alertText":"* This name is already taken",
-						"alertTextOk":"* This name is available",	
-						"alertTextLoad":"* Loading, please wait"},		
+						"file": document.location.href,
+						"alertText":"* Incorrect answer",
+						"alertTextOk":"* Correct answer",	
+						"alertTextLoad":"* Loading, please wait"},	
 					"onlyLetter":{
 						"regex":"/^[a-zA-Z\ \']+$/",
 						"alertText":"* Letters only"},

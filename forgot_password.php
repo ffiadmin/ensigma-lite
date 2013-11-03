@@ -34,6 +34,7 @@
 <?php validate(); ?>
 <body<?php bodyClass(); ?>>
 <?php topPage(); ?>
+<h4><a href="index.php">Home</a> &#9658 <a href="login.php">Login</a> &#9658 Forgot Password</h4>
 <h2>Password Recovery</h2>
 <p>Enter  your user name and your primary email address to recover your password.</p>
 <?php

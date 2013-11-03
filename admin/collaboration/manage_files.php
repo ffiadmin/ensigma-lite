@@ -90,11 +90,11 @@
 			$position = $positionArray{'position'}+1;
 				
 			$newFilesQuery = "INSERT INTO collaboration (
-								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`
+								`id`, `position`, `visible`, `type`, `fromDate`, `fromTime`, `toDate`, `toTime`, `title`, `content`, `assignee`, `task`, `dueDate`, `priority`, `completed`, `directories`, `name`, `date`, `comment`
 							) VALUES (
-								NULL, '{$position}', 'on', 'File Share', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '', '', '', '', '', '{$category}'
+								NULL, '{$position}', 'on', 'File Share', '{$fromDate}', '{$fromTime}', '{$toDate}', '{$toTime}', '{$title}', '{$content}', '', '', '', '', '', '{$category}', '', '', ''
 							)";
-							
+			
 			mysql_query($newFilesQuery, $connDBA);
 			
 			if ($redirect == "Location: manage_files.php?message=inferior") {
@@ -360,7 +360,7 @@
             <option value="11:30"<?php if (isset ($files) && $files['toTime'] == "11:30") {echo " selected=\"selected\"";} ?>>11:30 am</option>
             <option value="12:00"<?php if (isset ($files) && $files['toTime'] == "12:00") {echo " selected=\"selected\"";} ?>>12:00 pm</option>
             <option value="12:30"<?php if (isset ($files) && $files['toTime'] == "12:30") {echo " selected=\"selected\"";} ?>>12:30 pm</option>
-            <option value="13:00"<?php if (isset ($files) && $files['toTime'] == "12:00") {echo " selected=\"selected\"";} elseif (!isset ($files)) {echo " selected=\"selected\"";} elseif ($files['toTime'] == "") {echo " selected=\"selected\"";} ?>>1:00 pm</option>
+            <option value="13:00"<?php if (isset ($files) && $files['toTime'] == "13:00") {echo " selected=\"selected\"";} elseif (!isset ($files)) {echo " selected=\"selected\"";} elseif ($files['toTime'] == "") {echo " selected=\"selected\"";} ?>>1:00 pm</option>
             <option value="13:30"<?php if (isset ($files) && $files['toTime'] == "13:30") {echo " selected=\"selected\"";} ?>>1:30 pm</option>
             <option value="14:00"<?php if (isset ($files) && $files['toTime'] == "14:00") {echo " selected=\"selected\"";} ?>>2:00 pm</option>
             <option value="14:30"<?php if (isset ($files) && $files['toTime'] == "14:30") {echo " selected=\"selected\"";} ?>>2:30 pm</option>

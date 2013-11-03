@@ -1,28 +1,51 @@
-<?php require_once("../../../Connections/connDBA.php"); ?>
-<?php loginCheck("User,Administrator"); ?>
 <?php
+//Header functions
+	require_once("../../../Connections/connDBA.php");
+
 //Define this as a javascript file
 	header ("Content-type: text/javascript");
 
-//Grab all of the pages	
-	$pageCheck = mysql_query("SELECT * FROM pages WHERE `published` != '0'", $connDBA);
-	
-	if (mysql_fetch_array($pageCheck)) {
-		$pageDataGrabber = mysql_query("SELECT * FROM pages WHERE `published` != '0' ORDER BY position ASC", $connDBA);
-		$pageCountGrabber = mysql_query("SELECT * FROM pages WHERE `published` != '0' ORDER BY position ASC", $connDBA);
-		$pageCount = mysql_num_rows($pageCountGrabber);
+	if (exist("pages")) {
+		$return = "";
 		
 		echo "var tinyMCELinkList = new Array(";
 		
-		while ($page = mysql_fetch_array($pageDataGrabber)) {
-			echo "[\"" . $page['title'] . "\", \"" . $root . "index.php?page=" . $page['id'] . "\"]";
-			
-			if ($page['position'] != $pageCount) {
-				echo ", ";
+	//Find the current level of a page
+		function level($id) {
+			if (exist("pages", "id", $id)) {
+				$nextPage = query("SELECT * FROM `pages` WHERE `id` = '{$id}'");
+				return  "&nbsp;&nbsp;&nbsp;" . level($nextPage['parentPage']);
 			}
 		}
 		
-		echo ");";
+	//Recursively loop through the pages
+		function pagesDirectory($level) {
+			global $return, $root;
+			
+			if ($level == "0") {
+				$pagesGrabber = query("SELECT * FROM `pages` WHERE `parentPage` = '{$level}' ORDER BY `position` ASC", "raw");
+			} else {
+				$pagesGrabber = query("SELECT * FROM `pages` WHERE `parentPage` = '{$level}' ORDER BY `subPosition` ASC", "raw");
+			}
+			
+			while ($pages = mysql_fetch_array($pagesGrabber)) {
+				if (isset($_GET['id'])) {
+				   $parentPage = query("SELECT * FROM `pages` WHERE `id` = '{$_GET['id']}'");
+				}
+				
+				$title = unserialize($pages['content' . $pages['display']]);
+				
+				$return .= "[\"" . level($pages['parentPage']) . $title['title'] . "\", \"" . $root . "index.php?page=" . $pages['id'] . "\"], ";
+				
+				if (exist("pages", "parentPage", $pages['id'])) {
+					pagesDirectory($pages['id']);
+				}
+			}
+		}
+		
+		pagesDirectory('0');
+		
+		echo rtrim($return, ", ") .  ");";
 	} else {
 		echo "var tinyMCELinkList = new Array([\"Home Page\", \"" . $root . "index.php\"]);";
 	}

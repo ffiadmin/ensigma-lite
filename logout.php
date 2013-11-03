@@ -19,6 +19,7 @@
 </head>
 <body<?php bodyClass(); ?>>
 <?php topPage("public"); ?>
+<h4><a href="index.php">Home</a> &#9658 Logout</h4>
 <h2>Logout</h2>
 <?php
 	if (isset($_GET['action']) && $_GET['action'] == "relogin") {

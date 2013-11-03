@@ -781,6 +781,10 @@ a.skip:focus, a.skip:active {
 	a.statistics {
 		background:url(../../images/admin_icons/statistics.png) no-repeat left;
 	}
+	
+	a.alert {
+		background:url(../../images/admin_icons/warning.png) no-repeat left;
+	}
 /* End tool bar and menu options */
 
 /* Begin form layout */
@@ -1059,6 +1063,11 @@ a.skip:focus, a.skip:active {
 		padding-left:25px;
 	}
 	
+	span.page {
+		background:url(../../images/admin_icons/bullet.gif) no-repeat left;
+		padding-left:25px;
+	}
+	
 	span.notAssigned {
 		font-style:italic;
 		text-align:center;	
@@ -1102,6 +1111,18 @@ a.skip:focus, a.skip:active {
 		background:url(../../images/admin_icons/noDelete.png) no-repeat center;
 	}
 	
+	a.history {
+		background:url(../../images/admin_icons/search.png) no-repeat center;
+	}
+	
+	a.revert {
+		background:url(../../images/admin_icons/back.png) no-repeat center;
+	}
+	
+	span.noRevert {
+		background:url(../../images/admin_icons/noRevert.png) no-repeat center;
+	}
+	
 	a.smallDelete, span.smallDelete {
 		background:url(../../images/common/x.png) no-repeat center;
 		cursor:pointer;
@@ -1127,6 +1148,11 @@ a.skip:focus, a.skip:active {
 	
 	div.fileShareContent {
 		 background:url(../../images/common/fileShare.png) no-repeat left top;
+		 padding:0px 0px 12px 60px;
+	}
+	
+	div.pollContent {
+		 background:url(../../images/common/poll.png) no-repeat left top;
 		 padding:0px 0px 12px 60px;
 	}
 	
@@ -1179,6 +1205,11 @@ a.skip:focus, a.skip:active {
 /* End module styles */
 
 /* Begin naviagtion styles */
+	ul.headerNavigation li {
+		padding-left:10px;
+		padding-right:10px;
+	}
+	
 	a.topPageNav:link, a.topPageNav:visited {
 		color:#FFF;
 		font-size:11px;
@@ -1195,14 +1226,14 @@ a.skip:focus, a.skip:active {
 	a.topCurrentPageNav:link, a.topCurrentPageNav:visited {
 		color:#FFF;
 		text-decoration:underline;
-		font-size:12px;
+		font-size:13px;
 		font-weight:bolder;
 	}
 	
 	a.topCurrentPageNav:active, a.topCurrentPageNav:hover {
 		color:#FFF;
 		text-decoration:none;
-		font-size:12px;
+		font-size:13px;
 		font-weight:bolder;
 	}
 	

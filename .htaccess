@@ -1,3 +1,7 @@
+<Files ~ "\.(php)$">
+	order allow,deny
+	allow from all
+</Files>
 <Files ~ "\.(htaccess)$">
 	order deny,allow
 	deny from all

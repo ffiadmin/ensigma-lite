@@ -13,6 +13,7 @@ tinyMCE.init({
 		skin : "o2k7",
 		skin_variant : "silver",
 		plugins : " safari,pagebreak,style,layer,table,save,advhr,advimage,autosave,advlink,emotions,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,tabfocus,AtD",
+        extended_valid_elements : 'iframe[style|src|frameborder],param[name|value|_value],embed[src|quality|bgcolor|width|height|name|id|align|allowScriptAccess|type|pluginspage],object[classid|codebase|id|name|align|width|height]',
         
         atd_button_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/atdbuttontr.gif",
         atd_rpc_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/server/proxy.php?url=",
@@ -23,6 +24,9 @@ tinyMCE.init({
         theme_advanced_buttons4_add : "AtD",
         atd_ignore_enable : "true",
 		tab_focus : ':prev,:next',
+        verify_html : true,
+		cleanup : true,
+
 
 		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
 		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
@@ -36,15 +40,35 @@ tinyMCE.init({
         document_base_url : "<?php echo $root; ?>",
         remove_script_host : false,
         convert_urls : false,
+        media_strict : false,
 		content_css : "<?php echo $root; ?>styles/common/universal.css",
-		file_browser_callback: "tinyBrowser",
+		file_browser_callback: "filebrowser",
 		width : "640",
 		height: "320",
 
 		external_link_list_url : "<?php echo $root; ?>tiny_mce/plugins/advlink/data_base_links.php",
 		external_image_list_url : "lists/image_list.js",
 		media_external_list_url : "lists/media_list.js",
-		autosave_ask_before_unload : false,
+		autosave_ask_before_unload : true,
         editor_deselector : "noEditorAdvanced",
         gecko_spellcheck : false,
 });
+
+function filebrowser(field_name, url, type, win) {
+    fileBrowserURL = "<?php echo $root; ?>tiny_mce/plugins/filebrowser/index.php?filter=" + type;
+    
+    tinyMCE.activeEditor.windowManager.open({
+        file : fileBrowserURL,
+        title : 'Server Files',
+        width : 800, 
+        height : 500,
+        resizable : "no",
+        scrollbars : "yes",
+        inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
+        close_previous : "no"
+    }, {
+        window : win,
+        input : field_name
+    });
+}
+

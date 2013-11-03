@@ -13,7 +13,8 @@
 	if (isset($_GET['type'])) {
 		switch ($_GET['type']) {
 			case "daily" : 
-				$statisticsCheck = mysql_query("SELECT * FROM `dailyhits`");
+				$statisticsNumber = query("SELECT * FROM `dailyhits`", "num");
+				$statisticsCheck = mysql_query("SELECT * FROM `dailyhits` LIMIT 50");
 				
 				if (mysql_fetch_array($statisticsCheck)) {
 					$firstItemGrabber = mysql_query("SELECT * FROM `dailyhits` ORDER BY `id` ASC LIMIT 1");
@@ -25,7 +26,13 @@
 					
 					$statisticsGrabber = mysql_query("SELECT * FROM `dailyhits` ORDER BY `id` ASC");
 					
-					echo "<graph caption=\"Daily Hits\" subcaption=\"From " . $firstItem . " to " . $lastItem ."\" xAxisName=\"\" yAxisMinValue=\"0\" yAxisName=\"Hits\" decimalPrecision=\"0\" formatNumberScale=\"0\" showNames=\"0\" showValues=\"0\" showAlternateHGridColor=\"1\" AlternateHGridColor=\"ff5904\" divLineColor=\"ff5904\" divLineAlpha=\"20\" alternateHGridAlpha=\"5\" bgAlpha=\"0\" rotateNames=\"1\">";
+					echo "<graph caption=\"Daily Hits\" subcaption=\"";
+					
+					if ($statisticsNumber > 50) {
+						echo "Last 50 Days - ";
+					}
+					
+					echo "From " . $firstItem . " to " . $lastItem ."\" xAxisName=\"\" yAxisMinValue=\"0\" yAxisName=\"Hits\" decimalPrecision=\"0\" formatNumberScale=\"0\" showNames=\"0\" showValues=\"0\" showAlternateHGridColor=\"1\" AlternateHGridColor=\"ff5904\" divLineColor=\"ff5904\" divLineAlpha=\"20\" alternateHGridAlpha=\"5\" bgAlpha=\"0\" rotateNames=\"1\">";
 					
 					while($statistics = mysql_fetch_array($statisticsGrabber)) {
 						echo "<set name=\"" . $statistics['date'] . "\" value=\"" . $statistics['hits'] . "\" hoverText=\"" . $statistics['date'] . "\"/>";
@@ -49,7 +56,8 @@
 					while($statistics = mysql_fetch_array($statisticsGrabber)) {
 						$id = $statistics['page'];
 						$pageGrabber = mysql_query("SELECT * FROM `pages` WHERE `id` = '{$id}'", $connDBA);
-						$page = mysql_fetch_array($pageGrabber);
+						$pagePrep = mysql_fetch_array($pageGrabber);
+						$page = unserialize($pagePrep['content' . $pagePrep['display']]);
 						
 						echo "<set name=\"" . stripslashes($page['title']) . "\" value=\"" . $statistics['hits'] . "\" hoverText=\"" . stripslashes($page['title']) . " (" . $statistics['hits'] . " Hits)\"/>";
 					}

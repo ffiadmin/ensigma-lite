@@ -62,7 +62,8 @@ h6.main {
   clear:both
 }
 .generalboxcontent {
-  text-align:left
+  text-align:left;
+  margin-top:300px;
 }
 #layout-table {
   margin-top:0
@@ -111,7 +112,7 @@ img.resize {
  *** Header
  ***/
 .breadcrumb {
-  height:35px;
+  height:30px;
   color: #FFFFFF;
   font-weight:normal;
   font-size:11px;
@@ -576,7 +577,9 @@ h3 {
   font-size:0.8em
 }
 h4 {
-  font-size:0.7em
+  font-size:0.7em;
+  text-align:left;
+  color:#000;
 }
 pre code {
   font-size:1.2em

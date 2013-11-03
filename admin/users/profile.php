@@ -101,6 +101,10 @@
     <td><div align="right">Role:</div></td>
     <td><?php echo $user['role']; ?></td>
   </tr>
+  <tr>
+    <td><div align="right">Last Active:</div></td>
+    <td><?php echo date("l, M j, Y \\a\\t h:i:s A", $user['active']); ?></td>
+  </tr>
 </table>
 </div>
 <div class="catDivider two">Contact Information</div>

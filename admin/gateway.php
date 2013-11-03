@@ -18,12 +18,12 @@
 			}
 		}
 	
-	//Check ot see if the file exists
+	//Check to see if the file exists
 		if (!file_exists($gatewayFile) || is_dir($gatewayFile)) {
-			die("The file was not found");
+			redirect($root . "includes/access_deny.php?error=404");
 		}
 	
-	//Site administrators will have access to lesson and answer files from modules
+	//Logged in users will have access to this file
 		if (isset($_SESSION['MM_UserGroup'])) {
 			$mimeType = getMimeType($gatewayFile);
 			
@@ -39,6 +39,8 @@
 			readfile($gatewayFile);
 			exit;
 		}
+		
+		redirect($root . "includes/access_deny.php?error=403");
 	} else {
 		die(centerDiv("A file was not provided"));
 	}

@@ -9,37 +9,35 @@
 	if (isset($_POST['submit'])) {
 		$uploadFile = $_POST['uploadFile'];
 		$deleteFile = $_POST['deleteFile'];
+		$deleteForumComments = $_POST['deleteForumComments'];
 		$sendEmail = $_POST['sendEmail'];
 		$viewStaffPage = $_POST['viewStaffPage'];
 		$createStaffPage = $_POST['createStaffPage'];
 		$editStaffPage = $_POST['editStaffPage'];
 		$deleteStaffPage = $_POST['deleteStaffPage'];
 		$publishStaffPage = $_POST['publishStaffPage'];
-		$autoPublishStaffPage = $_POST['autoPublishStaffPage'];
 		$addStaffComments = $_POST['addStaffComments'];
 		$deleteStaffComments = $_POST['deleteStaffComments'];
 		$createPage = $_POST['createPage'];
 		$editPage = $_POST['editPage'];
 		$deletePage = $_POST['deletePage'];
 		$publishPage = $_POST['publishPage'];
-		$autoPublishPage = $_POST['autoPublishPage'];
 		$deleteComments = $_POST['deleteComments'];
 		$siteSettings = $_POST['siteSettings'];
 		$createSideBar = $_POST['createSideBar'];
 		$editSideBar = $_POST['editSideBar'];
 		$deleteSideBar = $_POST['deleteSideBar'];
 		$publishSideBar = $_POST['publishSideBar'];
-		$autoPublishSideBar = $_POST['autoPublishSideBar'];
 		$sideBarSettings = $_POST['sideBarSettings'];
 		$createExternal = $_POST['createExternal'];
 		$editExternal = $_POST['editExternal'];
 		$deleteExternal = $_POST['deleteExternal'];
 		$publishExternal = $_POST['publishExternal'];
-		$autoPublishExternal = $_POST['autoPublishExternal'];
 		$deleteComments = $_POST['deleteComments'];
 		$viewStatistics = $_POST['viewStatistics'];
+		$autoEmail = $_POST['autoEmail'];
 		
-		mysql_query("UPDATE `privileges` SET `uploadFile` = '{$uploadFile}', `deleteFile` = '{$deleteFile}', `sendEmail` = '{$sendEmail}', `viewStaffPage` = '{$viewStaffPage}', `createStaffPage` = '{$createStaffPage}', `editStaffPage` = '{$editStaffPage}', `deleteStaffPage` = '{$deleteStaffPage}', `publishStaffPage` = '{$publishStaffPage}', `autoPublishStaffPage` = '{$autoPublishStaffPage}', `addStaffComments` = '{$addStaffComments}', `deleteStaffComments` = '{$deleteStaffComments}', `createPage` = '{$createPage}', `editPage` = '{$editPage}', `deletePage` = '{$deletePage}', `publishPage` = '{$publishPage}', `autoPublishPage` = '{$autoPublishPage}', `deleteComments` = '{$deleteComments}', `siteSettings` = '{$siteSettings}', `createSideBar` = '{$createSideBar}', `editSideBar` = '{$editSideBar}', `deleteSideBar` = '{$deleteSideBar}', `publishSideBar` = '{$publishSideBar}', `autoPublishSideBar` = '{$autoPublishSideBar}', `sideBarSettings` = '{$sideBarSettings}',`createExternal` = '{$createExternal}', `editExternal` = '{$editExternal}', `deleteExternal` = '{$deleteExternal}', `publishExternal` = '{$publishExternal}', `autoPublishExternal` = '{$autoPublishExternal}', `deleteComments` = '{$deleteComments}', `viewStatistics` = '{$viewStatistics}' WHERE `id` = '1'", $connDBA);
+		mysql_query("UPDATE `privileges` SET `uploadFile` = '{$uploadFile}', `deleteFile` = '{$deleteFile}', `deleteForumComments` = '{$deleteForumComments}', `sendEmail` = '{$sendEmail}', `viewStaffPage` = '{$viewStaffPage}', `createStaffPage` = '{$createStaffPage}', `editStaffPage` = '{$editStaffPage}', `deleteStaffPage` = '{$deleteStaffPage}', `publishStaffPage` = '{$publishStaffPage}', `addStaffComments` = '{$addStaffComments}', `deleteStaffComments` = '{$deleteStaffComments}', `createPage` = '{$createPage}', `editPage` = '{$editPage}', `deletePage` = '{$deletePage}', `publishPage` = '{$publishPage}', `deleteComments` = '{$deleteComments}', `siteSettings` = '{$siteSettings}', `createSideBar` = '{$createSideBar}', `editSideBar` = '{$editSideBar}', `deleteSideBar` = '{$deleteSideBar}', `publishSideBar` = '{$publishSideBar}', `sideBarSettings` = '{$sideBarSettings}',`createExternal` = '{$createExternal}', `editExternal` = '{$editExternal}', `deleteExternal` = '{$deleteExternal}', `publishExternal` = '{$publishExternal}', `deleteComments` = '{$deleteComments}', `viewStatistics` = '{$viewStatistics}', `autoEmail` = '{$autoEmail}' WHERE `id` = '1'", $connDBA);
 		
 		header("Location: index.php?updated=privileges");
 		exit;
@@ -94,6 +92,22 @@ Yes
 	  ?> />
   No</label>
 </p>
+    <p>Delete forum comments:
+      <label>
+        <input type="radio" name="deleteForumComments" value="1" id="deleteForumComments_0"<?php
+		  if ($privileges['deleteForumComments'] == "1") {
+			  echo " checked=\"checked\"";
+		  }
+	  ?> />
+        Yes </label>
+      <label>
+        <input type="radio" name="deleteForumComments" value="0" id="deleteForumComments_1"<?php
+		  if ($privileges['deleteForumComments'] == "0") {
+			  echo " checked=\"checked\"";
+		  }
+	  ?> />
+        No</label>
+    </p>
     <p>Send email:
       <label>
         <input type="radio" name="sendEmail" value="1" id="sendEmail_0"<?php
@@ -116,22 +130,21 @@ Yes
 <div class="catDivider alignLeft">Staff Pages</div>
 <div class="stepContent">
   <blockquote>
-    <p>Staff pages require approval:
+    <p>Users can publish staff pages:
       <label>
-      <input type="radio" name="autoPublishStaffPage" value="0" id="autoPublishStaffPage_0"<?php
-		  if ($privileges['autoPublishStaffPage'] == "0") {
+        <input type="radio" name="publishStaffPage" value="1" id="publishStaffPage_0"<?php
+		  if ($privileges['publishStaffPage'] == "1") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-      Yes
-  </label>
-  <label>
-    <input type="radio" name="autoPublishStaffPage" value="1" id="autoPublishStaffPage_1"<?php
-		  if ($privileges['autoPublishStaffPage'] == "1") {
+        Yes </label>
+      <label>
+        <input type="radio" name="publishStaffPage" value="0" id="publishStaffPage_1"<?php
+		  if ($privileges['publishStaffPage'] == "0") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-    No</label>
+        No</label>
     </p>
     <p>View staff pages:
       <label>
@@ -201,23 +214,6 @@ Yes
 	  ?> />
   No</label>
     </p>
-    <p>Publish staff page:
-      <label>
-      <input type="radio" name="publishStaffPage" value="1" id="publishStaffPage_0"<?php
-		  if ($privileges['publishStaffPage'] == "1") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-Yes
-</label>
-<label>
-  <input type="radio" name="publishStaffPage" value="0" id="publishStaffPage_1"<?php
-		  if ($privileges['publishStaffPage'] == "0") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-  No</label>
-    </p>
     <p>Add staff page comments (if page allows):
       <label>
       <input type="radio" name="addStaffComments" value="1" id="addStaffComments_0"<?php
@@ -234,7 +230,7 @@ Yes
 		  }
 	  ?> />
   No</label>
-    </p>
+  </p>
     <p>Delete staff page comments:
       <label>
       <input type="radio" name="deleteStaffComments" value="1" id="deleteStaffComments_0"<?php
@@ -257,22 +253,21 @@ Yes
 <div class="catDivider alignLeft">Public Website</div>
 <div class="stepContent">
   <blockquote>
-    <p>Pages require approval:
+    <p>Users can publish pages:
       <label>
-      <input type="radio" name="autoPublishPage" value="0" id="autoPublishPage_0"<?php
-		  if ($privileges['autoPublishPage'] == "0") {
+        <input type="radio" name="publishPage" value="1" id="publishPage_0"<?php
+		  if ($privileges['publishPage'] == "1") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-Yes
-</label>
-<label>
-  <input type="radio" name="autoPublishPage" value="1" id="autoPublishPage_1"<?php
-		  if ($privileges['autoPublishPage'] == "1") {
+        Yes </label>
+      <label>
+        <input type="radio" name="publishPage" value="0" id="publishPage_1"<?php
+		  if ($privileges['publishPage'] == "0") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-  No</label>
+        No</label>
     </p>
     <p>Create page:
       <label>
@@ -325,23 +320,6 @@ Yes
 	  ?> />
     No</label>
     </p>
-    <p>Publish page:
-      <label>
-      <input type="radio" name="publishPage" value="1" id="publishPage_0"<?php
-		  if ($privileges['publishPage'] == "1") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-      Yes
-  </label>
-  <label>
-    <input type="radio" name="publishPage" value="0" id="publishPage_1"<?php
-		  if ($privileges['publishPage'] == "0") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-    No</label>
-    </p>
     <p>Delete page comments:
       <label>
       <input type="radio" name="deleteComments" value="1" id="deleteComments_0"<?php
@@ -358,7 +336,7 @@ Yes
 		  }
 	  ?> />
     No</label>
-  </p>
+</p>
     <p>Manage site settings:
       <label>
       <input type="radio" name="siteSettings" value="1" id="siteSettings_0"<?php
@@ -381,39 +359,38 @@ Yes
 <div class="catDivider alignLeft">Sidebar</div>
 <div class="stepContent">
   <blockquote>
-    <p>Sidebar boxes require approval:
+    <p>Users can publish boxes:
       <label>
-      <input type="radio" name="autoPublishSideBar" value="0" id="autoPublishSideBar_0"<?php
-		  if ($privileges['autoPublishSideBar'] == "0") {
+        <input type="radio" name="publishSideBar" value="1" id="publishSideBar_0"<?php
+		  if ($privileges['publishSideBar'] == "1") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-Yes
-</label>
-<label>
-  <input type="radio" name="autoPublishSideBar" value="1" id="autoPublishSideBar_1"<?php
-		  if ($privileges['autoPublishSideBar'] == "1") {
+        Yes </label>
+      <label>
+        <input type="radio" name="publishSideBar" value="0" id="publishSideBar_1"<?php
+		  if ($privileges['publishSideBar'] == "0") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-  No</label>
+        No</label>
     </p>
     <p>Create box:
       <label>
-      <input type="radio" name="createSideBar" value="1" id="createSideBar_0"<?php
+        <input type="radio" name="createSideBar" value="1" id="createSideBar_0"<?php
 		  if ($privileges['createSideBar'] == "1") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-      Yes
-  </label>
-  <label>
-    <input type="radio" name="createSideBar" value="0" id="createSideBar_1"<?php
+        Yes
+      </label>
+      <label>
+        <input type="radio" name="createSideBar" value="0" id="createSideBar_1"<?php
 		  if ($privileges['createSideBar'] == "0") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-    No</label>
+        No</label>
     </p>
     <p>Edit box:
       <label>
@@ -449,23 +426,6 @@ Yes
 	  ?> />
     No</label>
     </p>
-    <p>Publish box:
-      <label>
-      <input type="radio" name="publishSideBar" value="1" id="publishSideBar_0"<?php
-		  if ($privileges['publishSideBar'] == "1") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-      Yes
-  </label>
-  <label>
-    <input type="radio" name="publishSideBar" value="0" id="publishSideBar_1"<?php
-		  if ($privileges['publishSideBar'] == "0") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-    No</label>
-    </p>
     <p>Manage sidebar settings:
       <label>
       <input type="radio" name="sideBarSettings" value="1" id="sideBarSettings_0"<?php
@@ -488,22 +448,21 @@ Yes
 <div class="catDivider alignLeft">External Content</div>
 <div class="stepContent">
   <blockquote>
-    <p>External content requires approval:
+    <p>Users can publish content:
       <label>
-      <input type="radio" name="autoPublishExternal" value="0" id="autoPublishExternal_0"<?php
-		  if ($privileges['autoPublishExternal'] == "0") {
+        <input type="radio" name="publishExternal" value="1" id="publishExternal_0"<?php
+		  if ($privileges['publishExternal'] == "1") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-Yes
-</label>
-<label>
-  <input type="radio" name="autoPublishExternal" value="1" id="autoPublishExternal_1"<?php
-		  if ($privileges['autoPublishExternal'] == "1") {
+        Yes </label>
+      <label>
+        <input type="radio" name="publishExternal" value="0" id="publishExternal_1"<?php
+		  if ($privileges['publishExternal'] == "0") {
 			  echo " checked=\"checked\"";
 		  }
 	  ?> />
-  No</label>
+        No</label>
     </p>
     <p>Create content:
       <label>
@@ -556,23 +515,6 @@ Yes
 	  ?> />
     No</label>
     </p>
-    <p>Publish content:
-      <label>
-      <input type="radio" name="publishExternal" value="1" id="publishExternal_0"<?php
-		  if ($privileges['publishExternal'] == "1") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-      Yes
-  </label>
-  <label>
-    <input type="radio" name="publishExternal" value="0" id="publishExternal_1"<?php
-		  if ($privileges['publishExternal'] == "0") {
-			  echo " checked=\"checked\"";
-		  }
-	  ?> />
-    No</label>
-    </p>
   </blockquote>
 </div>
 <div class="catDivider alignLeft">Statistics</div>
@@ -596,6 +538,25 @@ Yes
     No</label>
     </p>
   </blockquote>
+</div>
+<div class="catDivider alignLeft">Automated Emails</div>
+<div class="stepContent">
+<blockquote>Administrators recieve system email notifications:
+  <label>
+    <input type="radio" name="autoEmail" value="1" id="autoEmail_0"<?php
+		  if ($privileges['autoEmail'] == "1") {
+			  echo " checked=\"checked\"";
+		  }
+	  ?> />
+    Yes </label>
+  <label>
+    <input type="radio" name="autoEmail" value="0" id="autoEmail_1"<?php
+		  if ($privileges['autoEmail'] == "0") {
+			  echo " checked=\"checked\"";
+		  }
+	  ?> />
+    No</label>
+</blockquote>
 </div>
 <div class="catDivider alignLeft">Submit</div>
 <div class="stepContent">

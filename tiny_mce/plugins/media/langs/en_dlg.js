@@ -1,3 +1,7 @@
+/**********************************************************************
+Developer enhancements are denoted by a //Developer Enhancement comment
+**********************************************************************/
+
 tinyMCE.addI18n('en.media_dlg',{
 title:"Insert / edit embedded media",
 general:"General",
@@ -99,5 +103,8 @@ flv_autostart:"Auto start",
 flv_loop:"Loop",
 flv_showscalemodes:"Show scale modes",
 flv_smoothvideo:"Smooth video",
-flv_jscallback:"JS Callback"
+flv_jscallback:"JS Callback",
+
+//Developer Enchancement, Allows the use of JWPlayer
+allowfullscreen:"Allow Full Screen"
 });

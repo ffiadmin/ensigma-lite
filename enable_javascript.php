@@ -11,8 +11,10 @@
 <?php
 	if (!isset ($_SESSION['MM_UserGroup'])) {
 		topPage("public");
+		echo "<h4><a href=\"index.php\">Home</a> &#9658 Enable Javascript</h4>";
 	} else {
 		topPage();
+		echo "<h4><a href=\"admin/index.php\">Home</a> &#9658 Enable Javascript</h4>";
 	}
 ?>
 <h2>Enable Javascript</h2>

@@ -10,8 +10,10 @@
 <?php
 	if (!isset ($_SESSION['MM_UserGroup'])) {
 		topPage("public");
+		echo "<h4><a href=\"index.php\">Home</a> &#9658 System Check</h4>";
 	} else {
 		topPage();
+		echo "<h4><a href=\"index.php\">Home</a> &#9658 System Check</h4>";
 	}
 ?>     
 <h2>System Check</h2>

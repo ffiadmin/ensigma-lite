@@ -13,6 +13,9 @@
 		}
 	}
 	
+//Check to see if the user name exists
+	validateName("users", "userName");
+	
 //Process the form
 	if (isset($_POST['submit']) && !empty($_POST['role']) && !empty($_POST['firstName']) && !empty($_POST['lastName']) && !empty($_POST['userName']) && !empty($_POST['primaryEmail'])) {
 		$role = $_POST['role'];
@@ -63,7 +66,12 @@
 			$idCheck = mysql_fetch_array($idCheckGrabber);
 			
 			if (mysql_num_rows($adminCheck) == "1" && $role != "Administrator" && $idCheck['id'] == $id) {
-				header("Location: index.php?message=noAdmin");
+				if (isset($_GET['id'])) {
+					header("Location: manage_user.php?id=" . $_GET['id'] . "&error=noAdmin");
+				} else {
+					header("Location: manage_user.php?error=noAdmin");
+				}
+				
 				exit;
 			}
 						
@@ -95,34 +103,6 @@
 		}
 	}
 ?>
-<?php
-	if (isset($_GET['checkName'])) {
-		$inputNameSpaces = $_GET['checkName'];
-		$inputNameNoSpaces = str_replace(" ", "", $_GET['checkName']);
-		$checkName = mysql_query("SELECT * FROM `users` WHERE `userName` = '{$inputNameSpaces}'", $connDBA);
-		
-		if($name = mysql_fetch_array($checkName)) {	
-			if (isset($_GET['id'])) {
-				$userID = $_GET['id'];
-				$currentUserGrabber = mysql_query("SELECT * FROM `users` WHERE `id` = '{$userID}'", $connDBA);
-				$currentUser = mysql_fetch_array($currentUserGrabber);
-				
-				if (strtolower($currentUser['userName']) != strtolower(mysql_real_escape_string($inputNameSpaces))) {
-					echo "<div class=\"error\" id=\"errorWindow\">This user name is already taken</div>";
-				} else {
-					echo "<p>&nbsp;</p>";
-				}
-			} else {
-				echo "<div class=\"error\" id=\"errorWindow\">This user name is already taken</div>";
-			}
-		} else {
-			echo "<p>&nbsp;</p>";
-		}
-		
-		echo "<script type=\"text/javascript\">validateName()</script>";
-		die();
-	}
-?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -138,7 +118,6 @@
 ?>
 <?php headers(); ?>
 <?php validate(); ?>
-<?php liveError(); ?>
 <script src="../../javascripts/common/goToURL.js" type="text/javascript"></script>
 <script src="../../javascripts/common/popupConfirm.js" type="text/javascript"></script>
 </head>
@@ -147,7 +126,16 @@
       
 <h2><?php echo $title ?></h2>
 <p><?php if (isset($id)) {echo "Modify " . $user['firstName'] . " " . $user['lastName'] . "'s information";} else {echo "Create a new user";} ?> by <?php if (isset($id)) {echo "modifying";} else {echo "filling in";} ?> the information below.</p>
-<?php errorWindow("database", "This user name is already taken", "error", "identical", "true"); ?>
+<?php
+//Display message updates
+	if (isset($_GET['error']) && $_GET['error'] == "identical") {
+		errorMessage("This user name is already taken.");
+	}
+	
+	if (isset($_GET['error']) && $_GET['error'] == "noAdmin") {
+		errorMessage("You cannot change your role, otherwise, this site would be left with out an administrator.");
+	}
+?>
 <form name="users" method="post" action="manage_user.php<?php if (isset($id)) {echo"?id=" . $id;} ?>" id="validate" onsubmit="return errorsOnSubmit(this);">
 <?php
 //Echo the user id, if the user is being edited
@@ -196,7 +184,7 @@
   <p>User Name<?php if (isset($user)) {if ($user['userName'] != $_SESSION['MM_Username']) {echo "<span class=\"require\">*</span>";}} else {echo "<span class=\"require\">*</span>";} ?>:</p>
   <blockquote>
     <p>
-      <input name="userName" type="text" id="userName" size="50" autocomplete="off" class="validate[required,length[6,30],custom[noSpecialCharactersSpaces]]<?php if (isset($user)) {if ($user['userName'] == $_SESSION['MM_Username']) {echo " disabled";}} ?>" onblur="checkName(this.name, 'manage_user'<?php if (isset ($user)) {echo ", 'id=" . $user['id'] . "'";}?>)"<?php if (isset($user)) {if ($user['userName'] == $_SESSION['MM_Username']) {echo " readonly=\"readonly\"";}} if (isset($id)) {echo " value=\"" . $user['userName'] . "\"";} ?> />
+      <input name="userName" type="text" id="userName" size="50" autocomplete="off" class="validate[required,length[6,30],custom[noSpecialCharactersSpaces],ajax[ajaxUser]]<?php if (isset($user)) {if ($user['userName'] == $_SESSION['MM_Username']) {echo " disabled";}} ?>"<?php if (isset($user)) {if ($user['userName'] == $_SESSION['MM_Username']) {echo " readonly=\"readonly\"";}} if (isset($id)) {echo " value=\"" . $user['userName'] . "\"";} ?> />
     </p>
   </blockquote>
   <a name="password"></a>

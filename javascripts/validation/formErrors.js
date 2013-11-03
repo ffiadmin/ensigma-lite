@@ -11,7 +11,7 @@ open source, freeware, nor commercial/closed source.
 //Script to validate all form field types, and tie serveral validation technologies together
 
 function errorsOnSubmit(form, upload, forced, extension) {	
-	var jqueryValidate = $('#validate').validationEngine({returnIsValid:true});
+	var jqueryValidate = $('#' + form.id).validationEngine({returnIsValid:true});
 		
 	if (jqueryValidate == true) {
 		if (upload == false || !upload) {

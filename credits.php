@@ -8,6 +8,13 @@
 
 <body<?php bodyClass(); ?>>
 <?php topPage(); ?>
+<?php
+	if (!isset ($_SESSION['MM_UserGroup'])) {
+		echo "<h4><a href=\"index.php\">Home</a> &#9658 Credits</h4>";
+	} else {
+		echo "<h4><a href=\"admin/index.php\">Home</a> &#9658 Credits</h4>";
+	}
+?>
 <h2>Credits</h2>
 <p>Apex Development thanks all of the third party sources and developers which made this project possible.
 <p>&nbsp;</p>

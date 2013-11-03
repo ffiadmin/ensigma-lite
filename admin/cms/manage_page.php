@@ -1,198 +1,19 @@
-<?php require_once('../../Connections/connDBA.php'); ?>
 <?php
-	if (!isset ($_GET['id'])) {
-		if (privileges("createPage") == "true") {
-			loginCheck("User,Administrator");
-		} else {
-			loginCheck("Administrator");
-		}
-	} else {
-		if (isset($_GET['content'])) {
-			if (privileges("editPage") == "true" && privileges("publishPage") == "true") {
-				loginCheck("User,Administrator");
-			} else {
-				loginCheck("Administrator");
-			}
-		} else {
-			if (privileges("editPage") == "true") {
-				loginCheck("User,Administrator");
-			} else {
-				loginCheck("Administrator");
-			}
-		}
-	}
-?>
-<?php
-//Check to see if the page is being edited
-	if (isset ($_GET['id'])) {
-		$page = $_GET['id'];
-		$pageGrabber = mysql_query("SELECT * FROM pages WHERE `id` = '{$page}'", $connDBA);
-		
-		if ($pageCheck = mysql_fetch_array($pageGrabber)) {
-			$page = $pageCheck;
-			
-			if (privileges("publishPage") != "true" && $pageCheck['published'] == "0" && $pageCheck['message'] != "1") {
-				header ("Location: index.php");
-				exit;
-			}
-			
-			if (isset($_GET['content']) && $pageCheck['published'] == "1") {
-				if ($_GET['content'] == "1") {
-					if (!empty($pageCheck['content1'])) {
-						$contentEditor = "content1";
-						$commentsEditor = "comments1";
-						$contentDisplay = $pageCheck['content1'];
-					} else {
-						header ("Location: index.php");
-						exit;
-					}
-				} elseif ($_GET['content'] == "2") {
-					if (!empty($pageCheck['content2'])) {
-						$contentEditor = "content2";
-						$commentsEditor = "comments2";
-						$contentDisplay = $pageCheck['content2'];
-					} else {
-						header ("Location: index.php");
-						exit;
-					}
-				} else {
-					header ("Location: index.php");
-					exit;
-				}
-			} elseif (isset($_GET['content']) && $pageCheck['published'] == "2") {
-				header("Location: index.php");
-				exit;
-			} elseif (isset($_GET['content']) && $_GET['content'] == "2" && $pageCheck['published'] == "0") {
-				header("Location: index.php");
-				exit;
-			} else {
-				if ($pageCheck['display'] == "1") {
-					$contentEditor = "content1";
-					$commentsEditor = "comments1";
-					$contentDisplay = $pageCheck['content1'];
-				} else {
-					$contentEditor = "content2";
-					$commentsEditor = "comments2";
-					$contentDisplay = $pageCheck['content2'];
-				}
-			}
-		} else {
-			header ("Location: index.php");
-			exit;
-		}
-	}
+//Header functions
+	require_once('../../Connections/connDBA.php');
+
+//Check access to this page
+	$page = access("pages", "Page", "index.php");
 	
 //Process the form
-	if (isset($_POST['submit']) && !empty ($_POST['title']) && !empty($_POST['content'])) {	
-		if (!isset ($page)) {
-			$title = mysql_real_escape_string($_POST['title']);
-			$content = mysql_real_escape_string($_POST['content']);
-			$comments = $_POST['comments'];
-			
-			if (privileges("publishPage") == "true") {
-				$published = "2";
-			} else {
-				$published = "0";
-			}
-			
-			$positionGrabber = mysql_query ("SELECT * FROM pages ORDER BY position DESC", $connDBA);
-			$positionArray = mysql_fetch_array($positionGrabber);
-			$position = $positionArray{'position'}+1;
-			
-			$newPageQuery = "INSERT INTO pages (
-									`id`, `title`, `position`, `visible`, `published`, `message`, `display`, `content1`, `content2`, `comments1`, `comments2`, `name`, `date`, `comment`
-								) VALUES (
-									NULL, '{$title}', '{$position}', 'on', '{$published}', '', '1', '{$content}', '', '{$comments}', '', '', '', ''
-								)";
-			
-			mysql_query($newPageQuery, $connDBA);
-			header ("Location: index.php?added=page");
-			exit;
-		} else {
-			$page = $_GET['id'];
-			$title = mysql_real_escape_string($_POST['title']);
-			$content = mysql_real_escape_string($_POST['content']);
-			$comments = $_POST['comments'];
-			
-			$pageDataGrabber = mysql_query ("SELECT * FROM pages WHERE `id` = '{$page}' LIMIT 1", $connDBA);
-			$pageData = mysql_fetch_array($pageDataGrabber);
-			
-			if ($pageData['display'] == "1") {
-				$contentEditor = "content1";
-				$commentsEditor = "comments1";
-			} else {
-				$contentEditor = "content2";
-				$commentsEditor = "comments2";
-			}
-			
-			if (stripslashes($pageData['title']) === $_POST['title'] && stripslashes($pageData[$contentEditor]) === $_POST['content'] && stripslashes($pageData[$commentsEditor]) === stripslashes($comments)) {
-			//Redirect back to the main page, no changes were made
-				header("Location: index.php");
-				exit;
-			} elseif (stripslashes($pageData['title']) !== $_POST['title'] && stripslashes($pageData[$contentEditor]) === $_POST['content'] && stripslashes($pageData[$commentsEditor]) === stripslashes($comments)) {
-				$editPageQuery = "UPDATE pages SET title = '{$title}' WHERE `id` = '{$page}'";
-			} else {
-				if (isset($_GET['content'])) {	
-					if ($pageData['published'] != "0") {
-						if ($pageData['display'] == "1") {			
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
-						} else {
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
-						}
-					} else {
-						$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', message = '', {$contentEditor} = '{$content}', {$commentsEditor} = '{$comments}' WHERE `id` = '{$page}'";
-					}
-				} else {
-					if ($pageData['published'] == "2") {
-						if ($pageData['display'] == "1") {
-							if (privileges("publishPage") == "true") {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
-							} else {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
-							}
-						} else {
-							if (privileges("publishPage") == "true") {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-							} else {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1',  message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-							}
-						}
-					} elseif ($pageData['published'] == "1") {
-						if ($pageData['display'] == "1") {
-							if (privileges("publishPage") == "true") {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-							} else {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-							}
-						} else {
-							if (privileges("publishPage") == "true") {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '2', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
-							} else {
-								$editPageQuery = "UPDATE pages SET title = '{$title}', published = '1', message = '', content2 = '{$content}', comments2 = '{$comments}' WHERE `id` = '{$page}'";
-							}
-						}
-					} else {
-						if (privileges("publishPage") == "true") {
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '2', display = '1', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-						} else {
-							$editPageQuery = "UPDATE pages SET title = '{$title}', published = '0', message = '', content1 = '{$content}', comments1 = '{$comments}' WHERE `id` = '{$page}'";
-						}
-					}
-				}
-			}
-			
-			mysql_query($editPageQuery, $connDBA);
-			header ("Location: index.php?updated=page");
-			exit;
-		}
-	} 
+	process("pages", "Page", "index.php", "page");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <?php 
 	if (isset ($page)) {
-		$title = "Edit the " . stripslashes(htmlentities($page['title'])) . " Page";
+		$title = "Edit the " . $page['title'] . " Page";
 	} else {
 		$title =  "Create a New Page";
 	}
@@ -213,16 +34,20 @@
     <h2>
       <?php if (isset ($page)) {echo "Edit the \"" . $page['title'] . "\" Page";} else {echo "Create New Page";} ?>
     </h2>
-<p>Use this page to <?php if (isset ($page)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($page['title'])) . "</strong>\"";} else {echo "create a new page";} ?>.</p>
+<p>Use this page to <?php if (isset ($page)) {echo "edit the content of <strong>" . $page['title'] . "</strong>";} else {echo "create a new page";} ?>.</p>
 	<?php
 	//Let users know an update is pending if one is pending
 		if (isset ($page) && !isset($_GET['content'])) {
-			if ($page['published'] == "1" && privileges("publishPage") != "true") {
-				alert("An more recent version of this page is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version.");
-			} elseif ($page['published'] == "1" && privileges("publishPage") == "true") {
-				alert("An more recent version of this page is awaiting approval. You are currently editing the older version. Any changes made to this verison will be applied to the pending version. Please <a href=\"index.php\" onclick=\"MM_openBrWindow('approve.php?id=" . $page['id'] . "','','status=yes,scrollbars=yes,resizable=yes,width=640,height=480')\">approve the newer version</a> if you wish to see the results.");
+			if (($page['published'] == "1" || $page['published'] == "0") && privileges("publishPage") != "true" && empty($page['message'])) {
+				alert("<p>This page is awaiting approval.</p>");
+			} elseif (($page['published'] == "1" || $page['published'] == "0") && privileges("publishPage") == "true" && empty($page['message'])) {
+				alert("<p>This page is awaiting approval. You may <a href=\"index.php\" onclick=\"MM_openBrWindow('approve.php?id=" . $_GET['id'] . "','','status=yes,scrollbars=yes,resizable=yes,fullscreen=yes')\">approve this version</a> if you do not have any changes to make. Changes made to this version will be published.</p>");
 			} else {
 				echo "<p>&nbsp;</p>";
+			}
+			
+			if (!empty($page['message'])) {
+				alert($page['message']);
 			}
 		} else {
 			echo "<p>&nbsp;</p>";
@@ -237,7 +62,7 @@
           <p>
             <input name="title" type="text" id="title" size="50" autocomplete="off" class="validate[required]"<?php
             	if (isset ($page)) {
-					echo " value=\"" . stripslashes(htmlentities($page['title'])) . "\"";
+					echo " value=\"" . htmlentities($page['title']) . "\"";
 				}
 			?> />
           </p>
@@ -247,7 +72,7 @@
         <p>
             <textarea name="content" id="content1" cols="45" rows="5" style="width:640px; height:320px;" class="validate[required]" /><?php 
 				if (isset ($page)) {
-					echo stripslashes($contentDisplay);
+					echo stripslashes($page['content']);
 				}
 			?></textarea>
           </p>
@@ -257,44 +82,83 @@
       <div class="catDivider two">Settings</div>
       <div class="stepContent">
       	<blockquote>
+        	<p>Parent Page:</p>
+            <blockquote>
+              <select name="parentPage" id="parentPage">
+              <option value="0"<?php if (isset ($page) && $page['parentPage'] == "0") { echo " selected=\"selected\""; } ?>>Top Level</option>
+              <?php
+			  //Find the current level of a page
+				  function level($id) {
+					  if (exist("pages", "id", $id)) {
+						  $nextPage = query("SELECT * FROM `pages` WHERE `id` = '{$id}'");
+						  return  "&nbsp;&nbsp;&nbsp;" . level($nextPage['parentPage']);
+					  }
+				  }
+				  
+			  //Check it see if the current page is a child of the parent
+			  	function isChild($input) {
+					if (exist("pages", "id", $input)) {						
+						$childCheck = query("SELECT * FROM `pages` WHERE `id` = '{$input}'");
+						
+						if ($childCheck['id'] == $_GET['id']) {
+							return true;
+						} else {
+							return isChild($childCheck['parentPage']);
+						}
+					}
+				}
+				  
+			  //Recursively loop through the pages
+				  function pagesDirectory($level) {
+					  if ($level == "0") {
+						  $pagesGrabber = query("SELECT * FROM `pages` WHERE `parentPage` = '{$level}' ORDER BY `position` ASC", "raw");
+					  } else {
+						  $pagesGrabber = query("SELECT * FROM `pages` WHERE `parentPage` = '{$level}' ORDER BY `subPosition` ASC", "raw");
+					  }
+					  
+					  while ($pages = mysql_fetch_array($pagesGrabber)) {
+						  if (isset($_GET['id'])) {
+							 $parentPage = query("SELECT * FROM `pages` WHERE `id` = '{$_GET['id']}'");
+						  }
+						  
+						  $title = unserialize($pages['content' . $pages['display']]);
+						   
+						  echo "<option value=\"" . $pages['id'] . "\"";
+						  
+						  if (isset($_GET['id']) && $parentPage['parentPage'] == $pages['id']) {
+							 echo " selected=\"selected\"";
+						  }
+						  
+						  if (isset($_GET['id']) && (isChild($pages['parentPage']) || $pages['id'] == $_GET['id'])) {
+							 echo " disabled=\"disabled\"";
+						  }
+						  
+						  echo ">" . level($pages['parentPage']) . $title['title'] . "</option>";
+						  
+						  if (exist("pages", "parentPage", $pages['id'])) {
+							  pagesDirectory($pages['id']);
+						  }
+					  }
+				  }
+				  
+				  pagesDirectory('0');
+			  ?>
+              </select>
+            </blockquote>
         	<p>Allow Comments:</p>
             <blockquote>
-            	<p>
+           	  <p>
                 	<label><input type="radio" name="comments" id="comments_1" class="validate[required]" value="1"<?php 
 						if (isset ($page)) {
-							if (isset($_GET['content'])) {
-								if ($page[$commentsEditor] == "1") {
-									echo " checked=\"checked\"";
-								}
-							} else {
-								if ($page['display'] == "1") {
-									if ($page['comments1'] == "1") {
-										echo " checked=\"checked\"";
-									}
-								} else {
-									if ($page['comments2'] == "1") {
-										echo " checked=\"checked\"";
-									}
-								}
+							if ($page['comments'] == "1") {
+								echo " checked=\"checked\"";
 							}
 						}
 					?> />Yes</label>
                     <label><input type="radio" name="comments" id="comments_0" class="validate[required]" value="0"<?php 
 						if (isset ($page)) {
-							if (isset($_GET['content'])) {
-								if ($page[$commentsEditor] == "0") {
-									echo " checked=\"checked\"";
-								}
-							} else {
-								if ($page['display'] == "1") {
-									if ($page['comments1'] == "0") {
-										echo " checked=\"checked\"";
-									}
-								} else {
-									if ($page['comments2'] == "0") {
-										echo " checked=\"checked\"";
-									}
-								}
+							if ($page['comments'] == "0") {
+								echo " checked=\"checked\"";
 							}
 						} else {
 							echo " checked=\"checked\"";

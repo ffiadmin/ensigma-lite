@@ -1,3 +1,7 @@
+/**********************************************************************
+Developer enhancements are denoted by a //Developer Enhancement comment
+**********************************************************************/
+
 tinyMCEPopup.requireLangPack();
 
 var oldWidth, oldHeight, ed, url;
@@ -71,6 +75,8 @@ function init() {
 				setBool(pl, 'flash', 'loop');
 				setBool(pl, 'flash', 'menu');
 				setBool(pl, 'flash', 'swliveconnect');
+				//Developer Enchancement, Allows the use of JWPlayer
+				setBool(pl, 'flash', 'allowfullscreen');
 				setStr(pl, 'flash', 'quality');
 				setStr(pl, 'flash', 'scale');
 				setStr(pl, 'flash', 'salign');
@@ -303,7 +309,23 @@ function getType(v) {
 	var fo, i, c, el, x, f = document.forms[0];
 
 	fo = ed.getParam("media_types", "flash=swf;flv=flv;shockwave=dcr;qt=mov,qt,mpg,mp3,mp4,mpeg;shockwave=dcr;wmp=avi,wmv,wm,asf,asx,wmx,wvx;rmp=rm,ra,ram").split(';');
-
+	
+	//Developer Enchancement, Allows the use of JWPlayer
+	if ((v.match(/(.+)(.*)\.flv/) || v.match(/(.+)(.*)\.mp4/)) && (!v.match(/player.swf\?file=(.+)(.*)/))) {
+		f.width.value = '328';
+		f.height.value = '200';
+		f.src.value = 'http://localhost/EnsigmaLite/tiny_mce/plugins/media/player/player.swf?file=' + v;
+		return 'flash';
+	}
+	
+	//Developer Enchancement, Allows the use of JWPlayer Audio
+	if (v.match(/(.+)(.*)\.mp3/) && (!v.match(/player.swf\?file=(.+)(.*)/))) {
+		f.width.value = '328';
+		f.height.value = '24';
+		f.src.value = 'http://localhost/EnsigmaLite/tiny_mce/plugins/media/player/player.swf?file=' + v;
+		return 'flash';
+	}
+	
 	// YouTube
 	if (v.match(/watch\?v=(.+)(.*)/)) {
 		f.width.value = '425';
@@ -317,6 +339,15 @@ function getType(v) {
 		f.width.value = '425';
 		f.height.value = '326';
 		f.src.value = 'http://video.google.com/googleplayer.swf?docId=' + v.substring('http://video.google.com/videoplay?docid='.length) + '&hl=en';
+		return 'flash';
+	}
+	
+	//Vimeo
+	if (v.match(/vimeo.com\/[0-9]/)) {
+		var playerID = v.split('/');
+		f.width.value = '300';
+		f.height.value = '169';
+		f.src.value = 'http://vimeo.com/moogaloop.swf?clip_id=' + playerID[3] + '&show_title=1&show_byline=1&show_portrait=0&color=00ADEF&fullscreen=1&autoplay=0&loop=0';
 		return 'flash';
 	}
 
@@ -334,7 +365,7 @@ function getType(v) {
 
 function switchType(v) {
 	var t = getType(v), d = document, f = d.forms[0];
-
+	
 	if (!t)
 		return;
 
@@ -373,6 +404,8 @@ function serializeParameters() {
 			s += getBool('flash', 'loop', true);
 			s += getBool('flash', 'menu', true);
 			s += getBool('flash', 'swliveconnect', false);
+			//Developer Enchancement, Allows the use of JWPlayer
+			s += getBool('flash', 'allowfullscreen', false);
 			s += getStr('flash', 'quality');
 			s += getStr('flash', 'scale');
 			s += getStr('flash', 'salign');
@@ -625,6 +658,16 @@ function generatePreview(c) {
 		h += '</object>';
 
 	p.innerHTML = "<!-- x --->" + h;
+}
+
+//Developer Enhancement, quickly focus on the source input field
+function focusField(field) {
+	document.getElementById(field).focus();
+}
+
+//Developer Enhancement, quickly blur on the source input field
+function blurField(field) {
+	document.getElementById(field).blur();
 }
 
 tinyMCEPopup.onInit.add(init);
