@@ -68,6 +68,6 @@ function writeEmbed(cls, cb, mt, p) {
 		h += n + '="' + p[n] + '" ';
 
 	h += '></embed></object>';
-	
+
 	document.write(h);
 }

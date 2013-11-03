@@ -177,7 +177,7 @@
 <?php toolTip(); ?>
 <?php topPage(); ?>
     <h2>
-      <?php if (isset ($announcement)) {echo "Edit the \"" . $announcement['title'] . "\" Announcement";} else {echo "Create a New Announcement";} ?>
+      <?php if (isset ($announcement)) {echo "Edit the &quot;" . stripslashes($announcement['title']) . "&quot; Announcement";} else {echo "Create a New Announcement";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($announcement)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($announcement['title'])) . "</strong>\"";} else {echo "create a new announcement";} ?>.</p>
 <?php

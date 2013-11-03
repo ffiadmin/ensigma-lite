@@ -84,7 +84,7 @@
 					"Content-Type:  text/html;\n" . 
 					" name = \"{$fileName}\"\n" . 
 					"Content-Transfer-Encoding: base64\n\n" . 
-					chunk_split(base64_encode($message)) . "\n\n" .    
+					chunk_split(base64_encode("<!--placeholder//-->")) . "\n\n" .    
 					"--{$mimeBoundary}--\n";
 					
 		//Send the email to all administrators

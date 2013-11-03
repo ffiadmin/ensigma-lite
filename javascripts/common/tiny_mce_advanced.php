@@ -13,7 +13,6 @@ tinyMCE.init({
 		skin : "o2k7",
 		skin_variant : "silver",
 		plugins : " safari,pagebreak,style,layer,table,save,advhr,advimage,autosave,advlink,emotions,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,tabfocus,AtD",
-        extended_valid_elements : 'iframe[style|src|frameborder],param[name|value|_value],embed[src|quality|bgcolor|width|height|name|id|align|allowScriptAccess|type|pluginspage],object[classid|codebase|id|name|align|width|height]',
         
         atd_button_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/atdbuttontr.gif",
         atd_rpc_url : "<?php echo $root; ?>tiny_mce/plugins/AtD/server/proxy.php?url=",

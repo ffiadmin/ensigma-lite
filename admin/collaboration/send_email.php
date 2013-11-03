@@ -91,15 +91,15 @@
 						"Content-Type:  text/html;\n" . 
 						" name = \"attachment.html\"\n" . 
 						"Content-Transfer-Encoding: base64\n\n" . 
-						chunk_split(base64_encode($body)) . "\n\n" .    
+						chunk_split(base64_encode("<!--placeholder//-->")) . "\n\n" .    
 						"--{$mimeBoundary}--\n";
 		}
 		
 	//Processor
-		$mailTo = explode(",", $to);
+		$mailTo = explode(",", trim($to, ","));
 		
 		foreach ($mailTo as $to) {
-		 	mail($to, $subject, $message, $header);
+			mail($to, $subject, $message, $header);
 		}
 		
 	//Redirect

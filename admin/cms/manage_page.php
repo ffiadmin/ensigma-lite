@@ -133,7 +133,7 @@
 							 echo " disabled=\"disabled\"";
 						  }
 						  
-						  echo ">" . level($pages['parentPage']) . $title['title'] . "</option>";
+						  echo ">" . level($pages['parentPage']) . stripslashes($title['title']) . "</option>";
 						  
 						  if (exist("pages", "parentPage", $pages['id'])) {
 							  pagesDirectory($pages['id']);

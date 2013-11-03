@@ -17,14 +17,7 @@
 				$statisticsCheck = mysql_query("SELECT * FROM `dailyhits` LIMIT 50");
 				
 				if (mysql_fetch_array($statisticsCheck)) {
-					$firstItemGrabber = mysql_query("SELECT * FROM `dailyhits` ORDER BY `id` ASC LIMIT 1");
-					$firstItemArray = mysql_fetch_array($firstItemGrabber);
-					$firstItem = $firstItemArray['date'];
-					$lastItemGrabber = mysql_query("SELECT * FROM `dailyhits` ORDER BY `id` DESC LIMIT 1");
-					$lastItemArray = mysql_fetch_array($lastItemGrabber);
-					$lastItem = $lastItemArray['date'];
-					
-					$statisticsGrabber = mysql_query("SELECT * FROM `dailyhits` ORDER BY `id` ASC");
+					$statisticsGrabber = mysql_query("SELECT * FROM `dailyhits` ORDER BY `id` DESC LIMIT 50");
 					
 					echo "<graph caption=\"Daily Hits\" subcaption=\"";
 					
@@ -32,10 +25,18 @@
 						echo "Last 50 Days - ";
 					}
 					
-					echo "From " . $firstItem . " to " . $lastItem ."\" xAxisName=\"\" yAxisMinValue=\"0\" yAxisName=\"Hits\" decimalPrecision=\"0\" formatNumberScale=\"0\" showNames=\"0\" showValues=\"0\" showAlternateHGridColor=\"1\" AlternateHGridColor=\"ff5904\" divLineColor=\"ff5904\" divLineAlpha=\"20\" alternateHGridAlpha=\"5\" bgAlpha=\"0\" rotateNames=\"1\">";
+					$values = array();
 					
 					while($statistics = mysql_fetch_array($statisticsGrabber)) {
-						echo "<set name=\"" . $statistics['date'] . "\" value=\"" . $statistics['hits'] . "\" hoverText=\"" . $statistics['date'] . "\"/>";
+						array_push($values, array("name" => $statistics['date'], "value" => $statistics['hits'], "hoverText" => $statistics['date']));
+					}
+					
+					$correctedValues = array_reverse($values);
+					
+					echo "From " . $correctedValues['0']['name'] . " to " . $correctedValues[sizeof($correctedValues) - 1]['name'] ."\" xAxisName=\"\" yAxisMinValue=\"0\" yAxisName=\"Hits\" decimalPrecision=\"0\" formatNumberScale=\"0\" showNames=\"0\" showValues=\"0\" showAlternateHGridColor=\"1\" AlternateHGridColor=\"ff5904\" divLineColor=\"ff5904\" divLineAlpha=\"20\" alternateHGridAlpha=\"5\" bgAlpha=\"0\" rotateNames=\"1\">";
+					
+					foreach($correctedValues as $value) {
+						echo "<set name=\"" . $value['name'] . "\" value=\"" . $value['value'] . "\" hoverText=\"" . $value['hoverText'] . "\"/>";
 					}
 					
 					echo "</graph>";

@@ -4,7 +4,7 @@ ob_start();
 
 /* Begin core functions */
 	//Root address for entire site
-	$root = "http://" . $_SERVER['HTTP_HOST'] . "/temp/EnsigmaLite/";
+	$root = "http://" . $_SERVER['HTTP_HOST'] . "/admin/";
 	$strippedRoot = str_replace("http://" . $_SERVER['HTTP_HOST'], "", $root);
 
 	//Database connection
@@ -350,159 +350,161 @@ ob_start();
 		}
 		
 	//Display back tracking
-		$URL = $_SERVER['PHP_SELF'];
-		$backTrack = "<div style=\"padding-left:12px;\" align=\"left\">";
-		
-		if (strstr($URL, $strippedRoot . "admin/index.php")) {
-			$backTrack .= "Home";
-		}
-		
-		//Collaboration
-		if (strstr($URL, $strippedRoot . "admin/collaboration/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Collaboration";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/collaboration/manage_announcement.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Announcement";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/collaboration/manage_agenda.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Agenda";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/collaboration/manage_files.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage File Share";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/collaboration/manage_poll.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Polling";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/collaboration/manage_forum.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Forum";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/collaboration/send_email.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Send Mass Email";
-		}
-		
-		//Staff Pages
-		if (strstr($URL, $strippedRoot . "admin/pages/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Staff Pages";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/pages/manage_page.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/pages/index.php\">Staff Pages</a> &#9658 Manage Page";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/pages/page.php")) {
-			if (isset($_GET['page']) && !empty($_GET['page'])) {
-				$id = $_GET['page'];
-			} else {
-				$pageData = query("SELECT * FROM `staffpages` WHERE `position` = '1'");
-				$id = $pageData['id'];
+		if ($URL != "public") {
+			$URL = $_SERVER['PHP_SELF'];
+			$backTrack = "<div style=\"padding-left:12px;\" align=\"left\">";
+			
+			if (strstr($URL, $strippedRoot . "admin/index.php")) {
+				$backTrack .= "Home";
 			}
 			
-			$pageNameGrabber = mysql_query("SELECT * FROM `staffpages` WHERE `id` = '{$id}'", $connDBA);
-			$pageNamePrep = mysql_fetch_array($pageNameGrabber);
-			$pageName = unserialize($pageNamePrep['content' . $pageNamePrep['display']]);
-			
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/pages/index.php\">Staff Pages</a> &#9658 " . stripslashes($pageName['title']);
-		}
-		
-		//Users
-		if (strstr($URL, $strippedRoot . "admin/users/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Users";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/users/manage_user.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 Manage User";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/users/privileges.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 User Privileges";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/users/failed.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 Failed Logins";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/users/search.php")) {
-			if (!isset($_GET['keywords'])) {
-				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 Search for Users";
-			} else {
-				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 <a href=\"" . $root . "admin/users/search.php\">Search for Users</a> &#9658 Search Results";
+			//Collaboration
+			if (strstr($URL, $strippedRoot . "admin/collaboration/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Collaboration";
 			}
-		}
-		
-		//CMS
-		//Public Website
-		if (strstr($URL, $strippedRoot . "admin/cms/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Public Website";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/cms/manage_page.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Manage Page";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/cms/site_settings.php")) {
-			if (!isset($_GET['type'])) {
-				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Site Settings";
-			} else {
-				switch($_GET['type']) {
-					case "logo" : 
-						$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Site Logo";
-						break;
-						
-					case "icon" : 
-						$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Browser Icon";
-						break;
-						
-					case "meta" : 
-						$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Site Information";
-						break;
-						
-					case "theme" : 
-						$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Site Theme";
-						break;
-						
-					case "security" : 
-						$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Security";
-						break;
+			
+			if (strstr($URL, $strippedRoot . "admin/collaboration/manage_announcement.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Announcement";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/collaboration/manage_agenda.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Agenda";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/collaboration/manage_files.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage File Share";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/collaboration/manage_poll.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Polling";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/collaboration/manage_forum.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Manage Forum";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/collaboration/send_email.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/collaboration/index.php\">Collaboration</a> &#9658 Send Mass Email";
+			}
+			
+			//Staff Pages
+			if (strstr($URL, $strippedRoot . "admin/pages/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Staff Pages";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/pages/manage_page.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/pages/index.php\">Staff Pages</a> &#9658 Manage Page";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/pages/page.php")) {
+				if (isset($_GET['page']) && !empty($_GET['page'])) {
+					$id = $_GET['page'];
+				} else {
+					$pageData = query("SELECT * FROM `staffpages` WHERE `position` = '1'");
+					$id = $pageData['id'];
+				}
+				
+				$pageNameGrabber = mysql_query("SELECT * FROM `staffpages` WHERE `id` = '{$id}'", $connDBA);
+				$pageNamePrep = mysql_fetch_array($pageNameGrabber);
+				$pageName = unserialize($pageNamePrep['content' . $pageNamePrep['display']]);
+				
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/pages/index.php\">Staff Pages</a> &#9658 " . stripslashes($pageName['title']);
+			}
+			
+			//Users
+			if (strstr($URL, $strippedRoot . "admin/users/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Users";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/users/manage_user.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 Manage User";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/users/privileges.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 User Privileges";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/users/failed.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 Failed Logins";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/users/search.php")) {
+				if (!isset($_GET['keywords'])) {
+					$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 Search for Users";
+				} else {
+					$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/users/index.php\">Users</a> &#9658 <a href=\"" . $root . "admin/users/search.php\">Search for Users</a> &#9658 Search Results";
 				}
 			}
+			
+			//CMS
+			//Public Website
+			if (strstr($URL, $strippedRoot . "admin/cms/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 Public Website";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/cms/manage_page.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Manage Page";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/cms/site_settings.php")) {
+				if (!isset($_GET['type'])) {
+					$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Site Settings";
+				} else {
+					switch($_GET['type']) {
+						case "logo" : 
+							$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Site Logo";
+							break;
+							
+						case "icon" : 
+							$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Browser Icon";
+							break;
+							
+						case "meta" : 
+							$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Site Information";
+							break;
+							
+						case "theme" : 
+							$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Site Theme";
+							break;
+							
+						case "security" : 
+							$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/site_settings.php\">Site Settings</a> &#9658 Security";
+							break;
+					}
+				}
+			}
+			
+			//Sidebar
+			if (strstr($URL, $strippedRoot . "admin/cms/sidebar/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Sidebar";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/cms/sidebar/manage_sidebar.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/sidebar/index.php\">Sidebar</a> &#9658 Manage Box";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/cms/sidebar/sidebar_settings.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/sidebar/index.php\">Sidebar</a> &#9658 Sidebar Settings";
+			}
+			
+			//External Content
+			if (strstr($URL, $strippedRoot . "admin/cms/external/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 External Content";
+			}
+			
+			if (strstr($URL, $strippedRoot . "admin/cms/external/manage_external.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/external/index.php\">External Content</a> &#9658 Manage Tab";
+			}
+			
+			//Statistics
+			if (strstr($URL, $strippedRoot . "admin/statistics/index.php")) {
+				$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Statistics";
+			}
+			
+			$backTrack .= "</div>";
+			
+			echo "<h4>" . $backTrack . "</h4>";
 		}
-		
-		//Sidebar
-		if (strstr($URL, $strippedRoot . "admin/cms/sidebar/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Sidebar";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/cms/sidebar/manage_sidebar.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/sidebar/index.php\">Sidebar</a> &#9658 Manage Box";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/cms/sidebar/sidebar_settings.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/sidebar/index.php\">Sidebar</a> &#9658 Sidebar Settings";
-		}
-		
-		//External Content
-		if (strstr($URL, $strippedRoot . "admin/cms/external/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 External Content";
-		}
-		
-		if (strstr($URL, $strippedRoot . "admin/cms/external/manage_external.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 <a href=\"" . $root . "admin/cms/external/index.php\">External Content</a> &#9658 Manage Tab";
-		}
-		
-		//Statistics
-		if (strstr($URL, $strippedRoot . "admin/statistics/index.php")) {
-			$backTrack .= "<a href=\"" . $root . "admin/index.php\">Home</a> &#9658 <a href=\"" . $root . "admin/cms/index.php\">Public Website</a> &#9658 Statistics";
-		}
-		
-		$backTrack .= "</div>";
-		
-		echo "<h4>" . $backTrack . "</h4>";
 	}
 	
 	//Include all top-page items
@@ -684,7 +686,20 @@ ob_start();
 		$footer= mysql_fetch_array($footerGrabber);
 		
 		echo stripslashes($footer['siteFooter']) . "</div></div></div>";
-		
+		echo "<hr /><p>The Bell News Magazine thanks our host:</p><script type=\"text/javascript\" src=\"http://links.ismywebsite.com?i=3871\"></script>";
+		echo "<script type=\"text/javascript\">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-11478926-14']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>";
 		activity("true");
 	}
 /* End site layout functions */
@@ -1081,9 +1096,9 @@ ob_start();
 		global $connDBA;
 		global $root;
 		
-	   $commentsStrip = preg_replace("/<img[^>]+\>/i", "(image)", $value);
+		$commentsStrip = preg_replace("/<img[^>]+\>/i", "(image)", $value);
 	   
-	   if ($imagesOnly == false) {
+		if ($imagesOnly == false) {
 		   $comments = strip_tags($commentsStrip);
 		   $maxLength = $length;
 		   $countValue = html_entity_decode($comments);
@@ -1092,10 +1107,10 @@ ob_start();
 		   }
 		   
 		   $shortenedValue = substr($countValue, 0, $maxLength - 3) . "...";
-		   return $shortenedValue;
-	   } else {
-		   return $commentsStrip;  
-	   }
+		   return stripslashes($shortenedValue);
+		} else {
+		   return stripslashes($commentsStrip);  
+		}
 	}
 	
 	//A function to check the extension of a file
@@ -2088,7 +2103,6 @@ ob_start();
 				}
 				
 				header ("Location: " . $redirect);
-				die;
 			}
 		}
 	}
@@ -2258,7 +2272,9 @@ ob_start();
 		echo "<style type=\"text/css\">
 		ins {background-color:#0C0;}
 		del {background-color:#903;}
-		</style></head><body class=\"overrideBackground\"><h2>" . "Approve " . ucfirst($itemType) . "</h2><p>&nbsp;</p><div class=\"toolBar\"><a class=\"toolBarItem accept\" href=\"" . $_SERVER['PHP_SELF'] . "?id=" .  $itemData['id'] . "&accepted=true\">Accept Pending Version</a><a class=\"toolBarItem reject\" href=\"javascript:void()\" onclick=\"reject()\">Reject Pending Version</a><div class=\"contentHide\" id=\"reject\"><form name=\"rejectReason\" id=\"validate\" method=\"post\" action=\"" . $_SERVER['REQUEST_URI'] . "\"><p>Why are you rejecting this version?</p><p><textarea name=\"comments\" id=\"comments\" cols=\"45\" rows=\"5\" style=\"width:450px;\" class=\"validate[required]\"></textarea></p><p>";
+		</style></head><body class=\"overrideBackground\">";
+		toolTip();
+		echo "<h2>" . "Approve " . ucfirst($itemType) . "</h2><p>&nbsp;</p><div class=\"toolBar\"><a class=\"toolBarItem accept\" href=\"" . $_SERVER['PHP_SELF'] . "?id=" .  $itemData['id'] . "&accepted=true\">Accept Pending Version</a><a class=\"toolBarItem reject\" href=\"javascript:void()\" onclick=\"reject()\">Reject Pending Version</a><div class=\"contentHide\" id=\"reject\"><form name=\"rejectReason\" id=\"validate\" method=\"post\" action=\"" . $_SERVER['REQUEST_URI'] . "\"><p>Why are you rejecting this version?</p><p><textarea name=\"comments\" id=\"comments\" cols=\"45\" rows=\"5\" style=\"width:450px;\" class=\"validate[required]\"></textarea></p><p>";
 		submit("submit", "Submit");
 		echo "</p></form></div></div><br />";
 		
@@ -2306,7 +2322,7 @@ ob_start();
 			echo "<div class=\"layoutControl\"><div class=\"halfLeft\"><div><p>Pending Approval";
 			
 			if (privileges("edit" . $privilegeType) == "true") {
-				echo "<a class=\"smallEdit\" target=\"_blank\" href=\"" . $editURL . "?id=" . $itemData['id'] . "&content=" . sprintf($itemData['display'] + 1) . "\"></a>";
+				echo " <a class=\"smallEdit\" target=\"_blank\" href=\"" . $editURL . "?id=" . $itemData['id'] . "&content=" . sprintf($itemData['display'] + 1) . "\" onmouseover=\"Tip('Edit version <strong>" . sprintf($itemData['display'] + 1) . "</strong>')\" onmouseout=\"UnTip()\"></a>";
 			}
 			
 			echo "</p>";
@@ -2318,7 +2334,7 @@ ob_start();
 			echo "</div><div><h2>" . prepare($newData['title']) . "</h2>" . prepare($newData['content']) . "</div></div><div class=\"halfRight\"><div><p>Curently Published";
 			
 			if (privileges("edit" . $privilegeType) == "true") {
-				echo "<a class=\"smallEdit\" target=\"_blank\" href=\"" . $editURL . "?id=" . $itemData['id'] . "&content=" . $itemData['display'] . "\"></a><br />";
+				echo " <a class=\"smallEdit\" target=\"_blank\" href=\"" . $editURL . "?id=" . $itemData['id'] . "&content=" . $itemData['display'] . "\" onmouseover=\"Tip('Edit version <strong>" . $itemData['display'] . "</strong>')\" onmouseout=\"UnTip()\"></a><br />";
 			}
 			
 			echo "</p>";
@@ -2329,21 +2345,21 @@ ob_start();
 			
 			echo "</div><div><h2>" . prepare($oldData['title']) . "</h2>" . prepare($oldData['content']) . "</div></div></div>";
 			
-			echo "<hr /><p>Below is the comparison between the pending version and the existing version. Please note that this only a text comparison. The differences regarding images, tables, etc... will not be displayed.</p><hr />" . htmlDiff($oldData['content'], $newData['content']);
+			echo "<div class=\"toolBar noPadding\">Below is the comparison between the pending version and the existing version. Please note that this only a text comparison. The differences regarding images, tables, etc... will not be displayed.</div><br />" . htmlDiff(stripslashes($oldData['content']), stripslashes($newData['content']));
 	//Display the a single column for approving a new page
 		} else {
 			echo "<div>Pending Approval";
 			
 			if (privileges("edit" . $privilegeType) == "true") {
-				echo "<a class=\"smallEdit\" target=\"_blank\" href=\"" . $editURL . "?id=" . $itemData['id'] . "&content=1\"></a>";
+				echo " <a class=\"smallEdit\" target=\"_blank\" href=\"" . $editURL . "?id=" . $itemData['id'] . "&content=1\" onmouseover=\"Tip('Edit version <strong>1</strong>')\" onmouseout=\"UnTip()\"></a>";
 			}
 			
 			echo "<h6>";
 			
 			if ($oldData['comments'] == "1") {
-				echo "Comments: <strong>On</strong><br />";
+				echo "Comments: <strong style=\"color:#00FF00\">On</strong><br />";
 			} else {
-				echo "Comments: <strong>Off</strong><br />";
+				echo "Comments: <strong style=\"color:#FF0000\">Off</strong><br />";
 			}
 			
 			if (exist("users", "id", $oldData['user'])) {
@@ -2448,7 +2464,7 @@ ob_start();
 		
 		//Display the history overview
 		if (!isset($_GET['preview'])) {
-			echo "<h2>" . ucfirst($itemType) . " History</h2><p>Below is a list of versions this " . $itemType .". These versions can be edited and reverted to as needed.</p>";
+			echo "<h2>" . ucfirst($itemType) . " History</h2><p>Below is a list of versions for this " . $itemType .". These versions can be edited and reverted to as needed.</p>";
 			
 		//Admin toolbar
 			if ($itemData["display"] != "1") {

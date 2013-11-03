@@ -177,7 +177,7 @@
 <?php toolTip(); ?>
 <?php topPage(); ?>
     <h2>
-      <?php if (isset ($forum)) {echo "Edit the \"" . $forum['title'] . "\" Forum";} else {echo "Create a New Forum";} ?>
+      <?php if (isset ($forum)) {echo "Edit the &quot;" . stripslashes($forum['title']) . "&quot; Forum";} else {echo "Create a New Forum";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($forum)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($forum['title'])) . "</strong>\"";} else {echo "create a new forum";} ?>.</p>
 <?php

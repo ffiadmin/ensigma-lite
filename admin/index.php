@@ -86,7 +86,7 @@
 			}
 			
 			if (extension($targetFile)) {
-				move_uploaded_file($tempFile, $uploadDir . "/" . $targetFile);
+				move_uploaded_file($tempFile, $uploadDir . "/" . stripslashes($targetFile));
 				
 				header("Location: index.php?message=uploaded");
 				exit;
@@ -142,7 +142,7 @@
 		$id = $_POST['id'];
 		$itemID = $_POST['itemID'];
 		$comment = $_POST['comment_' . $itemID];
-		$date = date();
+		$date = strtotime("now");
 		$oldDataGrabber = mysql_query("SELECT * FROM `collaboration` WHERE `id` = '{$itemID}'", $connDBA);
 		$oldData = mysql_fetch_array($oldDataGrabber);
 		$oldComments = unserialize($oldData['comment']);
@@ -317,7 +317,7 @@
 						
 						echo "<tr";
 						if ($count & 1) {echo " class=\"even\">";} else {echo " class=\"odd\">";}
-							echo "<td>" . $task[$count] . "</td>";
+							echo "<td>" . stripslashes($task[$count]) . "</td>";
 							
 							if ($assignee[$count] != "anyone") {
 								echo "<td>" . $user['firstName'] . " " . $user['lastName'] . "</td>";
@@ -376,7 +376,7 @@
 						$directories = unserialize($item['directories']);
 						
 						while (list($categoryKey, $categoryArray) = each($directories)) {
-							$filesDirectory = opendir("files/" . $categoryKey);
+							$filesDirectory = scandir("files/" . $categoryKey);
 							$count = 1;
 							
 							echo "<br /><table class=\"dataTable\">";
@@ -388,8 +388,10 @@
 									}
 									
 								echo "</tr>";
+								
+							sort($filesDirectory);
 							
-							while ($files = readdir($filesDirectory)) {
+							foreach($filesDirectory as $files) {
 								if ($files !== "." && $files !== "..") {
 									$filesResult = "true";
 									$count++;
@@ -412,10 +414,10 @@
 											}
 										}
 										
-										echo "<td><a href=\"gateway.php/files/" . $categoryKey . "/" . $files . "\" target=\"_blank\">" . $name . "</a></td>";
+										echo "<td><a href=\"gateway.php/files/" . $categoryKey . "/" . $files . "\" target=\"_blank\">" . stripslashes($name) . "</a></td>";
 										
 										if (privileges("deleteFile") == "true") {
-											echo "<td width=\"75\"><a class=\"action smallDelete\" href=\"index.php?action=delete&directory=" . $categoryKey . "&name=" . urlencode($files) . "\" onmouseover=\"Tip('Click to delete &quot;<strong>" . $name . "</strong>&quot;');\" onmouseout=\"UnTip();\" onclick=\"return confirm('This action cannot be undone. Continue?');\"></a></td>";
+											echo "<td width=\"75\"><a class=\"action smallDelete\" href=\"index.php?action=delete&directory=" . $categoryKey . "&name=" . urlencode($files) . "\" onmouseover=\"Tip('Click to delete &quot;<strong>" . addslashes($name) . "</strong>&quot;');\" onmouseout=\"UnTip();\" onclick=\"return confirm('This action cannot be undone. Continue?');\"></a></td>";
 										}
 										
 									echo "</tr>";
@@ -493,7 +495,13 @@
 							$currentValue = $responses[$count]['response'];
 							
 							if (!empty($currentValue)) {
-								$size = $currentValue;
+								$size = 0;
+								
+								foreach(explode(",", $responses[$count]['participant']) as $check) {
+									if (exist("users", "id", $check)) {
+										$size++;
+									}
+								}
 							} else {
 								$size = "0";
 							}

@@ -236,8 +236,8 @@
 			}
 			
 			echo "</select></form></td><td width=\"200\">" . $itemData['type'] . "</td>";
-			echo "<td width=\"200\">" . commentTrim(30, $itemData['title']) . "</td>";
-			echo "<td>" . commentTrim(60, $itemData['content']) . "</td>";
+			echo "<td width=\"200\">" . commentTrim(30, stripslashes($itemData['title'])) . "</td>";
+			echo "<td>" . commentTrim(60, stripslashes($itemData['content'])) . "</td>";
 			echo "<td width=\"50\"><a class=\"action edit\" href=\"manage_";
 			
 			switch ($itemData['type']) {

@@ -1,7 +1,3 @@
-/**********************************************************************
-Developer enhancements are denoted by a //Developer Enhancement comment
-**********************************************************************/
-
 tinyMCE.addI18n('en.media_dlg',{
 title:"Insert / edit embedded media",
 general:"General",
@@ -95,7 +91,6 @@ align_bottom_right:"Bottom right",
 flv_options:"Flash video options",
 flv_scalemode:"Scale mode",
 flv_buffer:"Buffer",
-flv_startimage:"Start image",
 flv_starttime:"Start time",
 flv_defaultvolume:"Default volumne",
 flv_hiddengui:"Hidden GUI",
@@ -104,7 +99,11 @@ flv_loop:"Loop",
 flv_showscalemodes:"Show scale modes",
 flv_smoothvideo:"Smooth video",
 flv_jscallback:"JS Callback",
+html5_video_options:"HTML5 Video Options",
+altsource1:"Alternative source 1",
+altsource2:"Alternative source 2",
+preload:"Preload",
+poster:"Poster",
 
-//Developer Enchancement, Allows the use of JWPlayer
-allowfullscreen:"Allow Full Screen"
+source:"Source"
 });

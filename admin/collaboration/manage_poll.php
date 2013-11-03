@@ -190,7 +190,7 @@
 <?php toolTip(); ?>
 <?php topPage(); ?>
     <h2>
-      <?php if (isset ($poll)) {echo "Edit the \"" . $poll['title'] . "\" Poll";} else {echo "Create a New Poll";} ?>
+      <?php if (isset ($poll)) {echo "Edit the &quot;" . stripslashes($poll['title']) . "&quot; Poll";} else {echo "Create a New Poll";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($poll)) {echo "edit the content of &quot;<strong>" . stripslashes(htmlentities($poll['title'])) . "</strong>&quot;";} else {echo "create a new poll";} ?>.</p>
 <?php

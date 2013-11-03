@@ -433,7 +433,7 @@
 					$access .= " Secs ";
 				}
 				
-				if ($lastActive == "0") {
+				if (time() - $userData['active'] == "0") {
 					$access = "Now";
 				}
 			}

@@ -220,7 +220,7 @@
 <?php toolTip(); ?>
 <?php topPage(); ?>
     <h2>
-      <?php if (isset ($files)) {echo "Edit the \"" . $files['title'] . "\" File Share";} else {echo "Create a New File Share";} ?>
+      <?php if (isset ($files)) {echo "Edit the &quot;" . stripslashes($files['title']) . "&quot; File Share";} else {echo "Create a New File Share";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($files)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($files['title'])) . "</strong>\"";} else {echo "create a new file share";} ?>.</p>
 <?php

@@ -79,7 +79,8 @@
 		} else {
 			$pageCheck = 0;
 		}
-	} elseif(isset ($_GET['page']) && ($_GET['page'] == "" || !is_numeric($_GET['page']))) {
+		
+	} elseif (isset ($_GET['page']) && ($_GET['page'] == "" || !is_numeric($_GET['page']))) {
 		header("Location:index.php");
 		exit;
 	} else {		
@@ -172,12 +173,12 @@
 			} else {
 				mysql_query("UPDATE `pages` SET `name` = '{$names}', `date` = '{$dates}', `comment` = '{$comments}' WHERE `id` = '{$pageID}'", $connDBA);
 			}
-		}
-		
-		if (isset($_GET['page'])) {
-			header("Location: index.php?page=" . $pageID . "&message=added");
-		} else {
-			header("Location: index.php?message=added");
+			
+			if (isset($_GET['page'])) {
+				header("Location: index.php?page=" . $pageID . "&message=added");
+			} else {
+				header("Location: index.php?message=added");
+			}
 		}
 		
 		exit;

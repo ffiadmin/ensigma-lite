@@ -201,7 +201,7 @@
 <?php toolTip(); ?>
 <?php topPage(); ?>
     <h2>
-      <?php if (isset ($agenda)) {echo "Edit the \"" . $agenda['title'] . "\" Agenda";} else {echo "Create a New Agenda";} ?>
+      <?php if (isset ($agenda)) {echo "Edit the &quot;" . stripslashes($agenda['title']) . "&quot; Agenda";} else {echo "Create a New Agenda";} ?>
     </h2>
 <p>Use this page to <?php if (isset ($agenda)) {echo "edit the content of \"<strong>" . stripslashes(htmlentities($agenda['title'])) . "</strong>\"";} else {echo "create a new agenda";} ?>.</p>
 <?php
