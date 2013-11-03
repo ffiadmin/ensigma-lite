@@ -61,7 +61,7 @@
 	}
 	
 //If no page URL variable is defined, then choose the home page
-	if (!isset ($_GET['page']) || $_GET['page'] == "") {
+	if (!isset ($_GET['page'])) {
 	//Grab the page data
 		$pageInfoPrep = mysql_fetch_array(mysql_query("SELECT * FROM pages WHERE position = '1' AND `published` != '0'", $connDBA));
 		$pageInfo = unserialize($pageInfoPrep['content' . $pageInfoPrep['display']]);
@@ -79,6 +79,9 @@
 		} else {
 			$pageCheck = 0;
 		}
+	} elseif(isset ($_GET['page']) && ($_GET['page'] == "" || !is_numeric($_GET['page']))) {
+		header("Location:index.php");
+		exit;
 	} else {		
 	//Grab the page data
 		$getPageID = $_GET['page'];

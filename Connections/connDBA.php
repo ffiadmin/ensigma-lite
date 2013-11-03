@@ -4,7 +4,7 @@ ob_start();
 
 /* Begin core functions */
 	//Root address for entire site
-	$root = "http://" . $_SERVER['HTTP_HOST'] . "/EnsigmaLite/";
+	$root = "http://" . $_SERVER['HTTP_HOST'] . "/temp/EnsigmaLite/";
 	$strippedRoot = str_replace("http://" . $_SERVER['HTTP_HOST'], "", $root);
 
 	//Database connection
